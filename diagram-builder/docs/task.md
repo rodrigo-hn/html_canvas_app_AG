@@ -1,0 +1,30 @@
+# Task Checklist: Angular Diagramming App
+
+- [x] **Project Setup & Configuration**
+  - [x] Initialize Angular 21 project
+  - [x] Configure Tailwind CSS
+  - [x] Set up directory structure (`core`, `canvas`, `stencils`, `components-tailwind`, `exporters`, `models`)
+- [x] **Core Architecture Definition**
+  - [x] Define Diagram Model (Nodes, Edges, Metadata)
+  - [x] Implement DiagramStateService (Signals)
+- [x] **Canvas Implementation**
+  - [x] Implement Canvas Component
+  - [x] Implement Drag & Drop Logic
+  - [x] Implement Grid & Snapping
+  - [x] Implement Selection Logic
+- [x] **Stencils Library (SVG)**
+  - [x] Implement Basic Shapes (Rectangle, Document, Cylinder, etc.)
+  - [x] Implement BPMN Shapes (Pool, Lane, Task, Event, Gateway)
+  - [ ] Implement Edges (Sequence Flow)
+- [x] **Tailwind Components (WebNodes)**
+  - [x] Implement Button, Input, Card, etc.
+  - [x] Ensure they render correctly in Canvas
+- [x] **Export Engine**
+  - [x] Implement HTML Export Service (Functional HTML + Tailwind)
+  - [x] Implement SVG Export Service
+- [ ] **UI & Toolbar**
+  - [ ] Create Toolbar for dragging shapes/components
+  - [ ] Property Editor (optional but good for changing text/colors)
+- [x] **Verification**
+  - [x] Create example diagram (Done via test data)
+  - [x] Verify HTML export fidelity
