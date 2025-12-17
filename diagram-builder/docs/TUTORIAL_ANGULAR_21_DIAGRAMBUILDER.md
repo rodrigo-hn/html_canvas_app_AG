@@ -13,12 +13,13 @@ Este documento explica la aplicación DiagramBuilder como un tutorial avanzado, 
 La aplicación utiliza **100% Standalone Components**, una característica fundamental de Angular moderno que elimina la necesidad de NgModules.
 
 **Ejemplo en `app.ts`:**
+
 ```typescript
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],  // ← Importación directa de dependencias
+  imports: [RouterOutlet], // ← Importación directa de dependencias
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('diagram-builder');
@@ -26,6 +27,7 @@ export class App {
 ```
 
 **¿Qué aprender aquí?**
+
 - `imports: [RouterOutlet]` - Los componentes standalone declaran sus dependencias directamente
 - No hay `@NgModule` en ninguna parte de la aplicación
 - Cada componente es autosuficiente y reutilizable
@@ -37,6 +39,7 @@ export class App {
 Angular 21 introduce **Signals** como mecanismo principal de reactividad, reemplazando RxJS en muchos casos.
 
 **Ejemplo en `diagram.service.ts`:**
+
 ```typescript
 export class DiagramService {
   // Signals privados para estado mutable
@@ -52,11 +55,13 @@ export class DiagramService {
 ```
 
 **Conceptos clave:**
+
 - `signal()` - Crea un valor reactivo que notifica cambios automáticamente
 - `asReadonly()` - Expone el signal de forma inmutable al exterior
 - `update()` - Actualiza el valor basándose en el anterior
 
 **Ejemplo de actualización:**
+
 ```typescript
 addNode(node: DiagramNode) {
   this.nodesSignal.update((nodes) => [...nodes, node]);
@@ -70,11 +75,13 @@ addNode(node: DiagramNode) {
 Los **computed signals** son valores que se recalculan automáticamente cuando sus dependencias cambian.
 
 **Ejemplo en `node-renderer.component.ts`:**
+
 ```typescript
 isSelected = computed(() => this.diagramService.selection().has(this.node.id));
 ```
 
 **¿Qué está pasando?**
+
 - `computed()` crea un signal derivado
 - Automáticamente se suscribe a `this.diagramService.selection()`
 - Cuando la selección cambia, `isSelected` se recalcula
@@ -89,6 +96,7 @@ Angular 21 favorece la función `inject()` sobre el decorador `@Inject` en el co
 **Comparación:**
 
 **❌ Forma antigua:**
+
 ```typescript
 constructor(
   private diagramService: DiagramService,
@@ -97,12 +105,14 @@ constructor(
 ```
 
 **✅ Forma moderna (usada en la app):**
+
 ```typescript
 private diagramService = inject(DiagramService);
 private htmlExportService = inject(HtmlExportService);
 ```
 
 **Ventajas:**
+
 - Más conciso y legible
 - Puede usarse fuera del constructor
 - Permite inyección condicional
@@ -114,6 +124,7 @@ private htmlExportService = inject(HtmlExportService);
 Angular 21 introduce una nueva sintaxis para estructuras de control en templates.
 
 **`@for` - Iteración (canvas.component.ts:30)**
+
 ```typescript
 @for (node of nodes(); track node.id) {
   <app-node-renderer [node]="node"></app-node-renderer>
@@ -121,6 +132,7 @@ Angular 21 introduce una nueva sintaxis para estructuras de control en templates
 ```
 
 **`@switch` - Condicional (web-node-wrapper.component.ts:14)**
+
 ```typescript
 @switch (node.componentType) {
   @case ('button') {
@@ -136,6 +148,7 @@ Angular 21 introduce una nueva sintaxis para estructuras de control en templates
 ```
 
 **Ventajas sobre `*ngFor` y `*ngIf`:**
+
 - Más legible y menos verboso
 - Mejor rendimiento
 - Mejor integración con TypeScript
@@ -148,10 +161,11 @@ Angular 21 introduce una nueva sintaxis para estructuras de control en templates
 Las directivas también son standalone y se importan directamente.
 
 **Ejemplo: `draggable.directive.ts`**
+
 ```typescript
 @Directive({
   selector: '[appDraggable]',
-  standalone: true,  // ← Directiva standalone
+  standalone: true, // ← Directiva standalone
 })
 export class DraggableDirective {
   @Input() dragDisabled = false;
@@ -159,11 +173,14 @@ export class DraggableDirective {
   @Output() dragMove = new EventEmitter<Point>();
 
   @HostListener('mousedown', ['$event'])
-  onMouseDown(event: MouseEvent) { /* ... */ }
+  onMouseDown(event: MouseEvent) {
+    /* ... */
+  }
 }
 ```
 
 **Uso en el componente:**
+
 ```typescript
 <div appDraggable
      [snapToGrid]="true"
@@ -178,9 +195,9 @@ Todos los servicios usan el patrón de inyección singleton a nivel de aplicaci�
 
 ```typescript
 @Injectable({
-  providedIn: 'root',  // ← Disponible en toda la app
+  providedIn: 'root', // ← Disponible en toda la app
 })
-export class DiagramService { }
+export class DiagramService {}
 ```
 
 ---
@@ -259,14 +276,14 @@ export interface DiagramElement {
 // 4. Nodo base (composición de interfaces)
 export interface DiagramNode extends DiagramElement, Point, Size {
   type: NodeType;
-  data: any;           // ← Flexible data bag
+  data: any; // ← Flexible data bag
   rotation?: number;
 }
 
 // 5. Especializaciones
 export interface ShapeNode extends DiagramNode {
   type: 'shape';
-  shapeType: string;   // 'rectangle', 'bpmn-task', etc.
+  shapeType: string; // 'rectangle', 'bpmn-task', etc.
   style?: {
     fill?: string;
     stroke?: string;
@@ -276,7 +293,7 @@ export interface ShapeNode extends DiagramNode {
 
 export interface WebNode extends DiagramNode {
   type: 'web-component';
-  componentType: string;  // 'button', 'card', 'input'
+  componentType: string; // 'button', 'card', 'input'
 }
 
 // 6. Modelo completo del diagrama
@@ -287,6 +304,7 @@ export interface DiagramModel {
 ```
 
 **Conceptos TypeScript importantes:**
+
 - **Type unions**: `NodeType = 'shape' | 'web-component'`
 - **Interface extension**: `extends DiagramElement, Point, Size`
 - **Optional properties**: `rotation?: number`
@@ -314,6 +332,7 @@ export class DiagramService {
 ```
 
 **Patrón de diseño:**
+
 1. **Signals privados** - Solo el servicio puede modificarlos
 2. **ReadonlySignals públicos** - Los componentes solo pueden leer
 3. **Métodos de acción** - Única forma de modificar el estado
@@ -321,15 +340,18 @@ export class DiagramService {
 ### Acciones CRUD
 
 **Agregar nodo:**
+
 ```typescript
 addNode(node: DiagramNode) {
   this.nodesSignal.update((nodes) => [...nodes, node]);
 }
 ```
+
 - `update()` recibe una función que transforma el estado
 - Spread operator `[...nodes, node]` crea nuevo array (inmutabilidad)
 
 **Actualizar nodo:**
+
 ```typescript
 updateNode(id: string, changes: Partial<DiagramNode>) {
   this.nodesSignal.update((nodes) =>
@@ -337,10 +359,12 @@ updateNode(id: string, changes: Partial<DiagramNode>) {
   );
 }
 ```
+
 - `Partial<DiagramNode>` - Solo propiedades a cambiar
 - Object spread `{ ...n, ...changes }` - Merge inmutable
 
 **Gestión de selección:**
+
 ```typescript
 toggleSelection(id: string, multi: boolean) {
   this.selectionSignal.update((sel) => {
@@ -354,6 +378,7 @@ toggleSelection(id: string, multi: boolean) {
   });
 }
 ```
+
 - Soporte multi-selección con `Cmd/Shift`
 - Usa `Set` para búsquedas O(1)
 
@@ -369,29 +394,37 @@ toggleSelection(id: string, multi: boolean) {
   standalone: true,
   imports: [CommonModule, NodeRendererComponent],
   template: `
-    <div class="relative w-full h-full bg-slate-50"
-         (click)="onBackgroundClick()">
-
+    <div class="relative w-full h-full bg-slate-50" (click)="onBackgroundClick()">
       <!-- Grid visual -->
-      <div class="absolute inset-0 pointer-events-none"
-           style="background-image: radial-gradient(#000 1px, transparent 1px);
-                  background-size: 20px 20px;">
-      </div>
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background-image: radial-gradient(#000 1px, transparent 1px);
+                  background-size: 20px 20px;"
+      ></div>
 
       <!-- Renderizado de nodos -->
       @for (node of nodes(); track node.id) {
-        <app-node-renderer [node]="node"></app-node-renderer>
+      <app-node-renderer [node]="node"></app-node-renderer>
       }
+
+      <!-- Renderizado de edges (conexiones) -->
+      <svg class="absolute inset-0 pointer-events-none w-full h-full z-0">
+        @for (edge of edges(); track edge.id) {
+        <app-edge-renderer [edge]="edge"></app-edge-renderer>
+        }
+      </svg>
     </div>
-  `
+  `,
 })
 export class CanvasComponent {
   private diagramService = inject(DiagramService);
-  nodes = this.diagramService.nodes;  // ← ReadonlySignal
+  nodes = this.diagramService.nodes; // ← ReadonlySignal
+  edges = this.diagramService.edges;
 }
 ```
 
 **Características clave:**
+
 - Grid con `radial-gradient` CSS
 - `pointer-events-none` evita interferencia con interacciones
 - `@for` itera sobre el signal reactivamente
@@ -405,24 +438,26 @@ Este componente maneja dos tipos de nodos: **Shapes (SVG)** y **Web Components**
 @Component({
   selector: 'app-node-renderer',
   template: `
-    <div class="absolute select-none"
-         appDraggable
-         [snapToGrid]="true"
-         [startPosition]="{ x: node.x, y: node.y }"
-         (dragMove)="onDragMove($event)"
-         [class.ring-2]="isSelected()"
-         [style.left.px]="node.x"
-         [style.top.px]="node.y">
-
+    <div
+      class="absolute select-none"
+      appDraggable
+      [snapToGrid]="true"
+      [startPosition]="{ x: node.x, y: node.y }"
+      (dragMove)="onDragMove($event)"
+      [class.ring-2]="isSelected()"
+      [style.left.px]="node.x"
+      [style.top.px]="node.y"
+    >
       <!-- SVG Shapes -->
-      <svg *ngIf="node.type === 'shape'"
-           [attr.viewBox]="'0 0 ' + node.width + ' ' + node.height">
+      <svg *ngIf="node.type === 'shape'" [attr.viewBox]="'0 0 ' + node.width + ' ' + node.height">
         <g [innerHTML]="getShapeContent()"></g>
 
         <!-- Texto sobre la figura -->
-        <foreignObject *ngIf="node.data?.text"
-                       [attr.width]="node.width"
-                       [attr.height]="node.height">
+        <foreignObject
+          *ngIf="node.data?.text"
+          [attr.width]="node.width"
+          [attr.height]="node.height"
+        >
           <div class="w-full h-full flex items-center justify-center">
             {{ node.data.text }}
           </div>
@@ -434,18 +469,17 @@ Este componente maneja dos tipos de nodos: **Shapes (SVG)** y **Web Components**
         <app-web-node-wrapper [node]="asWebNode(node)"></app-web-node-wrapper>
       </div>
     </div>
-  `
+  `,
 })
 export class NodeRendererComponent {
   @Input({ required: true }) node!: DiagramNode;
 
-  isSelected = computed(() =>
-    this.diagramService.selection().has(this.node.id)
-  );
+  isSelected = computed(() => this.diagramService.selection().has(this.node.id));
 }
 ```
 
 **Técnicas avanzadas:**
+
 - **Conditional rendering** con `*ngIf` basado en `node.type`
 - **foreignObject** - Permite HTML dentro de SVG
 - **Property binding** dinámico: `[style.left.px]="node.x"`
@@ -499,6 +533,7 @@ export class DraggableDirective {
 ```
 
 **Conceptos clave de Angular:**
+
 - `@HostListener` - Escucha eventos en el elemento host
 - `document:mousemove` - Escucha global (funciona fuera del elemento)
 - `EventEmitter` - Comunicación hijo → padre
@@ -522,14 +557,13 @@ export class StencilService {
 
   getShapeSVG(type: string, width: number, height: number): SafeHtml {
     const generator = this.shapes[type];
-    return this.sanitizer.bypassSecurityTrustHtml(
-      generator(width, height)
-    );
+    return this.sanitizer.bypassSecurityTrustHtml(generator(width, height));
   }
 }
 ```
 
 **Patrón Registry:**
+
 - Mapeo `string → función generadora`
 - Fácil extensión agregando nuevas formas
 - `DomSanitizer` previene XSS attacks
@@ -537,6 +571,7 @@ export class StencilService {
 ### Generadores de Figuras
 
 **Rectángulo básico:**
+
 ```typescript
 rectangle: (w: number, h: number) => {
   return `<rect x="0" y="0"
@@ -545,10 +580,11 @@ rectangle: (w: number, h: number) => {
                fill="white"
                stroke="black"
                stroke-width="2"/>`;
-}
+};
 ```
 
 **Cilindro (forma compleja):**
+
 ```typescript
 cylinder: (w: number, h: number) => {
   const rx = w / 2;
@@ -562,10 +598,11 @@ cylinder: (w: number, h: number) => {
              V ${ry}"
           fill="none" stroke="black"/>
   `;
-}
+};
 ```
 
 **Conceptos SVG:**
+
 - `<path>` con comandos `M` (move), `A` (arc), `V` (vertical line)
 - Cálculo dinámico de geometría basado en dimensiones
 
@@ -578,19 +615,15 @@ cylinder: (w: number, h: number) => {
 ```typescript
 @Component({
   template: `
-    @switch (node.componentType) {
-      @case ('button') {
-        <app-web-button
-          [text]="node.data.text || 'Button'"
-          [variant]="node.data.variant || 'primary'" />
-      }
-      @case ('card') {
-        <app-web-card
-          [title]="node.data.title"
-          [content]="node.data.content" />
-      }
-    }
-  `
+    @switch (node.componentType) { @case ('button') {
+    <app-web-button
+      [text]="node.data.text || 'Button'"
+      [variant]="node.data.variant || 'primary'"
+    />
+    } @case ('card') {
+    <app-web-card [title]="node.data.title" [content]="node.data.content" />
+    } }
+  `,
 })
 export class WebNodeWrapperComponent {
   @Input({ required: true }) node!: WebNode;
@@ -620,6 +653,7 @@ export class WebButtonComponent {
 ```
 
 **Patrón de diseño:**
+
 - Clases dinámicas con Tailwind
 - Type-safe variants con TypeScript unions
 - Composición de strings para flexibilidad
@@ -634,13 +668,15 @@ export class WebButtonComponent {
 @Injectable({ providedIn: 'root' })
 export class HtmlExportService {
   exportHtml(model: DiagramModel): string {
-    const nodesHtml = model.nodes.map(node => {
-      if (node.type === 'shape') {
-        return this.renderShape(node as ShapeNode);
-      } else {
-        return this.renderWebComponent(node as WebNode);
-      }
-    }).join('\n');
+    const nodesHtml = model.nodes
+      .map((node) => {
+        if (node.type === 'shape') {
+          return this.renderShape(node as ShapeNode);
+        } else {
+          return this.renderWebComponent(node as WebNode);
+        }
+      })
+      .join('\n');
 
     return `
 <!DOCTYPE html>
@@ -662,6 +698,7 @@ ${nodesHtml}
 ```
 
 **Renderizado de SVG:**
+
 ```typescript
 private renderShape(node: ShapeNode): string {
   const svgContent = this.getSvgContent(node);
@@ -677,6 +714,7 @@ private renderShape(node: ShapeNode): string {
 ```
 
 **Renderizado de componentes:**
+
 ```typescript
 private renderButton(node: WebNode, style: string): string {
   const cls = `px-4 py-2 rounded bg-blue-500 hover:bg-blue-600`;
@@ -697,11 +735,11 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+bootstrapApplication(App, appConfig).catch((err) => console.error(err));
 ```
 
 **Diferencia con versiones antiguas:**
+
 - No hay `platformBrowserDynamic().bootstrapModule(AppModule)`
 - Bootstrap directo del componente raíz
 - Configuración separada en `appConfig`
@@ -710,23 +748,19 @@ bootstrapApplication(App, appConfig)
 
 ```typescript
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes)],
 };
 ```
 
 **Provider functions:**
+
 - `provideRouter()` - Configuración de rutas
 - `provideBrowserGlobalErrorListeners()` - Manejo de errores
 
 ### 3. Rutas (app.routes.ts)
 
 ```typescript
-export const routes: Routes = [
-  { path: '', component: CanvasComponent }
-];
+export const routes: Routes = [{ path: '', component: CanvasComponent }];
 ```
 
 ### 4. TypeScript Configuration (tsconfig.json)
@@ -746,6 +780,7 @@ export const routes: Routes = [
 ```
 
 **Configuraciones importantes:**
+
 - `strict: true` - Type checking estricto
 - `experimentalDecorators` - Soporte para decoradores
 - `strictTemplates` - Type checking en templates
@@ -753,15 +788,17 @@ export const routes: Routes = [
 ### 5. Tailwind CSS Configuration
 
 **tailwind.config.js:**
+
 ```javascript
 module.exports = {
-  content: ['./src/**/*.{html,ts}'],  // ← Escanea templates
+  content: ['./src/**/*.{html,ts}'], // ← Escanea templates
   theme: { extend: {} },
   plugins: [],
 };
 ```
 
 **styles.css:**
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -775,6 +812,7 @@ module.exports = {
 ### Change Detection Strategy
 
 Aunque no está explícitamente configurado en esta app, Angular 21 con Signals usa:
+
 - **Automatic change detection** basada en signals
 - Actualizaciones granulares (solo cambia lo necesario)
 - Mejor rendimiento que Zone.js tradicional
@@ -791,11 +829,11 @@ Components (inject en cada nivel)
 
 ### Template Syntax Evolution
 
-| Característica | Sintaxis Antigua | Angular 21 |
-|---|---|---|
-| Loops | `*ngFor="let item of items"` | `@for (item of items; track item.id)` |
-| Conditionals | `*ngIf="condition"` | `@if (condition)` |
-| Switch | `[ngSwitch]` | `@switch (value)` |
+| Característica | Sintaxis Antigua             | Angular 21                            |
+| -------------- | ---------------------------- | ------------------------------------- |
+| Loops          | `*ngFor="let item of items"` | `@for (item of items; track item.id)` |
+| Conditionals   | `*ngIf="condition"`          | `@if (condition)`                     |
+| Switch         | `[ngSwitch]`                 | `@switch (value)`                     |
 
 ---
 
@@ -804,37 +842,44 @@ Components (inject en cada nivel)
 Para recrear esta aplicación desde cero, sigue este orden:
 
 ### Nivel 1: Fundamentos
+
 1. TypeScript avanzado (interfaces, generics, type guards)
 2. Componentes standalone básicos
 3. Property/Event binding
 4. Services e inyección de dependencias
 
 ### Nivel 2: Signals y Reactividad
+
 5. `signal()` y `computed()`
 6. `effect()` para side effects
 7. Patrones de gestión de estado
 
 ### Nivel 3: Templates Avanzados
+
 8. Nueva sintaxis `@for`, `@if`, `@switch`
 9. `@Input()` y `@Output()`
 10. Template references y ViewChild
 
 ### Nivel 4: Directivas y Pipes
+
 11. Attribute directives (`appDraggable`)
 12. `@HostListener` y `@HostBinding`
 13. Custom pipes
 
 ### Nivel 5: Interactividad
+
 14. Eventos del DOM
 15. Drag & Drop custom
 16. Canvas y SVG manipulation
 
 ### Nivel 6: Arquitectura
+
 17. Patrón Registry (StencilService)
 18. Export/Import de datos
 19. Type-safe APIs
 
 ### Nivel 7: Integración CSS
+
 20. Tailwind CSS con Angular
 21. Dynamic class binding
 22. Responsive design
@@ -881,22 +926,27 @@ Esta aplicación demuestra:
 ## 📝 **Referencias de Archivos Clave**
 
 ### Servicios
+
 - **diagram.service.ts** (diagram-builder/src/app/core/services/diagram.service.ts) - Gestión de estado con Signals
 - **html-exporter.service.ts** (diagram-builder/src/app/core/services/html-exporter.service.ts) - Exportación HTML
 - **stencil.service.ts** (diagram-builder/src/app/stencils/stencil.service.ts) - Registry de figuras SVG
 
 ### Componentes
+
 - **canvas.component.ts** (diagram-builder/src/app/canvas/canvas.component.ts) - Canvas principal
 - **node-renderer.component.ts** (diagram-builder/src/app/canvas/components/node-renderer.component.ts) - Renderizador polimórfico
 - **web-node-wrapper.component.ts** (diagram-builder/src/app/components-tailwind/web-node-wrapper.component.ts) - Switch de componentes web
 
 ### Directivas
+
 - **draggable.directive.ts** (diagram-builder/src/app/canvas/directives/draggable.directive.ts) - Drag & Drop con snapping
 
 ### Modelos
+
 - **diagram.model.ts** (diagram-builder/src/app/core/models/diagram.model.ts) - Type system completo
 
 ### Configuración
+
 - **main.ts** (diagram-builder/src/main.ts) - Bootstrap
 - **app.config.ts** (diagram-builder/src/app/app.config.ts) - Configuración de providers
 - **tailwind.config.js** (diagram-builder/tailwind.config.js) - Configuración Tailwind

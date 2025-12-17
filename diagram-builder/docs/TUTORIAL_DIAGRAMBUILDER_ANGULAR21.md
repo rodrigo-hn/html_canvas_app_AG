@@ -47,6 +47,7 @@ Al completar este tutorial dominarás:
 ### Nivel de dificultad
 
 Este tutorial está diseñado para desarrolladores con:
+
 - Conocimientos básicos de JavaScript/TypeScript
 - Familiaridad con conceptos de frameworks frontend
 - Ganas de aprender Angular moderno
@@ -85,14 +86,14 @@ Este tutorial está diseñado para desarrolladores con:
 
 ### Características Principales
 
-| Característica | Descripción |
-|----------------|-------------|
-| **Canvas Interactivo** | Área de dibujo con grid visual de 20px |
-| **Drag & Drop** | Arrastra elementos con snapping al grid |
-| **Selección** | Click simple o multi-selección con Cmd/Shift |
-| **Figuras SVG** | Rectángulos, cilindros, diamantes, formas BPMN |
-| **Componentes Web** | Botones, inputs, cards con Tailwind CSS |
-| **Exportación HTML** | Genera HTML standalone funcional |
+| Característica         | Descripción                                    |
+| ---------------------- | ---------------------------------------------- |
+| **Canvas Interactivo** | Área de dibujo con grid visual de 20px         |
+| **Drag & Drop**        | Arrastra elementos con snapping al grid        |
+| **Selección**          | Click simple o multi-selección con Cmd/Shift   |
+| **Figuras SVG**        | Rectángulos, cilindros, diamantes, formas BPMN |
+| **Componentes Web**    | Botones, inputs, cards con Tailwind CSS        |
+| **Exportación HTML**   | Genera HTML standalone funcional               |
 
 ### Stack Tecnológico
 
@@ -145,20 +146,22 @@ npx tailwindcss init
 ### 3.4 Configurar Tailwind
 
 **tailwind.config.js:**
+
 ```javascript
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{html,ts}",  // ← Escanea templates Angular
+    './src/**/*.{html,ts}', // ← Escanea templates Angular
   ],
   theme: {
     extend: {},
   },
   plugins: [],
-}
+};
 ```
 
 **src/styles.css:**
+
 ```css
 @tailwind base;
 @tailwind components;
@@ -304,9 +307,9 @@ export interface Size {
  * Propiedades comunes a todos los elementos
  */
 export interface DiagramElement {
-  id: string;          // Identificador único
-  selected?: boolean;  // ¿Está seleccionado?
-  zIndex: number;      // Orden de apilamiento
+  id: string; // Identificador único
+  selected?: boolean; // ¿Está seleccionado?
+  zIndex: number; // Orden de apilamiento
 }
 
 /**
@@ -314,9 +317,9 @@ export interface DiagramElement {
  * Combina posición, tamaño y propiedades de elemento
  */
 export interface DiagramNode extends DiagramElement, Point, Size {
-  type: NodeType;      // 'shape' o 'web-component'
-  data: any;           // Datos específicos (texto, configuración)
-  rotation?: number;   // Rotación en grados (opcional)
+  type: NodeType; // 'shape' o 'web-component'
+  data: any; // Datos específicos (texto, configuración)
+  rotation?: number; // Rotación en grados (opcional)
 }
 
 // ============================================
@@ -327,12 +330,12 @@ export interface DiagramNode extends DiagramElement, Point, Size {
  * Nodo de tipo figura SVG
  */
 export interface ShapeNode extends DiagramNode {
-  type: 'shape';                    // ← Literal type (discriminator)
-  shapeType: string;                // 'rectangle', 'cylinder', 'bpmn-task'
+  type: 'shape'; // ← Literal type (discriminator)
+  shapeType: string; // 'rectangle', 'cylinder', 'bpmn-task'
   style?: {
-    fill?: string;                  // Color de relleno
-    stroke?: string;                // Color de borde
-    strokeWidth?: number;           // Grosor de borde
+    fill?: string; // Color de relleno
+    stroke?: string; // Color de borde
+    strokeWidth?: number; // Grosor de borde
   };
 }
 
@@ -340,8 +343,8 @@ export interface ShapeNode extends DiagramNode {
  * Nodo de tipo componente web
  */
 export interface WebNode extends DiagramNode {
-  type: 'web-component';            // ← Literal type (discriminator)
-  componentType: string;            // 'button', 'input', 'card'
+  type: 'web-component'; // ← Literal type (discriminator)
+  componentType: string; // 'button', 'input', 'card'
 }
 
 // ============================================
@@ -352,10 +355,10 @@ export interface WebNode extends DiagramNode {
  * Representa una conexión entre dos nodos
  */
 export interface DiagramEdge extends DiagramElement {
-  sourceId: string;                 // ID del nodo origen
-  targetId: string;                 // ID del nodo destino
-  points: Point[];                  // Puntos intermedios
-  markerEnd?: string;               // Tipo de flecha ('arrow')
+  sourceId: string; // ID del nodo origen
+  targetId: string; // ID del nodo destino
+  points: Point[]; // Puntos intermedios
+  markerEnd?: string; // Tipo de flecha ('arrow')
   style?: {
     stroke?: string;
     strokeWidth?: number;
@@ -385,10 +388,10 @@ El campo `type` actúa como **discriminador**:
 function processNode(node: DiagramNode) {
   if (node.type === 'shape') {
     // TypeScript sabe que node es ShapeNode aquí
-    console.log(node.shapeType);  // ✓ Válido
+    console.log(node.shapeType); // ✓ Válido
   } else if (node.type === 'web-component') {
     // TypeScript sabe que node es WebNode aquí
-    console.log(node.componentType);  // ✓ Válido
+    console.log(node.componentType); // ✓ Válido
   }
 }
 ```
@@ -445,24 +448,24 @@ import {
 } from '../models/diagram.model';
 
 @Injectable({
-  providedIn: 'root',  // Singleton a nivel de aplicación
+  providedIn: 'root', // Singleton a nivel de aplicación
 })
 export class DiagramService {
   // ============================================
   // ESTADO PRIVADO (Writable Signals)
   // ============================================
-  
+
   /**
    * Array de nodos en el diagrama
    * Solo este servicio puede modificarlo
    */
   private nodesSignal = signal<DiagramNode[]>([]);
-  
+
   /**
    * Array de conexiones entre nodos
    */
   private edgesSignal = signal<DiagramEdge[]>([]);
-  
+
   /**
    * Set de IDs de nodos seleccionados
    * Usamos Set para búsquedas O(1)
@@ -472,7 +475,7 @@ export class DiagramService {
   // ============================================
   // API PÚBLICA (Readonly Signals)
   // ============================================
-  
+
   /**
    * Los componentes pueden leer pero NO escribir
    */
@@ -483,7 +486,7 @@ export class DiagramService {
   // ============================================
   // CONSTRUCTOR: Datos iniciales de prueba
   // ============================================
-  
+
   constructor() {
     // Agregar datos de ejemplo para ver algo en el canvas
     this.initializeSampleData();
@@ -574,15 +577,13 @@ export class DiagramService {
    */
   removeNode(nodeId: string) {
     // Eliminar el nodo
-    this.nodesSignal.update((nodes) => 
-      nodes.filter((n) => n.id !== nodeId)
-    );
-    
+    this.nodesSignal.update((nodes) => nodes.filter((n) => n.id !== nodeId));
+
     // Eliminar edges conectados
     this.edgesSignal.update((edges) =>
       edges.filter((e) => e.sourceId !== nodeId && e.targetId !== nodeId)
     );
-    
+
     // Quitar de selección
     this.selectionSignal.update((sel) => {
       const newSel = new Set(sel);
@@ -598,9 +599,9 @@ export class DiagramService {
    */
   updateNode(id: string, changes: Partial<DiagramNode>) {
     this.nodesSignal.update((nodes) =>
-      nodes.map((n) => 
-        n.id === id 
-          ? { ...n, ...changes }  // Merge inmutable
+      nodes.map((n) =>
+        n.id === id
+          ? { ...n, ...changes } // Merge inmutable
           : n
       )
     );
@@ -615,7 +616,7 @@ export class DiagramService {
     this.selectionSignal.update((sel) => {
       // Si no es multi-select, empezar con Set vacío
       const newSel = multi ? new Set<string>(sel) : new Set<string>();
-      
+
       if (sel.has(id) && multi) {
         // Si ya está seleccionado y es multi, deseleccionar
         newSel.delete(id);
@@ -623,7 +624,7 @@ export class DiagramService {
         // Agregar a selección
         newSel.add(id);
       }
-      
+
       return newSel;
     });
   }
@@ -643,10 +644,10 @@ export class DiagramService {
 
 ```typescript
 // ❌ INCORRECTO: Mutación directa
-this.nodesSignal().push(newNode);  // No funciona, no dispara cambios
+this.nodesSignal().push(newNode); // No funciona, no dispara cambios
 
 // ✓ CORRECTO: Crear nuevo array
-this.nodesSignal.update(nodes => [...nodes, newNode]);
+this.nodesSignal.update((nodes) => [...nodes, newNode]);
 ```
 
 #### Signal vs Computed
@@ -680,14 +681,11 @@ import { HtmlExportService } from '../core/services/html-exporter.service';
 
 @Component({
   selector: 'app-canvas',
-  standalone: true,  // ← Componente autónomo (sin NgModule)
+  standalone: true, // ← Componente autónomo (sin NgModule)
   imports: [CommonModule, NodeRendererComponent],
   template: `
     <!-- Container principal -->
-    <div 
-      class="relative w-full h-full bg-slate-50 overflow-hidden" 
-      (click)="onBackgroundClick()"
-    >
+    <div class="relative w-full h-full bg-slate-50 overflow-hidden" (click)="onBackgroundClick()">
       <!-- Toolbar flotante -->
       <div class="absolute top-4 right-4 z-50 flex gap-2">
         <button
@@ -710,25 +708,35 @@ import { HtmlExportService } from '../core/services/html-exporter.service';
       <!-- Renderizado de nodos -->
       <!-- @for es la nueva sintaxis de Angular 21 para loops -->
       @for (node of nodes(); track node.id) {
-        <app-node-renderer [node]="node"></app-node-renderer>
+      <app-node-renderer [node]="node"></app-node-renderer>
       }
+
+      <!-- Edges Layer -->
+      <svg class="absolute inset-0 pointer-events-none w-full h-full z-0">
+        @for (edge of edges(); track edge.id) {
+        <app-edge-renderer [edge]="edge"></app-edge-renderer>
+        }
+      </svg>
     </div>
   `,
-  styles: [`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100vh;
-    }
-  `],
+  styles: [
+    `
+      :host {
+        display: block;
+        width: 100%;
+        height: 100vh;
+      }
+    `,
+  ],
 })
 export class CanvasComponent {
   // Inyección moderna con inject()
   private diagramService = inject(DiagramService);
   private htmlExportService = inject(HtmlExportService);
-  
-  // Exponer el signal de nodos para el template
+
+  // Exponer el signal de nodos y edges para el template
   nodes = this.diagramService.nodes;
+  edges = this.diagramService.edges;
 
   /**
    * Click en el fondo limpia la selección
@@ -798,7 +806,7 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
       <!-- ============================================ -->
       <!-- RENDERIZADO CONDICIONAL POR TIPO            -->
       <!-- ============================================ -->
-      
+
       <!-- Opción 1: Figuras SVG -->
       <svg
         *ngIf="node.type === 'shape'"
@@ -817,7 +825,9 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
           [attr.width]="node.width"
           [attr.height]="node.height"
         >
-          <div class="w-full h-full flex items-center justify-center text-center p-1 text-sm pointer-events-none">
+          <div
+            class="w-full h-full flex items-center justify-center text-center p-1 text-sm pointer-events-none"
+          >
             {{ node.data.text }}
           </div>
         </foreignObject>
@@ -841,15 +851,13 @@ export class NodeRendererComponent {
    * Computed signal que indica si el nodo está seleccionado
    * Se recalcula automáticamente cuando cambia la selección
    */
-  isSelected = computed(() => 
-    this.diagramService.selection().has(this.node.id)
-  );
+  isSelected = computed(() => this.diagramService.selection().has(this.node.id));
 
   /**
    * Maneja el click para seleccionar el nodo
    */
   onSelect(event: MouseEvent) {
-    event.stopPropagation();  // Evitar que llegue al canvas
+    event.stopPropagation(); // Evitar que llegue al canvas
     const multi = event.metaKey || event.shiftKey;
     this.diagramService.toggleSelection(this.node.id, multi);
   }
@@ -867,11 +875,7 @@ export class NodeRendererComponent {
   getShapeContent() {
     if (this.node.type !== 'shape') return '';
     const shapeNode = this.node as ShapeNode;
-    return this.stencilService.getShapeSVG(
-      shapeNode.shapeType, 
-      this.node.width, 
-      this.node.height
-    );
+    return this.stencilService.getShapeSVG(shapeNode.shapeType, this.node.width, this.node.height);
   }
 
   /**
@@ -924,35 +928,28 @@ Una directiva es un comportamiento reutilizable que se puede aplicar a cualquier
 **src/app/canvas/directives/draggable.directive.ts:**
 
 ```typescript
-import { 
-  Directive, 
-  ElementRef, 
-  EventEmitter, 
-  HostListener, 
-  Input, 
-  Output 
-} from '@angular/core';
+import { Directive, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { Point } from '../../core/models/diagram.model';
 
 @Directive({
   selector: '[appDraggable]',
-  standalone: true,  // ← Directiva standalone
+  standalone: true, // ← Directiva standalone
 })
 export class DraggableDirective {
   // ============================================
   // INPUTS: Configuración del comportamiento
   // ============================================
-  
-  @Input() dragDisabled = false;      // Deshabilitar arrastre
-  @Input() snapToGrid = false;        // Activar snapping
-  @Input() gridSize = 10;             // Tamaño del grid
-  @Input() zoom = 1;                  // Nivel de zoom (para calcular delta)
-  @Input() startPosition: Point = { x: 0, y: 0 };  // Posición inicial
+
+  @Input() dragDisabled = false; // Deshabilitar arrastre
+  @Input() snapToGrid = false; // Activar snapping
+  @Input() gridSize = 10; // Tamaño del grid
+  @Input() zoom = 1; // Nivel de zoom (para calcular delta)
+  @Input() startPosition: Point = { x: 0, y: 0 }; // Posición inicial
 
   // ============================================
   // OUTPUTS: Eventos emitidos
   // ============================================
-  
+
   @Output() dragStart = new EventEmitter<void>();
   @Output() dragMove = new EventEmitter<Point>();
   @Output() dragEnd = new EventEmitter<Point>();
@@ -960,10 +957,10 @@ export class DraggableDirective {
   // ============================================
   // ESTADO INTERNO
   // ============================================
-  
+
   private isDragging = false;
-  private initialMouse: Point = { x: 0, y: 0 };  // Posición inicial del mouse
-  private initialPos: Point = { x: 0, y: 0 };    // Posición inicial del elemento
+  private initialMouse: Point = { x: 0, y: 0 }; // Posición inicial del mouse
+  private initialPos: Point = { x: 0, y: 0 }; // Posición inicial del elemento
 
   constructor(private el: ElementRef) {}
 
@@ -978,7 +975,7 @@ export class DraggableDirective {
   onMouseDown(event: MouseEvent) {
     // No arrastrar si está deshabilitado
     if (this.dragDisabled) return;
-    
+
     // No arrastrar si el click fue en un control (input, button, etc.)
     if ((event.target as HTMLElement).closest('input, select, textarea, button')) {
       return;
@@ -990,7 +987,7 @@ export class DraggableDirective {
     this.initialPos = { ...this.startPosition };
 
     this.dragStart.emit();
-    event.preventDefault();  // Evitar selección de texto
+    event.preventDefault(); // Evitar selección de texto
   }
 
   /**
@@ -1024,7 +1021,7 @@ export class DraggableDirective {
   @HostListener('document:mouseup')
   onMouseUp() {
     if (!this.isDragging) return;
-    
+
     this.isDragging = false;
     this.dragEnd.emit({ x: this.initialPos.x, y: this.initialPos.y });
   }
@@ -1117,9 +1114,9 @@ export const BasicShapes = {
    * Cilindro (representa base de datos)
    */
   cylinder: (w: number, h: number) => {
-    const rx = w / 2;      // Radio X de la elipse
-    const ry = h * 0.15;   // Radio Y (más pequeño para efecto 3D)
-    
+    const rx = w / 2; // Radio X de la elipse
+    const ry = h * 0.15; // Radio Y (más pequeño para efecto 3D)
+
     return `
       <!-- Elipse superior (tapa) -->
       <path 
@@ -1219,7 +1216,9 @@ export const BpmnShapes = {
       />
       <!-- Diamante interior (decoración) -->
       <path 
-        d="M ${w / 2} ${h * 0.2} L ${w * 0.8} ${h / 2} L ${w / 2} ${h * 0.8} L ${w * 0.2} ${h / 2} Z" 
+        d="M ${w / 2} ${h * 0.2} L ${w * 0.8} ${h / 2} L ${w / 2} ${h * 0.8} L ${w * 0.2} ${
+      h / 2
+    } Z" 
         fill="none" 
         stroke="black" 
         stroke-width="1"
@@ -1277,12 +1276,12 @@ export class StencilService {
    */
   private shapes: Record<string, ShapeGenerator> = {
     // Figuras básicas
-    'rectangle': BasicShapes.rectangle,
+    rectangle: BasicShapes.rectangle,
     'rounded-rectangle': BasicShapes.roundedRectangle,
-    'document': BasicShapes.document,
-    'cylinder': BasicShapes.cylinder,
-    'diamond': BasicShapes.diamond,
-    
+    document: BasicShapes.document,
+    cylinder: BasicShapes.cylinder,
+    diamond: BasicShapes.diamond,
+
     // Figuras BPMN
     'bpmn-task': BpmnShapes.task,
     'bpmn-start-event': BpmnShapes.eventStart,
@@ -1299,13 +1298,11 @@ export class StencilService {
    */
   getShapeSVG(type: string, width: number, height: number): SafeHtml {
     const generator = this.shapes[type];
-    
+
     if (generator) {
-      return this.sanitizer.bypassSecurityTrustHtml(
-        generator(width, height)
-      );
+      return this.sanitizer.bypassSecurityTrustHtml(generator(width, height));
     }
-    
+
     // Fallback: rectángulo rojo para shapes desconocidos
     return this.sanitizer.bypassSecurityTrustHtml(
       `<rect width="${width}" height="${height}" fill="red"/>`
@@ -1345,14 +1342,14 @@ export class WebButtonComponent {
    */
   getClasses() {
     const base = 'px-4 py-2 rounded font-semibold focus:outline-none focus:shadow-outline';
-    
+
     const variants = {
       primary: 'bg-blue-500 text-white hover:bg-blue-600',
       secondary: 'bg-gray-500 text-white hover:bg-gray-600',
       success: 'bg-green-500 text-white hover:bg-green-600',
       danger: 'bg-red-500 text-white hover:bg-red-600',
     };
-    
+
     return `${base} ${variants[this.variant]}`;
   }
 }
@@ -1438,30 +1435,22 @@ import { WebCardComponent } from './renderers/web-card.component';
   template: `
     <div class="w-full h-full overflow-hidden pointer-events-none">
       <!-- @switch usa el nuevo control flow de Angular 21 -->
-      @switch (node.componentType) {
-        @case ('button') {
-          <app-web-button
-            [text]="node.data.text || 'Button'"
-            [variant]="node.data.variant || 'primary'"
-          />
-        }
-        @case ('input') {
-          <app-web-input
-            [label]="node.data.label"
-            [placeholder]="node.data.placeholder"
-            [type]="node.data.inputType || 'text'"
-          />
-        }
-        @case ('card') {
-          <app-web-card 
-            [title]="node.data.title" 
-            [content]="node.data.content" 
-          />
-        }
-        @default {
-          <div class="text-red-500">Unknown: {{ node.componentType }}</div>
-        }
-      }
+      @switch (node.componentType) { @case ('button') {
+      <app-web-button
+        [text]="node.data.text || 'Button'"
+        [variant]="node.data.variant || 'primary'"
+      />
+      } @case ('input') {
+      <app-web-input
+        [label]="node.data.label"
+        [placeholder]="node.data.placeholder"
+        [type]="node.data.inputType || 'text'"
+      />
+      } @case ('card') {
+      <app-web-card [title]="node.data.title" [content]="node.data.content" />
+      } @default {
+      <div class="text-red-500">Unknown: {{ node.componentType }}</div>
+      } }
     </div>
   `,
 })
@@ -1477,6 +1466,7 @@ export class WebNodeWrapperComponent {
 ### 11.1 El Concepto
 
 El exportador genera un archivo HTML **completamente independiente** que:
+
 - No requiere Angular
 - Incluye Tailwind CSS vía CDN
 - Los botones tienen estados hover funcionales
@@ -1496,7 +1486,6 @@ import { BpmnShapes } from '../../stencils/shapes/bpmn.shapes';
   providedIn: 'root',
 })
 export class HtmlExportService {
-  
   /**
    * Genera HTML completo a partir del modelo del diagrama
    */
@@ -1557,18 +1546,18 @@ ${nodesHtml}
   private getSvgContent(node: ShapeNode): string {
     // Registry local de generadores (mismo que StencilService)
     const shapes: Record<string, (w: number, h: number) => string> = {
-      'rectangle': BasicShapes.rectangle,
+      rectangle: BasicShapes.rectangle,
       'rounded-rectangle': BasicShapes.roundedRectangle,
-      'document': BasicShapes.document,
-      'cylinder': BasicShapes.cylinder,
-      'diamond': BasicShapes.diamond,
+      document: BasicShapes.document,
+      cylinder: BasicShapes.cylinder,
+      diamond: BasicShapes.diamond,
       'bpmn-task': BpmnShapes.task,
       'bpmn-start-event': BpmnShapes.eventStart,
       'bpmn-end-event': BpmnShapes.eventEnd,
       'bpmn-gateway': BpmnShapes.gateway,
       'bpmn-pool': BpmnShapes.pool,
     };
-    
+
     const generator = shapes[node.shapeType];
     if (generator) {
       return generator(node.width, node.height);
@@ -1578,14 +1567,22 @@ ${nodesHtml}
 
   private generateSvgWrapper(node: ShapeNode, innerContent: string): string {
     return `
-      <div style="position: absolute; left: ${node.x}px; top: ${node.y}px; width: ${node.width}px; height: ${node.height}px; z-index: ${node.zIndex}; pointer-events: none;">
-        <svg viewBox="0 0 ${node.width} ${node.height}" style="width: 100%; height: 100%; overflow: visible;">
+      <div style="position: absolute; left: ${node.x}px; top: ${node.y}px; width: ${
+      node.width
+    }px; height: ${node.height}px; z-index: ${node.zIndex}; pointer-events: none;">
+        <svg viewBox="0 0 ${node.width} ${
+      node.height
+    }" style="width: 100%; height: 100%; overflow: visible;">
            ${innerContent}
         </svg>
-        ${node.data?.text ? `
+        ${
+          node.data?.text
+            ? `
         <div style="position: absolute; top:0; left:0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; text-align: center; padding: 4px; font-size: 0.875rem;">
             ${node.data.text}
-        </div>` : ''}
+        </div>`
+            : ''
+        }
       </div>`;
   }
 
@@ -1624,7 +1621,11 @@ ${nodesHtml}
     const widthStyle = `width: ${node.width}px;`;
     return `
      <div style="${style} ${widthStyle}" class="flex flex-col">
-       ${node.data.label ? `<label class="mb-1 text-sm font-bold text-gray-700">${node.data.label}</label>` : ''}
+       ${
+         node.data.label
+           ? `<label class="mb-1 text-sm font-bold text-gray-700">${node.data.label}</label>`
+           : ''
+       }
        <input type="${node.data.inputType || 'text'}" 
               placeholder="${node.data.placeholder || ''}" 
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
@@ -1653,46 +1654,44 @@ ${nodesHtml}
 ### 12.1 Bootstrap de la Aplicación
 
 **src/main.ts:**
+
 ```typescript
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+bootstrapApplication(App, appConfig).catch((err) => console.error(err));
 ```
 
 ### 12.2 Configuración
 
 **src/app/app.config.ts:**
+
 ```typescript
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideRouter(routes)
-  ]
+  providers: [provideBrowserGlobalErrorListeners(), provideRouter(routes)],
 };
 ```
 
 ### 12.3 Rutas
 
 **src/app/app.routes.ts:**
+
 ```typescript
 import { Routes } from '@angular/router';
 import { CanvasComponent } from './canvas/canvas.component';
 
-export const routes: Routes = [
-  { path: '', component: CanvasComponent }
-];
+export const routes: Routes = [{ path: '', component: CanvasComponent }];
 ```
 
 ### 12.4 Componente Raíz
 
 **src/app/app.ts:**
+
 ```typescript
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
@@ -1701,7 +1700,7 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-root',
   imports: [RouterOutlet],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.css',
 })
 export class App {
   protected readonly title = signal('diagram-builder');
@@ -1709,6 +1708,7 @@ export class App {
 ```
 
 **src/app/app.html:**
+
 ```html
 <router-outlet></router-outlet>
 ```
@@ -1716,19 +1716,20 @@ export class App {
 ### 12.5 HTML Principal
 
 **src/index.html:**
+
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>DiagramBuilder</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-</head>
-<body>
-  <app-root></app-root>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <title>DiagramBuilder</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
 </html>
 ```
 
@@ -1817,12 +1818,13 @@ inicial     snapping
 **Pasos:**
 
 1. Agregar la función generadora en `basic.shapes.ts`:
+
 ```typescript
 hexagon: (w: number, h: number) => {
   const cx = w / 2;
   const cy = h / 2;
   const size = Math.min(w, h) / 2;
-  
+
   // Calcular los 6 puntos del hexágono
   let points = '';
   for (let i = 0; i < 6; i++) {
@@ -1832,17 +1834,19 @@ hexagon: (w: number, h: number) => {
     points += `${i === 0 ? 'M' : 'L'} ${x} ${y} `;
   }
   points += 'Z';
-  
+
   return `<path d="${points}" fill="white" stroke="black" stroke-width="2"/>`;
-}
+};
 ```
 
 2. Registrar en `stencil.service.ts`:
+
 ```typescript
 'hexagon': BasicShapes.hexagon,
 ```
 
 3. Agregar un nodo de prueba en `diagram.service.ts`:
+
 ```typescript
 this.addNode({
   id: '6',
@@ -1880,6 +1884,7 @@ this.addNode({
 **Causa:** TypeScript no puede inferir el tipo correcto.
 
 **Solución:**
+
 ```typescript
 // Usar type assertion
 const shapeNode = node as ShapeNode;
@@ -1896,6 +1901,7 @@ if (node.type === 'shape') {
 **Causa:** Estás modificando un signal durante el renderizado.
 
 **Solución:**
+
 ```typescript
 // ❌ Incorrecto
 ngOnInit() {
@@ -1913,6 +1919,7 @@ effect(() => {
 **Causa:** Tailwind no está procesando los archivos correctamente.
 
 **Solución:**
+
 1. Verificar `tailwind.config.js` tiene el path correcto
 2. Verificar `styles.css` tiene las directivas @tailwind
 3. Reiniciar el servidor de desarrollo
@@ -1924,22 +1931,27 @@ effect(() => {
 ### Funcionalidades para Agregar
 
 1. **Toolbar con Drag de Stencils**
+
    - Paleta lateral con figuras disponibles
    - Drag & drop para agregar nuevos nodos
 
 2. **Conexiones (Edges)**
+
    - Dibujar líneas entre nodos
    - Flechas y diferentes estilos de línea
 
 3. **Property Editor**
+
    - Panel para editar propiedades del nodo seleccionado
    - Cambiar colores, texto, tamaños
 
 4. **Zoom y Pan**
+
    - Hacer zoom con scroll
    - Arrastrar el canvas
 
 5. **Guardar/Cargar**
+
    - Exportar modelo como JSON
    - Importar desde archivo
 
@@ -1967,7 +1979,7 @@ effect(() => {
 ✅ **SVG Programático** - Generar gráficos dinámicamente  
 ✅ **Tailwind CSS** - Integración con Angular  
 ✅ **Directivas** - Comportamiento reutilizable  
-✅ **Patrones de Diseño** - Registry, Inmutabilidad  
+✅ **Patrones de Diseño** - Registry, Inmutabilidad
 
 ### Recursos Adicionales
 
@@ -1978,4 +1990,4 @@ effect(() => {
 
 ---
 
-*Tutorial creado basado en el proyecto DiagramBuilder - Angular 21 + Tailwind CSS*
+_Tutorial creado basado en el proyecto DiagramBuilder - Angular 21 + Tailwind CSS_

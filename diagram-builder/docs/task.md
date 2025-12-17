@@ -15,7 +15,7 @@
 - [x] **Stencils Library (SVG)**
   - [x] Implement Basic Shapes (Rectangle, Document, Cylinder, etc.)
   - [x] Implement BPMN Shapes (Pool, Lane, Task, Event, Gateway)
-  - [ ] Implement Edges (Sequence Flow)
+  - [x] Implement Edges (Sequence Flow)
 - [x] **Tailwind Components (WebNodes)**
   - [x] Implement Button, Input, Card, etc.
   - [x] Ensure they render correctly in Canvas

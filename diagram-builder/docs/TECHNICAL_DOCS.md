@@ -38,12 +38,14 @@ The entire diagram is described by a serializable JSON model.
 - **`DiagramNode`**: Base interface.
 - **`ShapeNode`**: Represents SVG shapes. Has a `shapeType` (e.g., 'rect', 'bpmn-task').
 - **`WebNode`**: Represents HTML/Tailwind components. Has a `componentType` (e.g., 'button', 'card').
+- **`DiagramEdge`**: Represents a connection between two nodes (`sourceId`, `targetId`) with optional routing points and styling.
 
 ### State Management (`diagram.service.ts`)
 
 State is managed using **Angular Signals**.
 
 - `nodesSignal`: Writable signal holding the array of nodes.
+- `edgesSignal`: Writable signal holding the array of edges.
 - `selectionSignal`: Set of currently selected node IDs.
 - `computed` signals are exposed for the UI to consume efficiently.
 - `OnPush` change detection is used everywhere for performance.
@@ -52,7 +54,8 @@ State is managed using **Angular Signals**.
 
 ### The Canvas (`canvas.component.ts`)
 
-Iterates over the `nodes` signal and renders an `app-node-renderer` for each. It handles background clicks for clearing selection.
+It iterates over the `nodes` signal and renders an `app-node-renderer` for each.
+It also iterates over the `edges` signal and renders an `app-edge-renderer` for each, placed in a `z-0` SVG layer behind the nodes.
 
 ### Node Renderer (`node-renderer.component.ts`)
 
@@ -62,6 +65,10 @@ A generic wrapper that decides how to paint a node:
 2. **If WebNode**: instantiates `WebNodeWrapperComponent` which dynamically picks the correct Tailwind component (Button, Card, etc.).
 
 It also attaches the `appDraggable` directive to enable interaction.
+
+### Edge Renderer (`edge-renderer.component.ts`)
+
+Visualizes the connection between nodes. It computes the path dynamically based on the current positions of the source and target nodes (center-to-center line for now). It uses an SVG `<path>` with an optional marker-end (arrowhead).
 
 ### Draggable Directive
 

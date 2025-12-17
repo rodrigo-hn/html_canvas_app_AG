@@ -2,12 +2,13 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiagramService } from '../core/services/diagram.service';
 import { NodeRendererComponent } from './components/node-renderer.component';
+import { EdgeRendererComponent } from './components/edge-renderer.component';
 import { HtmlExportService } from '../core/services/html-exporter.service';
 
 @Component({
   selector: 'app-canvas',
   standalone: true,
-  imports: [CommonModule, NodeRendererComponent],
+  imports: [CommonModule, NodeRendererComponent, EdgeRendererComponent],
   template: `
     <div class="relative w-full h-full bg-slate-50 overflow-hidden" (click)="onBackgroundClick()">
       <!-- Toolbar (Simulated) -->
@@ -26,7 +27,16 @@ import { HtmlExportService } from '../core/services/html-exporter.service';
         style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"
       ></div>
 
-      <!-- Nodes -->
+      <!-- Edges Layer (Bottom) -->
+      <svg class="absolute inset-0 pointer-events-none w-full h-full z-0">
+        <!-- We can put global defs here if needed, but EdgeRenderer handles its own for now or we loop inside a single svg -->
+      </svg>
+      <!-- We accept having multiple SVGs for simplicity in this MVP, or we can project them differently -->
+      @for (edge of edges(); track edge.id) {
+      <app-edge-renderer [edge]="edge"></app-edge-renderer>
+      }
+
+      <!-- Nodes Layer (Top) -->
       @for (node of nodes(); track node.id) {
       <app-node-renderer [node]="node"></app-node-renderer>
       }
@@ -46,6 +56,7 @@ export class CanvasComponent {
   private diagramService = inject(DiagramService);
   private htmlExportService = inject(HtmlExportService);
   nodes = this.diagramService.nodes;
+  edges = this.diagramService.edges;
 
   onBackgroundClick() {
     this.diagramService.clearSelection();

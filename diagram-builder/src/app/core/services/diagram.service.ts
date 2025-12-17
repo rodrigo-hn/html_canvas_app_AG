@@ -83,11 +83,26 @@ export class DiagramService {
       zIndex: 0,
       data: { title: 'User Profile', content: 'Details regarding the user...' },
     } as WebNode);
+
+    this.addEdge({
+      id: 'e1',
+      sourceId: '1',
+      targetId: '4',
+      zIndex: 0,
+      points: [],
+      markerEnd: 'arrow',
+      style: { stroke: '#333', strokeWidth: 2 },
+    });
   }
 
   // Actions
+  // Actions
   addNode(node: DiagramNode) {
     this.nodesSignal.update((nodes) => [...nodes, node]);
+  }
+
+  addEdge(edge: DiagramEdge) {
+    this.edgesSignal.update((edges) => [...edges, edge]);
   }
 
   removeNode(nodeId: string) {
