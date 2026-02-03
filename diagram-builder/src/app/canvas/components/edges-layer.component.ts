@@ -252,10 +252,10 @@ export class EdgesLayerComponent {
     if (manualPoint) {
       const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
       const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
-      const points = [...first, ...second.slice(1)];
+      const points = this.simplifyPoints([...first, ...second.slice(1)]);
       return this.pointsToPath(points);
     }
-    const points = this.routePoints(start, end, sourcePort, target);
+    const points = this.simplifyPoints(this.routePoints(start, end, sourcePort, target));
     return this.pointsToPath(points);
   }
 
@@ -268,7 +268,17 @@ export class EdgesLayerComponent {
     const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
     const scoreA = this.pathScore(candidateA);
     const scoreB = this.pathScore(candidateB);
-    return scoreA <= scoreB ? candidateA : candidateB;
+    const best = scoreA <= scoreB ? candidateA : candidateB;
+    if (this.isTargetDirectionCorrect(best, targetPort)) {
+      return best;
+    }
+    const flipped = this.oppositePort(targetPort);
+    const endInFlipped = this.pushFromPort(end, flipped, offset);
+    const altA = this.orthogonalVia(start, startOut, endInFlipped, end, true);
+    const altB = this.orthogonalVia(start, startOut, endInFlipped, end, false);
+    const altScoreA = this.pathScore(altA);
+    const altScoreB = this.pathScore(altB);
+    return altScoreA <= altScoreB ? altA : altB;
   }
 
   private orthogonalVia(
@@ -308,6 +318,62 @@ export class EdgesLayerComponent {
     return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
   }
 
+  private simplifyPoints(points: Point[]): Point[] {
+    const cleaned: Point[] = [];
+    for (const p of points) {
+      const last = cleaned[cleaned.length - 1];
+      if (!last || last.x !== p.x || last.y !== p.y) {
+        cleaned.push(p);
+      }
+    }
+    const result: Point[] = [];
+    for (let i = 0; i < cleaned.length; i++) {
+      const prev = result[result.length - 1];
+      const curr = cleaned[i];
+      const next = cleaned[i + 1];
+      if (!prev || !next) {
+        result.push(curr);
+        continue;
+      }
+      const dx1 = curr.x - prev.x;
+      const dy1 = curr.y - prev.y;
+      const dx2 = next.x - curr.x;
+      const dy2 = next.y - curr.y;
+      const colinear = (dx1 === 0 && dx2 === 0) || (dy1 === 0 && dy2 === 0);
+      const opposite = (dx1 === -dx2 && dy1 === -dy2);
+      if (colinear || opposite) {
+        continue;
+      }
+      result.push(curr);
+    }
+    return result;
+  }
+
+  private isTargetDirectionCorrect(points: Point[], targetPort: Port): boolean {
+    if (points.length < 2) return true;
+    const end = points[points.length - 1];
+    const prev = points[points.length - 2];
+    const dx = end.x - prev.x;
+    const dy = end.y - prev.y;
+    const direction = Math.abs(dx) >= Math.abs(dy) ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'down' : 'up');
+    const expected =
+      targetPort === 'top' ? 'down' : targetPort === 'bottom' ? 'up' : targetPort === 'left' ? 'right' : 'left';
+    return direction === expected;
+  }
+
+  private oppositePort(port: Port): Port {
+    switch (port) {
+      case 'top':
+        return 'bottom';
+      case 'bottom':
+        return 'top';
+      case 'left':
+        return 'right';
+      case 'right':
+        return 'left';
+    }
+  }
+
   private guessTargetPort(start: Point, end: Point): Port {
     const dx = end.x - start.x;
     const dy = end.y - start.y;
@@ -317,7 +383,7 @@ export class EdgesLayerComponent {
     return dy >= 0 ? 'top' : 'bottom';
   }
 
-  private getBendPoint(edge: DiagramEdge): Point {
+  getBendPoint(edge: DiagramEdge): Point {
     if (edge.points?.[0]) return edge.points[0];
     const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
     const targetNode = this.nodes().find((n) => n.id === edge.targetId);
