@@ -12,7 +12,55 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
     <div class="h-full w-72 bg-white border-l border-slate-200 p-4 overflow-auto">
       <h2 class="text-lg font-semibold mb-4">Inspector</h2>
 
-      @if (selectedNodes().length === 0) {
+      @if (selectedEdge()) {
+      <details open>
+        <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">Edge</summary>
+        <div class="space-y-3">
+          <div class="text-xs text-slate-500">ID: {{ selectedEdge()!.id }}</div>
+          <button
+            class="w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
+            (click)="deleteSelectedEdge()"
+          >
+            Delete Edge
+          </button>
+          <div>
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('stroke')"
+              >Stroke</label
+            >
+            <input
+              [id]="edgeFieldId('stroke')"
+              [attr.name]="edgeFieldId('stroke')"
+              type="text"
+              class="w-full border rounded px-2 py-1 text-sm"
+              [ngModel]="selectedEdge()!.style?.stroke || '#333'"
+              (ngModelChange)="updateEdgeStyle({ stroke: $event })"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('strokeWidth')"
+              >Stroke Width</label
+            >
+            <input
+              [id]="edgeFieldId('strokeWidth')"
+              [attr.name]="edgeFieldId('strokeWidth')"
+              type="number"
+              min="1"
+              class="w-full border rounded px-2 py-1 text-sm"
+              [ngModel]="selectedEdge()!.style?.strokeWidth || 2"
+              (ngModelChange)="updateEdgeStyleNumber('strokeWidth', $event)"
+            />
+          </div>
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              [checked]="(selectedEdge()!.markerEnd || '') === 'arrow'"
+              (change)="updateEdgeMarker($event)"
+            />
+            Arrow
+          </label>
+        </div>
+      </details>
+      } @else if (selectedNodes().length === 0) {
       <div class="text-sm text-slate-500">No selection.</div>
       } @else if (selectedNodes().length > 1) {
       <div class="text-sm text-slate-600">
@@ -274,6 +322,12 @@ export class InspectorComponent {
     return this.diagramService.nodes().filter((node) => selectedIds.has(node.id));
   });
 
+  selectedEdge = computed(() => {
+    const edgeId = this.diagramService.selectedEdgeId();
+    if (!edgeId) return null;
+    return this.diagramService.edges().find((edge) => edge.id === edgeId) || null;
+  });
+
   node = computed(() => this.selectedNodes()[0] || null);
 
   shapeNode(): ShapeNode | null {
@@ -321,9 +375,43 @@ export class InspectorComponent {
     this.diagramService.updateNodeData(n.id, { [key]: value });
   }
 
+  updateEdgeStyle(style: { stroke?: string; strokeWidth?: number }) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    this.diagramService.setEdgeStyle(edge.id, style);
+  }
+
+  updateEdgeStyleNumber(field: 'strokeWidth', value: number) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) return;
+    const clamped = Math.max(1, parsed);
+    this.diagramService.setEdgeStyle(edge.id, { [field]: clamped });
+  }
+
+  updateEdgeMarker(event: Event) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const checked = (event.target as HTMLInputElement).checked;
+    this.diagramService.updateEdge(edge.id, { markerEnd: checked ? 'arrow' : undefined });
+  }
+
+  deleteSelectedEdge() {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    this.diagramService.removeEdge(edge.id);
+  }
+
   fieldId(field: string): string {
     const n = this.node();
     const id = n?.id ?? 'none';
     return `inspector-${id}-${field}`;
+  }
+
+  edgeFieldId(field: string): string {
+    const edge = this.selectedEdge();
+    const id = edge?.id ?? 'none';
+    return `inspector-edge-${id}-${field}`;
   }
 }

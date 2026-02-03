@@ -40,6 +40,8 @@ export interface WebNode extends DiagramNode {
 export interface DiagramEdge extends DiagramElement {
   sourceId: string;
   targetId: string;
+  sourcePort?: 'top' | 'right' | 'bottom' | 'left';
+  targetPort?: 'top' | 'right' | 'bottom' | 'left';
   points: Point[];
   markerEnd?: string; // 'arrow'
   style?: {

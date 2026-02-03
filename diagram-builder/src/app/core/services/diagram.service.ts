@@ -21,6 +21,12 @@ export class DiagramService {
   private lastDragEndAt = 0;
   private snapToGridSignal = signal<boolean>(true);
   private gridSizeSignal = signal<number>(20);
+  private edgePreviewSignal = signal<{
+    sourceId: string;
+    sourcePort: 'top' | 'right' | 'bottom' | 'left';
+    targetPoint: Point;
+  } | null>(null);
+  private selectedEdgeIdSignal = signal<string | null>(null);
 
   // Computed
   readonly nodes = this.nodesSignal.asReadonly();
@@ -28,6 +34,8 @@ export class DiagramService {
   readonly selection = this.selectionSignal.asReadonly();
   readonly snapToGrid = this.snapToGridSignal.asReadonly();
   readonly gridSize = this.gridSizeSignal.asReadonly();
+  readonly edgePreview = this.edgePreviewSignal.asReadonly();
+  readonly selectedEdgeId = this.selectedEdgeIdSignal.asReadonly();
 
   constructor() {
     // Initialize with some dummy data for now
@@ -96,6 +104,8 @@ export class DiagramService {
       id: 'e1',
       sourceId: '1',
       targetId: '4',
+      sourcePort: 'right',
+      targetPort: 'left',
       zIndex: 0,
       points: [],
       markerEnd: 'arrow',
@@ -111,6 +121,23 @@ export class DiagramService {
 
   addEdge(edge: DiagramEdge) {
     this.edgesSignal.update((edges) => [...edges, edge]);
+  }
+
+  removeEdge(edgeId: string) {
+    this.edgesSignal.update((edges) => edges.filter((e) => e.id !== edgeId));
+    if (this.selectedEdgeIdSignal() === edgeId) {
+      this.selectedEdgeIdSignal.set(null);
+    }
+  }
+
+  updateEdge(id: string, changes: Partial<DiagramEdge>) {
+    this.edgesSignal.update((edges) => edges.map((e) => (e.id === id ? { ...e, ...changes } : e)));
+  }
+
+  setEdgeStyle(id: string, style: DiagramEdge['style']) {
+    this.edgesSignal.update((edges) =>
+      edges.map((e) => (e.id === id ? { ...e, style: { ...(e.style || {}), ...(style || {}) } } : e))
+    );
   }
 
   removeNode(nodeId: string) {
@@ -146,6 +173,7 @@ export class DiagramService {
   }
 
   toggleSelection(id: string, multi: boolean) {
+    this.selectedEdgeIdSignal.set(null);
     this.selectionSignal.update((sel) => {
       const newSel = multi ? new Set<string>(sel) : new Set<string>();
       if (sel.has(id) && multi) {
@@ -159,6 +187,7 @@ export class DiagramService {
 
   clearSelection() {
     this.selectionSignal.set(new Set());
+    this.selectedEdgeIdSignal.set(null);
   }
 
   setSnapToGrid(enabled: boolean) {
@@ -171,6 +200,7 @@ export class DiagramService {
   }
 
   setSelection(ids: string[], additive: boolean) {
+    this.selectedEdgeIdSignal.set(null);
     if (!additive) {
       this.selectionSignal.set(new Set(ids));
       return;
@@ -180,6 +210,34 @@ export class DiagramService {
       ids.forEach((id) => next.add(id));
       return next;
     });
+  }
+
+  exportJson(): string {
+    const model = { nodes: this.nodesSignal(), edges: this.edgesSignal() };
+    return JSON.stringify(model, null, 2);
+  }
+
+  loadFromJson(json: string) {
+    const parsed = JSON.parse(json) as { nodes: DiagramNode[]; edges: DiagramEdge[] };
+    if (!parsed?.nodes || !parsed?.edges) {
+      throw new Error('Invalid diagram JSON');
+    }
+    this.nodesSignal.set(parsed.nodes);
+    this.edgesSignal.set(parsed.edges);
+    this.selectionSignal.set(new Set());
+    this.selectedEdgeIdSignal.set(null);
+  }
+
+  saveToLocalStorage(key = 'diagram-builder') {
+    const model = { nodes: this.nodesSignal(), edges: this.edgesSignal() };
+    localStorage.setItem(key, JSON.stringify(model));
+  }
+
+  loadFromLocalStorage(key = 'diagram-builder'): boolean {
+    const raw = localStorage.getItem(key);
+    if (!raw) return false;
+    this.loadFromJson(raw);
+    return true;
   }
 
   beginDrag(activeNodeId: string) {
@@ -230,5 +288,24 @@ export class DiagramService {
   shouldIgnoreBackgroundClick(): boolean {
     if (this.isDragging) return true;
     return Date.now() - this.lastDragEndAt < 200;
+  }
+
+  selectEdge(edgeId: string | null) {
+    this.selectionSignal.set(new Set());
+    this.selectedEdgeIdSignal.set(edgeId);
+  }
+
+  startEdgePreview(sourceId: string, sourcePort: 'top' | 'right' | 'bottom' | 'left', point: Point) {
+    this.edgePreviewSignal.set({ sourceId, sourcePort, targetPoint: point });
+  }
+
+  updateEdgePreview(point: Point) {
+    const preview = this.edgePreviewSignal();
+    if (!preview) return;
+    this.edgePreviewSignal.set({ ...preview, targetPoint: point });
+  }
+
+  clearEdgePreview() {
+    this.edgePreviewSignal.set(null);
   }
 }

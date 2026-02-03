@@ -1,0 +1,351 @@
+import { Component, ElementRef, HostListener, ViewChild, computed, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DiagramService } from '../../core/services/diagram.service';
+import { DiagramEdge, DiagramNode, Point } from '../../core/models/diagram.model';
+
+type Port = 'top' | 'right' | 'bottom' | 'left';
+
+@Component({
+  selector: 'app-edges-layer',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <svg
+      #svgRoot
+      class="absolute inset-0 pointer-events-none w-full h-full overflow-visible"
+    >
+      <defs>
+        <marker
+          id="arrow"
+          markerWidth="10"
+          markerHeight="10"
+          refX="9"
+          refY="3"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+        </marker>
+      </defs>
+
+      @for (edge of edges(); track edge.id) {
+      <path
+        class="pointer-events-auto"
+        [attr.d]="edgePath(edge)"
+        fill="none"
+        [attr.stroke]="edge.style?.stroke || '#333'"
+        [attr.stroke-width]="edge.style?.strokeWidth || 2"
+        [attr.marker-end]="edge.markerEnd ? 'url(#arrow)' : null"
+        (click)="onEdgeClick(edge, $event)"
+      />
+      @if (selectedEdgeId() === edge.id) {
+      <path
+        [attr.d]="edgePath(edge)"
+        fill="none"
+        stroke="#2563eb"
+        stroke-width="4"
+        stroke-opacity="0.3"
+        pointer-events="none"
+      />
+      <circle
+        [attr.cx]="edgePortPoint(edge, 'source').x"
+        [attr.cy]="edgePortPoint(edge, 'source').y"
+        r="5"
+        fill="#fff"
+        stroke="#2563eb"
+        stroke-width="2"
+        class="pointer-events-auto cursor-grab"
+        (mousedown)="onEdgeHandleDown(edge, 'source', $event)"
+      />
+      <circle
+        [attr.cx]="edgePortPoint(edge, 'target').x"
+        [attr.cy]="edgePortPoint(edge, 'target').y"
+        r="5"
+        fill="#fff"
+        stroke="#2563eb"
+        stroke-width="2"
+        class="pointer-events-auto cursor-grab"
+        (mousedown)="onEdgeHandleDown(edge, 'target', $event)"
+      />
+      <circle
+        [attr.cx]="getBendPoint(edge).x"
+        [attr.cy]="getBendPoint(edge).y"
+        r="5"
+        fill="#fff"
+        stroke="#10b981"
+        stroke-width="2"
+        class="pointer-events-auto cursor-grab"
+        (mousedown)="onBendHandleDown(edge, $event)"
+        (dblclick)="clearBend(edge, $event)"
+      />
+      }
+      }
+
+      @if (previewPath()) {
+      <path
+        [attr.d]="previewPath()!"
+        fill="none"
+        stroke="#3b82f6"
+        stroke-width="2"
+        stroke-dasharray="6 4"
+        [attr.marker-end]="'url(#arrow)'"
+      />
+      }
+
+      @if (dragPath()) {
+      <path
+        [attr.d]="dragPath()!"
+        fill="none"
+        stroke="#2563eb"
+        stroke-width="2"
+        stroke-dasharray="6 4"
+        [attr.marker-end]="'url(#arrow)'"
+      />
+      }
+    </svg>
+  `,
+})
+export class EdgesLayerComponent {
+  private diagramService = inject(DiagramService);
+  @ViewChild('svgRoot', { static: true }) svgRoot!: ElementRef<SVGSVGElement>;
+  edges = this.diagramService.edges;
+  preview = this.diagramService.edgePreview;
+  nodes = this.diagramService.nodes;
+  selectedEdgeId = this.diagramService.selectedEdgeId;
+  private connectionDrag: {
+    edgeId: string;
+    end: 'source' | 'target';
+    fixedPoint: Point;
+    currentPoint: Point;
+  } | null = null;
+  private bendDrag: { edgeId: string } | null = null;
+
+  previewPath = computed(() => {
+    const preview = this.preview();
+    if (!preview) return null;
+    const sourceNode = this.nodes().find((n) => n.id === preview.sourceId);
+    if (!sourceNode) return null;
+    const sourcePoint = this.getPortPoint(sourceNode, preview.sourcePort);
+    const targetPort = this.guessTargetPort(sourcePoint, preview.targetPoint);
+    return this.buildOrthogonalPath(sourcePoint, preview.targetPoint, preview.sourcePort, targetPort);
+  });
+
+  dragPath = computed(() => {
+    if (!this.connectionDrag) return null;
+    const start = this.connectionDrag.end === 'source' ? this.connectionDrag.currentPoint : this.connectionDrag.fixedPoint;
+    const end = this.connectionDrag.end === 'source' ? this.connectionDrag.fixedPoint : this.connectionDrag.currentPoint;
+    const targetPort = this.guessTargetPort(start, end);
+    return this.buildOrthogonalPath(start, end, 'right', targetPort);
+  });
+
+  onEdgeClick(edge: DiagramEdge, event: MouseEvent) {
+    event.stopPropagation();
+    this.diagramService.selectEdge(edge.id);
+  }
+
+  onEdgeHandleDown(edge: DiagramEdge, end: 'source' | 'target', event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.diagramService.selectEdge(edge.id);
+    const sourcePort = edge.sourcePort || 'right';
+    const targetPort = edge.targetPort || 'left';
+    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
+    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
+    if (!sourceNode || !targetNode) return;
+    const sourcePoint = this.getPortPoint(sourceNode, sourcePort);
+    const targetPoint = this.getPortPoint(targetNode, targetPort);
+    this.connectionDrag = {
+      edgeId: edge.id,
+      end,
+      fixedPoint: end === 'source' ? targetPoint : sourcePoint,
+      currentPoint: end === 'source' ? sourcePoint : targetPoint,
+    };
+  }
+
+  onBendHandleDown(edge: DiagramEdge, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.diagramService.selectEdge(edge.id);
+    this.bendDrag = { edgeId: edge.id };
+  }
+
+  clearBend(edge: DiagramEdge, event: MouseEvent) {
+    event.stopPropagation();
+    this.diagramService.updateEdge(edge.id, { points: [] });
+  }
+
+  @HostListener('document:mousemove', ['$event'])
+  onDocumentMouseMove(event: MouseEvent) {
+    const rect = this.svgRoot.nativeElement.getBoundingClientRect();
+    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    if (this.connectionDrag) {
+      this.connectionDrag.currentPoint = point;
+      return;
+    }
+    if (this.bendDrag) {
+      this.diagramService.updateEdge(this.bendDrag.edgeId, { points: [point] });
+    }
+  }
+
+  @HostListener('document:mouseup', ['$event'])
+  onDocumentMouseUp(event: MouseEvent) {
+    if (this.bendDrag) {
+      this.bendDrag = null;
+      return;
+    }
+    if (!this.connectionDrag) return;
+    const rect = this.svgRoot.nativeElement.getBoundingClientRect();
+    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const { edgeId, end } = this.connectionDrag;
+    const nearest = this.findNearestPort(point);
+    if (nearest) {
+      if (end === 'source') {
+        this.diagramService.updateEdge(edgeId, { sourceId: nearest.nodeId, sourcePort: nearest.port });
+      } else {
+        this.diagramService.updateEdge(edgeId, { targetId: nearest.nodeId, targetPort: nearest.port });
+      }
+    }
+    this.connectionDrag = null;
+  }
+
+  edgePath(edge: DiagramEdge): string {
+    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
+    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
+    if (!sourceNode || !targetNode) return '';
+    const sourcePort = edge.sourcePort || 'right';
+    const targetPort = edge.targetPort || 'left';
+    const start = this.getPortPoint(sourceNode, sourcePort);
+    const end = this.getPortPoint(targetNode, targetPort);
+    const manual = edge.points?.[0] || null;
+    return this.buildOrthogonalPath(start, end, sourcePort, targetPort, manual);
+  }
+
+  edgePortPoint(edge: DiagramEdge, end: 'source' | 'target'): Point {
+    const nodeId = end === 'source' ? edge.sourceId : edge.targetId;
+    const port = end === 'source' ? edge.sourcePort || 'right' : edge.targetPort || 'left';
+    const node = this.nodes().find((n) => n.id === nodeId);
+    if (!node) return { x: 0, y: 0 };
+    return this.getPortPoint(node, port);
+  }
+
+  private getPortPoint(node: DiagramNode, port: Port): Point {
+    switch (port) {
+      case 'top':
+        return { x: node.x + node.width / 2, y: node.y };
+      case 'right':
+        return { x: node.x + node.width, y: node.y + node.height / 2 };
+      case 'bottom':
+        return { x: node.x + node.width / 2, y: node.y + node.height };
+      case 'left':
+        return { x: node.x, y: node.y + node.height / 2 };
+    }
+  }
+
+  private buildOrthogonalPath(
+    start: Point,
+    end: Point,
+    sourcePort: Port,
+    targetPort?: Port,
+    manualPoint?: Point | null
+  ): string {
+    const target = targetPort || this.guessTargetPort(start, end);
+    if (manualPoint) {
+      const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
+      const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
+      const points = [...first, ...second.slice(1)];
+      return this.pointsToPath(points);
+    }
+    const points = this.routePoints(start, end, sourcePort, target);
+    return this.pointsToPath(points);
+  }
+
+  private routePoints(start: Point, end: Point, sourcePort: Port, targetPort: Port): Point[] {
+    const offset = 20;
+    const startOut = this.pushFromPort(start, sourcePort, offset);
+    const endIn = this.pushFromPort(end, targetPort, offset);
+
+    const candidateA = this.orthogonalVia(start, startOut, endIn, end, true);
+    const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
+    const scoreA = this.pathScore(candidateA);
+    const scoreB = this.pathScore(candidateB);
+    return scoreA <= scoreB ? candidateA : candidateB;
+  }
+
+  private orthogonalVia(
+    start: Point,
+    startOut: Point,
+    endIn: Point,
+    end: Point,
+    horizontalFirst: boolean
+  ): Point[] {
+    const middle = horizontalFirst ? { x: endIn.x, y: startOut.y } : { x: startOut.x, y: endIn.y };
+    return [start, startOut, middle, endIn, end];
+  }
+
+  private pathScore(points: Point[]): number {
+    let score = 0;
+    for (let i = 1; i < points.length; i++) {
+      score += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
+    }
+    return score;
+  }
+
+  private pushFromPort(point: Point, port: Port, offset: number, invert = false): Point {
+    const dir = invert ? -1 : 1;
+    switch (port) {
+      case 'top':
+        return { x: point.x, y: point.y - offset * dir };
+      case 'right':
+        return { x: point.x + offset * dir, y: point.y };
+      case 'bottom':
+        return { x: point.x, y: point.y + offset * dir };
+      case 'left':
+        return { x: point.x - offset * dir, y: point.y };
+    }
+  }
+
+  private pointsToPath(points: Point[]): string {
+    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  }
+
+  private guessTargetPort(start: Point, end: Point): Port {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      return dx >= 0 ? 'left' : 'right';
+    }
+    return dy >= 0 ? 'top' : 'bottom';
+  }
+
+  private getBendPoint(edge: DiagramEdge): Point {
+    if (edge.points?.[0]) return edge.points[0];
+    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
+    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
+    if (!sourceNode || !targetNode) return { x: 0, y: 0 };
+    const start = this.getPortPoint(sourceNode, edge.sourcePort || 'right');
+    const end = this.getPortPoint(targetNode, edge.targetPort || 'left');
+    return { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+  }
+
+  private findNearestPort(point: Point): { nodeId: string; port: Port } | null {
+    let closest: { nodeId: string; port: Port; distance: number } | null = null;
+    for (const node of this.nodes()) {
+      const ports: Array<{ port: Port; point: Point }> = [
+        { port: 'top', point: { x: node.x + node.width / 2, y: node.y } },
+        { port: 'right', point: { x: node.x + node.width, y: node.y + node.height / 2 } },
+        { port: 'bottom', point: { x: node.x + node.width / 2, y: node.y + node.height } },
+        { port: 'left', point: { x: node.x, y: node.y + node.height / 2 } },
+      ];
+      for (const p of ports) {
+        const dx = p.point.x - point.x;
+        const dy = p.point.y - point.y;
+        const distance = Math.hypot(dx, dy);
+        if (!closest || distance < closest.distance) {
+          closest = { nodeId: node.id, port: p.port, distance };
+        }
+      }
+    }
+    if (!closest || closest.distance > 30) return null;
+    return { nodeId: closest.nodeId, port: closest.port };
+  }
+}

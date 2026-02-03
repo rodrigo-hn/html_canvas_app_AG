@@ -114,6 +114,26 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
         (click)="onResizeClick($event)"
       ></div>
       }
+
+      <!-- Connection Ports (only when selected) -->
+      @if (isSelected()) {
+      <div
+        class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -top-2 left-1/2 -translate-x-1/2 cursor-crosshair"
+        (mousedown)="startEdge('top', $event)"
+      ></div>
+      <div
+        class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -right-2 top-1/2 -translate-y-1/2 cursor-crosshair"
+        (mousedown)="startEdge('right', $event)"
+      ></div>
+      <div
+        class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -bottom-2 left-1/2 -translate-x-1/2 cursor-crosshair"
+        (mousedown)="startEdge('bottom', $event)"
+      ></div>
+      <div
+        class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -left-2 top-1/2 -translate-y-1/2 cursor-crosshair"
+        (mousedown)="startEdge('left', $event)"
+      ></div>
+      }
     </div>
   `,
   styles: [],
@@ -213,6 +233,13 @@ export class NodeRendererComponent {
     event.stopPropagation();
   }
 
+  startEdge(port: 'top' | 'right' | 'bottom' | 'left', event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    const point = this.getPortPoint(port);
+    this.diagramService.startEdgePreview(this.node.id, port, point);
+  }
+
   @HostListener('document:mousemove', ['$event'])
   onResizeMove(event: MouseEvent) {
     if (!this.isResizing || !this.resizeState) return;
@@ -266,6 +293,19 @@ export class NodeRendererComponent {
 
   asWebNode(node: DiagramNode): WebNode {
     return node as WebNode;
+  }
+
+  private getPortPoint(port: 'top' | 'right' | 'bottom' | 'left'): Point {
+    switch (port) {
+      case 'top':
+        return { x: this.node.x + this.node.width / 2, y: this.node.y };
+      case 'right':
+        return { x: this.node.x + this.node.width, y: this.node.y + this.node.height / 2 };
+      case 'bottom':
+        return { x: this.node.x + this.node.width / 2, y: this.node.y + this.node.height };
+      case 'left':
+        return { x: this.node.x, y: this.node.y + this.node.height / 2 };
+    }
   }
 
   canEditText(): boolean {

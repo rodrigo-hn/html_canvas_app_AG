@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { DiagramModel, ShapeNode, WebNode } from '../models/diagram.model';
+import { DiagramModel, DiagramNode, ShapeNode, WebNode } from '../models/diagram.model';
 import { BasicShapes } from '../../stencils/shapes/basic.shapes';
 import { BpmnShapes } from '../../stencils/shapes/bpmn.shapes';
 import { StencilService } from '../../stencils/stencil.service';
@@ -44,6 +44,68 @@ ${nodesHtml}
 </body>
 </html>
     `;
+  }
+
+  exportSvg(model: DiagramModel): string {
+    const bounds = this.getBounds(model);
+    const edgesSvg = this.renderEdgesSvg(model);
+    const nodesSvg = model.nodes.map((node) => this.renderNodeSvg(node)).join('\n');
+
+    return `
+<svg xmlns="http://www.w3.org/2000/svg" width="${bounds.width}" height="${bounds.height}" viewBox="${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}">
+  <defs>
+    <marker
+      id="arrow"
+      markerWidth="10"
+      markerHeight="10"
+      refX="9"
+      refY="3"
+      orient="auto"
+      markerUnits="strokeWidth"
+    >
+      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+    </marker>
+  </defs>
+  <rect x="${bounds.minX}" y="${bounds.minY}" width="${bounds.width}" height="${bounds.height}" fill="#f8fafc" />
+  ${edgesSvg}
+  ${nodesSvg}
+</svg>
+    `;
+  }
+
+  async exportPng(model: DiagramModel): Promise<Blob> {
+    const svg = this.exportSvg(model);
+    const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(svgBlob);
+
+    return new Promise<Blob>((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width || 1200;
+        canvas.height = img.height || 800;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          URL.revokeObjectURL(url);
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+        ctx.drawImage(img, 0, 0);
+        canvas.toBlob((blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            reject(new Error('PNG export failed'));
+            return;
+          }
+          resolve(blob);
+        }, 'image/png');
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('SVG image load failed'));
+      };
+      img.src = url;
+    });
   }
 
   private renderShape(node: ShapeNode): string {
@@ -126,13 +188,14 @@ ${nodesHtml}
 
     const paths = model.edges
       .map((edge) => {
-        const start = this.getEdgePoint(model, edge.sourceId);
-        const end = this.getEdgePoint(model, edge.targetId);
+        const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
+        const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
         const stroke = edge.style?.stroke || 'black';
         const strokeWidth = edge.style?.strokeWidth || 1;
         const marker = edge.markerEnd ? 'url(#arrow)' : '';
-        return `<path d="M ${start.x} ${start.y} L ${end.x} ${end.y}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
+        const d = this.buildOrthogonalPath(start, end, edge.sourcePort || 'right', edge.targetPort || 'left', edge.points?.[0] || null);
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
       })
       .filter(Boolean)
       .join('\n');
@@ -157,10 +220,172 @@ ${nodesHtml}
     `;
   }
 
-  private getEdgePoint(model: DiagramModel, nodeId: string) {
+  private renderEdgesSvg(model: DiagramModel): string {
+    if (!model.edges || model.edges.length === 0) return '';
+    return model.edges
+      .map((edge) => {
+        const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
+        const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
+        if (!start || !end) return '';
+        const stroke = edge.style?.stroke || '#333';
+        const strokeWidth = edge.style?.strokeWidth || 2;
+        const marker = edge.markerEnd ? 'url(#arrow)' : '';
+        const d = this.buildOrthogonalPath(start, end, edge.sourcePort || 'right');
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
+      })
+      .filter(Boolean)
+      .join('\n');
+  }
+
+  private renderNodeSvg(node: DiagramNode): string {
+    if (node.type === 'shape') {
+      const shapeNode = node as ShapeNode;
+      const content = this.getSvgContent(shapeNode);
+      const text = shapeNode.data?.text ? this.escapeText(shapeNode.data.text) : '';
+      return `
+        <g transform="translate(${shapeNode.x} ${shapeNode.y})">
+          ${content}
+          ${
+            text
+              ? `<text x="${shapeNode.width / 2}" y="${shapeNode.height / 2}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#111">${text}</text>`
+              : ''
+          }
+        </g>
+      `;
+    }
+
+    const web = node as WebNode;
+    const x = web.x;
+    const y = web.y;
+    const w = web.width;
+    const h = web.height;
+    const text = this.escapeText((web.data?.text || web.data?.title || web.componentType || '').toString());
+    return `
+      <g>
+        <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#ffffff" stroke="#333" />
+        <text x="${x + w / 2}" y="${y + h / 2}" text-anchor="middle" dominant-baseline="middle" font-size="14" fill="#111">
+          ${text}
+        </text>
+      </g>
+    `;
+  }
+
+  private getBounds(model: DiagramModel) {
+    const padding = 40;
+    const xs = model.nodes.map((n) => [n.x, n.x + n.width]).flat();
+    const ys = model.nodes.map((n) => [n.y, n.y + n.height]).flat();
+    const minX = Math.min(...xs, 0) - padding;
+    const minY = Math.min(...ys, 0) - padding;
+    const maxX = Math.max(...xs, 1200) + padding;
+    const maxY = Math.max(...ys, 800) + padding;
+    return { minX, minY, width: maxX - minX, height: maxY - minY };
+  }
+
+  private escapeText(value: string): string {
+    return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  private getPortPoint(
+    model: DiagramModel,
+    nodeId: string,
+    port: 'top' | 'right' | 'bottom' | 'left'
+  ) {
     const node = model.nodes.find((n) => n.id === nodeId);
     if (!node) return null;
-    return { x: node.x + node.width / 2, y: node.y + node.height / 2 };
+    switch (port) {
+      case 'top':
+        return { x: node.x + node.width / 2, y: node.y };
+      case 'right':
+        return { x: node.x + node.width, y: node.y + node.height / 2 };
+      case 'bottom':
+        return { x: node.x + node.width / 2, y: node.y + node.height };
+      case 'left':
+        return { x: node.x, y: node.y + node.height / 2 };
+    }
+  }
+
+  private buildOrthogonalPath(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    sourcePort: 'top' | 'right' | 'bottom' | 'left',
+    targetPort: 'top' | 'right' | 'bottom' | 'left',
+    manualPoint?: { x: number; y: number } | null
+  ): string {
+    const target = targetPort || this.guessTargetPort(start, end);
+    if (manualPoint) {
+      const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
+      const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
+      const points = [...first, ...second.slice(1)];
+      return this.pointsToPath(points);
+    }
+    const points = this.routePoints(start, end, sourcePort, target);
+    return this.pointsToPath(points);
+  }
+
+  private routePoints(
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+    sourcePort: 'top' | 'right' | 'bottom' | 'left',
+    targetPort: 'top' | 'right' | 'bottom' | 'left'
+  ) {
+    const offset = 20;
+    const startOut = this.pushFromPort(start, sourcePort, offset);
+    const endIn = this.pushFromPort(end, targetPort, offset);
+    const candidateA = this.orthogonalVia(start, startOut, endIn, end, true);
+    const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
+    const scoreA = this.pathScore(candidateA);
+    const scoreB = this.pathScore(candidateB);
+    return scoreA <= scoreB ? candidateA : candidateB;
+  }
+
+  private orthogonalVia(
+    start: { x: number; y: number },
+    startOut: { x: number; y: number },
+    endIn: { x: number; y: number },
+    end: { x: number; y: number },
+    horizontalFirst: boolean
+  ) {
+    const middle = horizontalFirst ? { x: endIn.x, y: startOut.y } : { x: startOut.x, y: endIn.y };
+    return [start, startOut, middle, endIn, end];
+  }
+
+  private pathScore(points: Array<{ x: number; y: number }>) {
+    let score = 0;
+    for (let i = 1; i < points.length; i++) {
+      score += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
+    }
+    return score;
+  }
+
+  private pushFromPort(
+    point: { x: number; y: number },
+    port: 'top' | 'right' | 'bottom' | 'left',
+    offset: number,
+    invert = false
+  ) {
+    const dir = invert ? -1 : 1;
+    switch (port) {
+      case 'top':
+        return { x: point.x, y: point.y - offset * dir };
+      case 'right':
+        return { x: point.x + offset * dir, y: point.y };
+      case 'bottom':
+        return { x: point.x, y: point.y + offset * dir };
+      case 'left':
+        return { x: point.x - offset * dir, y: point.y };
+    }
+  }
+
+  private pointsToPath(points: Array<{ x: number; y: number }>) {
+    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  }
+
+  private guessTargetPort(start: { x: number; y: number }, end: { x: number; y: number }) {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    if (Math.abs(dx) >= Math.abs(dy)) {
+      return dx >= 0 ? 'left' : 'right';
+    }
+    return dy >= 0 ? 'top' : 'bottom';
   }
 
   private renderButton(node: WebNode, style: string): string {
