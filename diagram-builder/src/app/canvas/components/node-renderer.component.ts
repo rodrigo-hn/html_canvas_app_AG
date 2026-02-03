@@ -17,7 +17,9 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
       [snapToGrid]="true"
       [gridSize]="20"
       [startPosition]="{ x: node.x, y: node.y }"
+      (dragStart)="onDragStart()"
       (dragMove)="onDragMove($event)"
+      (dragEnd)="onDragEnd()"
       [class.ring-2]="isSelected()"
       [class.ring-blue-600]="isSelected()"
       [style.left.px]="node.x"
@@ -65,17 +67,30 @@ export class NodeRendererComponent {
 
   private diagramService = inject(DiagramService);
   private stencilService = inject(StencilService);
+  private lastDragMoveAt = 0;
 
   isSelected = computed(() => this.diagramService.selection().has(this.node.id));
 
   onSelect(event: MouseEvent) {
+    if (Date.now() - this.lastDragMoveAt < 200) {
+      return;
+    }
     event.stopPropagation();
     const meta = event.metaKey || event.shiftKey;
     this.diagramService.toggleSelection(this.node.id, meta);
   }
 
+  onDragStart() {
+    this.diagramService.beginDrag(this.node.id);
+  }
+
   onDragMove(pos: Point) {
-    this.diagramService.updateNode(this.node.id, { x: pos.x, y: pos.y });
+    this.lastDragMoveAt = Date.now();
+    this.diagramService.dragMove(this.node.id, pos);
+  }
+
+  onDragEnd() {
+    this.diagramService.endDrag();
   }
 
   getShapeContent() {

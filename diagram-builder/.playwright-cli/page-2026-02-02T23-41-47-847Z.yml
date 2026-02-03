@@ -1,0 +1,55 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Export HTML" [ref=e6] [cursor=pointer]
+    - img
+    - generic:
+      - img
+    - generic [ref=e7]:
+      - img:
+        - generic:
+          - generic: Start Process
+    - generic [ref=e8]:
+      - img:
+        - generic:
+          - generic: Database
+    - generic [ref=e9]:
+      - img:
+        - generic:
+          - generic: User Task
+    - generic [ref=e12]:
+      - generic:
+        - generic:
+          - button "Save"
+    - generic [ref=e15]:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic: User Profile
+              - paragraph: Details regarding the user...
+  - generic [ref=e18]:
+    - heading "Inspector" [level=2] [ref=e19]
+    - generic [ref=e46]:
+      - generic [ref=e47]: "ID: 1"
+      - generic [ref=e48]: "Type: shape"
+      - generic [ref=e49]:
+        - generic [ref=e50]: X
+        - spinbutton [ref=e51]: "180"
+      - generic [ref=e52]:
+        - generic [ref=e53]: "Y"
+        - spinbutton [ref=e54]: "120"
+      - generic [ref=e55]:
+        - generic [ref=e56]: Width
+        - spinbutton [ref=e57]: "120"
+      - generic [ref=e58]:
+        - generic [ref=e59]: Height
+        - spinbutton [ref=e60]: "80"
+      - generic [ref=e61]:
+        - generic [ref=e62]: Z-Index
+        - spinbutton [ref=e63]: "1"
+      - generic [ref=e64]:
+        - generic [ref=e65]: Shape Type
+        - textbox [ref=e66]: rectangle
+      - generic [ref=e67]:
+        - generic [ref=e68]: Text
+        - textbox [ref=e69]: Start Process

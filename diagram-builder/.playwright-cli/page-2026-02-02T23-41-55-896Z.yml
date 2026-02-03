@@ -1,0 +1,32 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - button "Export HTML" [ref=e6] [cursor=pointer]
+    - img
+    - generic:
+      - img
+    - generic [ref=e7]:
+      - img:
+        - generic:
+          - generic: Start Process
+    - generic [ref=e8]:
+      - img:
+        - generic:
+          - generic: Database
+    - generic [ref=e9]:
+      - img:
+        - generic:
+          - generic: User Task
+    - generic [ref=e12]:
+      - generic:
+        - generic:
+          - button "Save"
+    - generic [ref=e15]:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic: User Profile
+              - paragraph: Details regarding the user...
+  - generic [ref=e18]:
+    - heading "Inspector" [level=2] [ref=e19]
+    - generic [ref=e70]: No selection.

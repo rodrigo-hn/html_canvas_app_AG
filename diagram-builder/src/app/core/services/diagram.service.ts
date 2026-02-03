@@ -5,6 +5,7 @@ import {
   DiagramEdge,
   ShapeNode,
   WebNode,
+  Point,
 } from '../models/diagram.model';
 
 @Injectable({
@@ -15,6 +16,9 @@ export class DiagramService {
   private nodesSignal = signal<DiagramNode[]>([]);
   private edgesSignal = signal<DiagramEdge[]>([]);
   private selectionSignal = signal<Set<string>>(new Set());
+  private dragStartPositions = new Map<string, Point>();
+  private isDragging = false;
+  private lastDragEndAt = 0;
 
   // Computed
   readonly nodes = this.nodesSignal.asReadonly();
@@ -117,8 +121,24 @@ export class DiagramService {
     });
   }
 
-  updateNode(id: string, changes: Partial<DiagramNode>) {
+  updateNode(id: string, changes: Partial<DiagramNode> & Partial<ShapeNode> & Partial<WebNode>) {
     this.nodesSignal.update((nodes) => nodes.map((n) => (n.id === id ? { ...n, ...changes } : n)));
+  }
+
+  updateNodeData(id: string, changes: Record<string, any>) {
+    this.nodesSignal.update((nodes) =>
+      nodes.map((n) =>
+        n.id === id
+          ? {
+              ...n,
+              data: {
+                ...(n.data || {}),
+                ...changes,
+              },
+            }
+          : n
+      )
+    );
   }
 
   toggleSelection(id: string, multi: boolean) {
@@ -135,5 +155,55 @@ export class DiagramService {
 
   clearSelection() {
     this.selectionSignal.set(new Set());
+  }
+
+  beginDrag(activeNodeId: string) {
+    this.isDragging = true;
+    const currentSelection = this.selectionSignal();
+    if (!currentSelection.has(activeNodeId)) {
+      this.selectionSignal.set(new Set([activeNodeId]));
+    }
+
+    const selectedIds = new Set(this.selectionSignal());
+    this.dragStartPositions.clear();
+    this.nodesSignal().forEach((node) => {
+      if (selectedIds.has(node.id)) {
+        this.dragStartPositions.set(node.id, { x: node.x, y: node.y });
+      }
+    });
+  }
+
+  dragMove(activeNodeId: string, position: Point) {
+    const activeStart = this.dragStartPositions.get(activeNodeId);
+    if (!activeStart) {
+      this.updateNode(activeNodeId, { x: position.x, y: position.y });
+      return;
+    }
+
+    const deltaX = position.x - activeStart.x;
+    const deltaY = position.y - activeStart.y;
+
+    this.nodesSignal.update((nodes) =>
+      nodes.map((node) => {
+        const start = this.dragStartPositions.get(node.id);
+        if (!start) return node;
+        return {
+          ...node,
+          x: start.x + deltaX,
+          y: start.y + deltaY,
+        };
+      })
+    );
+  }
+
+  endDrag() {
+    this.isDragging = false;
+    this.lastDragEndAt = Date.now();
+    this.dragStartPositions.clear();
+  }
+
+  shouldIgnoreBackgroundClick(): boolean {
+    if (this.isDragging) return true;
+    return Date.now() - this.lastDragEndAt < 200;
   }
 }

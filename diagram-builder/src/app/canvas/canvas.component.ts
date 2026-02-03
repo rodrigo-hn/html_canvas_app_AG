@@ -4,15 +4,16 @@ import { DiagramService } from '../core/services/diagram.service';
 import { NodeRendererComponent } from './components/node-renderer.component';
 import { EdgeRendererComponent } from './components/edge-renderer.component';
 import { HtmlExportService } from '../core/services/html-exporter.service';
+import { InspectorComponent } from '../inspector/inspector.component';
 
 @Component({
   selector: 'app-canvas',
   standalone: true,
-  imports: [CommonModule, NodeRendererComponent, EdgeRendererComponent],
+  imports: [CommonModule, NodeRendererComponent, EdgeRendererComponent, InspectorComponent],
   template: `
     <div class="relative w-full h-full bg-slate-50 overflow-hidden" (click)="onBackgroundClick()">
       <!-- Toolbar (Simulated) -->
-      <div class="absolute top-4 right-4 z-50 flex gap-2">
+      <div class="absolute top-4 left-4 z-50 flex gap-2">
         <button
           (click)="exportHtml()"
           class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
@@ -41,6 +42,10 @@ import { HtmlExportService } from '../core/services/html-exporter.service';
       <app-node-renderer [node]="node"></app-node-renderer>
       }
     </div>
+
+    <div class="absolute top-0 right-0 h-full z-50">
+      <app-inspector></app-inspector>
+    </div>
   `,
   styles: [
     `
@@ -59,13 +64,16 @@ export class CanvasComponent {
   edges = this.diagramService.edges;
 
   onBackgroundClick() {
+    if (this.diagramService.shouldIgnoreBackgroundClick()) {
+      return;
+    }
     this.diagramService.clearSelection();
   }
 
   exportHtml() {
     const html = this.htmlExportService.exportHtml({
       nodes: this.diagramService.nodes(),
-      edges: [], // Edges not implemented yet
+      edges: this.diagramService.edges(),
     });
 
     // Download logic

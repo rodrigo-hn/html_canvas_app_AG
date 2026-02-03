@@ -21,6 +21,8 @@ export class HtmlExportService {
       })
       .join('\n');
 
+    const edgesHtml = this.renderEdges(model);
+
     return `
 <!DOCTYPE html>
 <html lang="en">
@@ -36,6 +38,7 @@ export class HtmlExportService {
 </head>
 <body>
     <div class="diagram-container">
+${edgesHtml}
 ${nodesHtml}
     </div>
 </body>
@@ -116,6 +119,48 @@ ${nodesHtml}
       default:
         return `<!-- Unknown component: ${node.componentType} -->`;
     }
+  }
+
+  private renderEdges(model: DiagramModel): string {
+    if (!model.edges || model.edges.length === 0) return '';
+
+    const paths = model.edges
+      .map((edge) => {
+        const start = this.getEdgePoint(model, edge.sourceId);
+        const end = this.getEdgePoint(model, edge.targetId);
+        if (!start || !end) return '';
+        const stroke = edge.style?.stroke || 'black';
+        const strokeWidth = edge.style?.strokeWidth || 1;
+        const marker = edge.markerEnd ? 'url(#arrow)' : '';
+        return `<path d="M ${start.x} ${start.y} L ${end.x} ${end.y}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    return `
+      <svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow: visible;">
+        <defs>
+          <marker
+            id="arrow"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+          </marker>
+        </defs>
+        ${paths}
+      </svg>
+    `;
+  }
+
+  private getEdgePoint(model: DiagramModel, nodeId: string) {
+    const node = model.nodes.find((n) => n.id === nodeId);
+    if (!node) return null;
+    return { x: node.x + node.width / 2, y: node.y + node.height / 2 };
   }
 
   private renderButton(node: WebNode, style: string): string {
