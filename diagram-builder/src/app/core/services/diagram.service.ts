@@ -19,11 +19,15 @@ export class DiagramService {
   private dragStartPositions = new Map<string, Point>();
   private isDragging = false;
   private lastDragEndAt = 0;
+  private snapToGridSignal = signal<boolean>(true);
+  private gridSizeSignal = signal<number>(20);
 
   // Computed
   readonly nodes = this.nodesSignal.asReadonly();
   readonly edges = this.edgesSignal.asReadonly();
   readonly selection = this.selectionSignal.asReadonly();
+  readonly snapToGrid = this.snapToGridSignal.asReadonly();
+  readonly gridSize = this.gridSizeSignal.asReadonly();
 
   constructor() {
     // Initialize with some dummy data for now
@@ -155,6 +159,27 @@ export class DiagramService {
 
   clearSelection() {
     this.selectionSignal.set(new Set());
+  }
+
+  setSnapToGrid(enabled: boolean) {
+    this.snapToGridSignal.set(enabled);
+  }
+
+  setGridSize(size: number) {
+    const next = Number.isFinite(size) && size > 2 ? Math.round(size) : 2;
+    this.gridSizeSignal.set(next);
+  }
+
+  setSelection(ids: string[], additive: boolean) {
+    if (!additive) {
+      this.selectionSignal.set(new Set(ids));
+      return;
+    }
+    this.selectionSignal.update((sel) => {
+      const next = new Set(sel);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
   }
 
   beginDrag(activeNodeId: string) {

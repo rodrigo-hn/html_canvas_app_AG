@@ -1,0 +1,39 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "Export HTML" [ref=e6] [cursor=pointer]
+      - generic [ref=e7]:
+        - checkbox "Snap" [checked] [ref=e8]
+        - text: Snap
+      - generic [ref=e9]:
+        - text: Grid
+        - spinbutton "Grid" [ref=e10]: "20"
+    - img
+    - generic:
+      - img
+    - generic [ref=e11]:
+      - img:
+        - generic:
+          - generic: Start Process
+    - generic [ref=e12]:
+      - img:
+        - generic:
+          - generic: Database
+    - generic [ref=e13]:
+      - img:
+        - generic:
+          - generic: User Task
+    - generic [ref=e16]:
+      - generic:
+        - generic:
+          - button "Save"
+    - generic [ref=e19]:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic: User Profile
+              - paragraph: Details regarding the user...
+  - generic [ref=e22]:
+    - heading "Inspector" [level=2] [ref=e23]
+    - generic [ref=e24]: No selection.
