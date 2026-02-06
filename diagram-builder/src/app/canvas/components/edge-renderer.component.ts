@@ -1,7 +1,7 @@
 import { Component, Input, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiagramEdge, DiagramNode } from '../../core/models/diagram.model';
-import { DiagramService } from '../../core/services/diagram.service';
+import { DiagramStore } from '../../core/services/diagram-store.service';
 
 @Component({
   selector: 'app-edge-renderer',
@@ -35,11 +35,11 @@ import { DiagramService } from '../../core/services/diagram.service';
 export class EdgeRendererComponent {
   @Input({ required: true }) edge!: DiagramEdge;
 
-  private diagramService = inject(DiagramService);
+  private store = inject(DiagramStore);
 
   // Compute path based on source/target node positions
   pathData = computed(() => {
-    const nodes = this.diagramService.nodes();
+    const nodes = this.store.nodes();
     const sourceNode = nodes.find((n) => n.id === this.edge.sourceId);
     const targetNode = nodes.find((n) => n.id === this.edge.targetId);
 

@@ -1,8 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DiagramService } from '../core/services/diagram.service';
-import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
+import { DiagramStore } from '../core/services/diagram-store.service';
+import { DiagramCommands } from '../core/services/diagram-commands.service';
+import { DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/models/diagram.model';
 
 @Component({
   selector: 'app-inspector',
@@ -22,6 +23,12 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
             (click)="deleteSelectedEdge()"
           >
             Delete Edge
+          </button>
+          <button
+            class="w-full bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded hover:bg-slate-300"
+            (click)="resetEdgeBend()"
+          >
+            Reset Bend
           </button>
           <div>
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('stroke')"
@@ -48,6 +55,28 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
               class="w-full border rounded px-2 py-1 text-sm"
               [ngModel]="selectedEdge()!.style?.strokeWidth || 2"
               (ngModelChange)="updateEdgeStyleNumber('strokeWidth', $event)"
+            />
+          </div>
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              [checked]="(selectedEdge()!.style?.cornerRadius || 0) > 0"
+              (change)="toggleEdgeCurves($event)"
+            />
+            Rounded corners
+          </label>
+          <div>
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('cornerRadius')"
+              >Corner Radius</label
+            >
+            <input
+              [id]="edgeFieldId('cornerRadius')"
+              [attr.name]="edgeFieldId('cornerRadius')"
+              type="number"
+              min="0"
+              class="w-full border rounded px-2 py-1 text-sm"
+              [ngModel]="selectedEdge()!.style?.cornerRadius || 0"
+              (ngModelChange)="updateEdgeCornerRadius($event)"
             />
           </div>
           <label class="flex items-center gap-2 text-sm">
@@ -172,7 +201,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('shapeText')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.text"
+                [ngModel]="shapeNode()!.data?.text"
                 (ngModelChange)="updateData('text', $event)"
               />
             </div>
@@ -202,6 +231,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 }
               </select>
             </div>
+            @if (isButtonNode()) {
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('webText')"
                 >Text</label
@@ -211,7 +241,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('webText')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.text"
+                [ngModel]="buttonNode()!.data?.text"
                 (ngModelChange)="updateData('text', $event)"
               />
             </div>
@@ -224,10 +254,13 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('variant')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.variant"
+                [ngModel]="buttonNode()!.data?.variant"
                 (ngModelChange)="updateData('variant', $event)"
               />
             </div>
+            }
+
+            @if (isInputNode()) {
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('label')"
                 >Label</label
@@ -237,7 +270,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('label')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.label"
+                [ngModel]="inputNode()!.data?.label"
                 (ngModelChange)="updateData('label', $event)"
               />
             </div>
@@ -250,7 +283,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('placeholder')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.placeholder"
+                [ngModel]="inputNode()!.data?.placeholder"
                 (ngModelChange)="updateData('placeholder', $event)"
               />
             </div>
@@ -263,10 +296,13 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('inputType')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.inputType"
+                [ngModel]="inputNode()!.data?.inputType"
                 (ngModelChange)="updateData('inputType', $event)"
               />
             </div>
+            }
+
+            @if (isCardNode()) {
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('title')"
                 >Title</label
@@ -276,7 +312,7 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('title')"
                 type="text"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.title"
+                [ngModel]="cardNode()!.data?.title"
                 (ngModelChange)="updateData('title', $event)"
               />
             </div>
@@ -289,10 +325,11 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
                 [attr.name]="fieldId('content')"
                 rows="3"
                 class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.data?.content"
+                [ngModel]="cardNode()!.data?.content"
                 (ngModelChange)="updateData('content', $event)"
               ></textarea>
             </div>
+            }
           </div>
         </details>
         }
@@ -302,7 +339,8 @@ import { DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
   `,
 })
 export class InspectorComponent {
-  private diagramService = inject(DiagramService);
+  private store = inject(DiagramStore);
+  private commands = inject(DiagramCommands);
   readonly shapeTypes = [
     'rectangle',
     'rounded-rectangle',
@@ -318,14 +356,14 @@ export class InspectorComponent {
   readonly componentTypes = ['button', 'input', 'card'];
 
   selectedNodes = computed(() => {
-    const selectedIds = this.diagramService.selection();
-    return this.diagramService.nodes().filter((node) => selectedIds.has(node.id));
+    const selectedIds = this.store.selection();
+    return this.store.nodes().filter((node) => selectedIds.has(node.id));
   });
 
   selectedEdge = computed(() => {
-    const edgeId = this.diagramService.selectedEdgeId();
+    const edgeId = this.store.selectedEdgeId();
     if (!edgeId) return null;
-    return this.diagramService.edges().find((edge) => edge.id === edgeId) || null;
+    return this.store.edges().find((edge) => edge.id === edgeId) || null;
   });
 
   node = computed(() => this.selectedNodes()[0] || null);
@@ -340,6 +378,21 @@ export class InspectorComponent {
     return n && n.type === 'web-component' ? (n as WebNode) : null;
   }
 
+  buttonNode() {
+    const n = this.webNode();
+    return n && n.componentType === 'button' ? n : null;
+  }
+
+  inputNode() {
+    const n = this.webNode();
+    return n && n.componentType === 'input' ? n : null;
+  }
+
+  cardNode() {
+    const n = this.webNode();
+    return n && n.componentType === 'card' ? n : null;
+  }
+
   isShapeNode(): boolean {
     return this.node()?.type === 'shape';
   }
@@ -348,37 +401,49 @@ export class InspectorComponent {
     return this.node()?.type === 'web-component';
   }
 
+  isButtonNode(): boolean {
+    return this.webNode()?.componentType === 'button';
+  }
+
+  isInputNode(): boolean {
+    return this.webNode()?.componentType === 'input';
+  }
+
+  isCardNode(): boolean {
+    return this.webNode()?.componentType === 'card';
+  }
+
   updateNumber(field: keyof DiagramNode, value: number) {
     const n = this.node();
     if (!n) return;
     const parsed = Number(value);
     if (Number.isNaN(parsed)) return;
     const clamped = Math.max(0, parsed);
-    this.diagramService.updateNode(n.id, { [field]: clamped });
+    this.commands.updateNode(n.id, { [field]: clamped });
   }
 
   updateShapeType(value: string) {
     const n = this.shapeNode();
     if (!n) return;
-    this.diagramService.updateNode(n.id, { shapeType: value });
+    this.commands.updateNode(n.id, { shapeType: value });
   }
 
   updateComponentType(value: string) {
     const n = this.webNode();
     if (!n) return;
-    this.diagramService.updateNode(n.id, { componentType: value });
+    this.commands.updateNode(n.id, { componentType: value as WebComponentType });
   }
 
   updateData(key: string, value: any) {
     const n = this.node();
     if (!n) return;
-    this.diagramService.updateNodeData(n.id, { [key]: value });
+    this.commands.updateNodeData(n.id, { [key]: value });
   }
 
-  updateEdgeStyle(style: { stroke?: string; strokeWidth?: number }) {
+  updateEdgeStyle(style: { stroke?: string; strokeWidth?: number; cornerRadius?: number }) {
     const edge = this.selectedEdge();
     if (!edge) return;
-    this.diagramService.setEdgeStyle(edge.id, style);
+    this.commands.setEdgeStyle(edge.id, style);
   }
 
   updateEdgeStyleNumber(field: 'strokeWidth', value: number) {
@@ -387,20 +452,43 @@ export class InspectorComponent {
     const parsed = Number(value);
     if (Number.isNaN(parsed)) return;
     const clamped = Math.max(1, parsed);
-    this.diagramService.setEdgeStyle(edge.id, { [field]: clamped });
+    this.commands.setEdgeStyle(edge.id, { [field]: clamped });
+  }
+
+  updateEdgeCornerRadius(value: number) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) return;
+    const clamped = Math.max(0, parsed);
+    this.commands.setEdgeStyle(edge.id, { cornerRadius: clamped });
+  }
+
+  toggleEdgeCurves(event: Event) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const checked = (event.target as HTMLInputElement).checked;
+    const current = edge.style?.cornerRadius || 0;
+    this.commands.setEdgeStyle(edge.id, { cornerRadius: checked ? Math.max(12, current) : 0 });
   }
 
   updateEdgeMarker(event: Event) {
     const edge = this.selectedEdge();
     if (!edge) return;
     const checked = (event.target as HTMLInputElement).checked;
-    this.diagramService.updateEdge(edge.id, { markerEnd: checked ? 'arrow' : undefined });
+    this.commands.updateEdge(edge.id, { markerEnd: checked ? 'arrow' : undefined });
   }
 
   deleteSelectedEdge() {
     const edge = this.selectedEdge();
     if (!edge) return;
-    this.diagramService.removeEdge(edge.id);
+    this.commands.removeEdge(edge.id);
+  }
+
+  resetEdgeBend() {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    this.commands.updateEdge(edge.id, { points: [] });
   }
 
   fieldId(field: string): string {

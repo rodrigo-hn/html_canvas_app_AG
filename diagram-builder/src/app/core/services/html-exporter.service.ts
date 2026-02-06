@@ -1,5 +1,13 @@
 import { Injectable, inject } from '@angular/core';
-import { DiagramModel, DiagramNode, ShapeNode, WebNode } from '../models/diagram.model';
+import {
+  DiagramModel,
+  DiagramNode,
+  ShapeNode,
+  WebButtonNode,
+  WebCardNode,
+  WebInputNode,
+  WebNode,
+} from '../models/diagram.model';
 import { BasicShapes } from '../../stencils/shapes/basic.shapes';
 import { BpmnShapes } from '../../stencils/shapes/bpmn.shapes';
 import { StencilService } from '../../stencils/stencil.service';
@@ -173,13 +181,13 @@ ${nodesHtml}
 
     switch (node.componentType) {
       case 'button':
-        return this.renderButton(node, style);
+        return this.renderButton(node as WebButtonNode, style);
       case 'input':
-        return this.renderInput(node, style);
+        return this.renderInput(node as WebInputNode, style);
       case 'card':
-        return this.renderCard(node, style);
+        return this.renderCard(node as WebCardNode, style);
       default:
-        return `<!-- Unknown component: ${node.componentType} -->`;
+        return `<!-- Unknown component -->`;
     }
   }
 
@@ -194,8 +202,15 @@ ${nodesHtml}
         const stroke = edge.style?.stroke || 'black';
         const strokeWidth = edge.style?.strokeWidth || 1;
         const marker = edge.markerEnd ? 'url(#arrow)' : '';
-        const d = this.buildOrthogonalPath(start, end, edge.sourcePort || 'right', edge.targetPort || 'left', edge.points?.[0] || null);
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
+        const d = this.buildOrthogonalPath(
+          start,
+          end,
+          edge.sourcePort || 'right',
+          edge.targetPort || 'left',
+          edge.points?.[0] || null,
+          edge.style?.cornerRadius || 0
+        );
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" marker-end="${marker}" />`;
       })
       .filter(Boolean)
       .join('\n');
@@ -235,9 +250,10 @@ ${nodesHtml}
           end,
           edge.sourcePort || 'right',
           edge.targetPort || 'left',
-          edge.points?.[0] || null
+          edge.points?.[0] || null,
+          edge.style?.cornerRadius || 0
         );
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" marker-end="${marker}" />`;
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" marker-end="${marker}" />`;
       })
       .filter(Boolean)
       .join('\n');
@@ -265,7 +281,19 @@ ${nodesHtml}
     const y = web.y;
     const w = web.width;
     const h = web.height;
-    const text = this.escapeText((web.data?.text || web.data?.title || web.componentType || '').toString());
+    let text = '';
+    switch (web.componentType) {
+      case 'button':
+        text = (web.data as WebButtonNode['data']).text || 'Button';
+        break;
+      case 'card':
+        text = (web.data as WebCardNode['data']).title || 'Card';
+        break;
+      case 'input':
+        text = (web.data as WebInputNode['data']).label || 'Input';
+        break;
+    }
+    text = this.escapeText(text.toString());
     return `
       <g>
         <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#ffffff" stroke="#333" />
@@ -314,17 +342,18 @@ ${nodesHtml}
     end: { x: number; y: number },
     sourcePort: 'top' | 'right' | 'bottom' | 'left',
     targetPort: 'top' | 'right' | 'bottom' | 'left',
-    manualPoint?: { x: number; y: number } | null
+    manualPoint?: { x: number; y: number } | null,
+    cornerRadius = 0
   ): string {
     const target = targetPort || this.guessTargetPort(start, end);
     if (manualPoint) {
       const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
       const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
-      const points = this.simplifyPoints([...first, ...second.slice(1)]);
-      return this.pointsToPath(points);
+      const points = this.simplifyPoints(this.trimBacktracks([...first, ...second.slice(1)]));
+      return this.pointsToPath(points, cornerRadius);
     }
-    const points = this.simplifyPoints(this.routePoints(start, end, sourcePort, target));
-    return this.pointsToPath(points);
+    const points = this.simplifyPoints(this.trimBacktracks(this.routePoints(start, end, sourcePort, target)));
+    return this.pointsToPath(points, cornerRadius);
   }
 
   private routePoints(
@@ -391,8 +420,46 @@ ${nodesHtml}
     }
   }
 
-  private pointsToPath(points: Array<{ x: number; y: number }>) {
-    return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  private pointsToPath(points: Array<{ x: number; y: number }>, cornerRadius = 0) {
+    if (cornerRadius <= 0) {
+      return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+    }
+    return this.pointsToRoundedPath(points, cornerRadius);
+  }
+
+  private pointsToRoundedPath(points: Array<{ x: number; y: number }>, radius: number) {
+    if (points.length === 0) return '';
+    if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length; i++) {
+      if (i === points.length - 1) {
+        d += ` L ${points[i].x} ${points[i].y}`;
+        continue;
+      }
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+      const v1 = { x: curr.x - prev.x, y: curr.y - prev.y };
+      const v2 = { x: next.x - curr.x, y: next.y - curr.y };
+      if ((v1.x === 0 && v2.x === 0) || (v1.y === 0 && v2.y === 0)) {
+        d += ` L ${curr.x} ${curr.y}`;
+        continue;
+      }
+      const len1 = Math.hypot(v1.x, v1.y);
+      const len2 = Math.hypot(v2.x, v2.y);
+      if (len1 === 0 || len2 === 0) {
+        d += ` L ${curr.x} ${curr.y}`;
+        continue;
+      }
+      const r = Math.min(radius, len1 / 2, len2 / 2);
+      const p1 = { x: curr.x - (v1.x / len1) * r, y: curr.y - (v1.y / len1) * r };
+      const p2 = { x: curr.x + (v2.x / len2) * r, y: curr.y + (v2.y / len2) * r };
+      d += ` L ${p1.x} ${p1.y}`;
+      const cross = v1.x * v2.y - v1.y * v2.x;
+      const sweep = cross > 0 ? 1 : 0;
+      d += ` A ${r} ${r} 0 0 ${sweep} ${p2.x} ${p2.y}`;
+    }
+    return d;
   }
 
   private simplifyPoints(points: Array<{ x: number; y: number }>) {
@@ -417,11 +484,39 @@ ${nodesHtml}
       const dx2 = next.x - curr.x;
       const dy2 = next.y - curr.y;
       const colinear = (dx1 === 0 && dx2 === 0) || (dy1 === 0 && dy2 === 0);
-      const opposite = dx1 === -dx2 && dy1 === -dy2;
-      if (colinear || opposite) {
+      const reverseHorizontal = dy1 === 0 && dy2 === 0 && Math.sign(dx1) !== 0 && Math.sign(dx2) !== 0 && Math.sign(dx1) !== Math.sign(dx2);
+      const reverseVertical = dx1 === 0 && dx2 === 0 && Math.sign(dy1) !== 0 && Math.sign(dy2) !== 0 && Math.sign(dy1) !== Math.sign(dy2);
+      if (colinear || reverseHorizontal || reverseVertical) {
         continue;
       }
       result.push(curr);
+    }
+    return result;
+  }
+
+  private trimBacktracks(points: Array<{ x: number; y: number }>) {
+    if (points.length < 3) return points;
+    const result: Array<{ x: number; y: number }> = [];
+    for (const p of points) {
+      result.push(p);
+      while (result.length >= 3) {
+        const a = result[result.length - 3];
+        const b = result[result.length - 2];
+        const c = result[result.length - 1];
+        const dx1 = b.x - a.x;
+        const dy1 = b.y - a.y;
+        const dx2 = c.x - b.x;
+        const dy2 = c.y - b.y;
+        const reverseHorizontal =
+          dy1 === 0 && dy2 === 0 && Math.sign(dx1) !== 0 && Math.sign(dx2) !== 0 && Math.sign(dx1) !== Math.sign(dx2);
+        const reverseVertical =
+          dx1 === 0 && dx2 === 0 && Math.sign(dy1) !== 0 && Math.sign(dy2) !== 0 && Math.sign(dy1) !== Math.sign(dy2);
+        if (reverseHorizontal || reverseVertical) {
+          result.splice(result.length - 2, 1);
+          continue;
+        }
+        break;
+      }
     }
     return result;
   }
@@ -460,7 +555,7 @@ ${nodesHtml}
     return dy >= 0 ? 'top' : 'bottom';
   }
 
-  private renderButton(node: WebNode, style: string): string {
+  private renderButton(node: WebButtonNode, style: string): string {
     const variant = node.data.variant || 'primary';
     const variants: any = {
       primary: 'bg-blue-500 text-white hover:bg-blue-600',
@@ -472,7 +567,7 @@ ${nodesHtml}
     return `<button style="${style}" class="${cls}">${node.data.text || 'Button'}</button>`;
   }
 
-  private renderInput(node: WebNode, style: string): string {
+  private renderInput(node: WebInputNode, style: string): string {
     const widthStyle = `width: ${node.width}px;`; /* Inputs usually need width */
     return `
      <div style="${style} ${widthStyle}" class="flex flex-col">
@@ -487,7 +582,7 @@ ${nodesHtml}
      </div>`;
   }
 
-  private renderCard(node: WebNode, style: string): string {
+  private renderCard(node: WebCardNode, style: string): string {
     const widthStyle = `width: ${node.width}px; height: ${node.height}px;`;
     return `
       <div style="${style} ${widthStyle}" class="max-w-sm rounded overflow-hidden shadow-lg bg-white">

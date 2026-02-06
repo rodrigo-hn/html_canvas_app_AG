@@ -68,10 +68,10 @@ Evolucionar el editor de diagramas para soportar creación/edición avanzada, me
 ---
 
 ### Fase 4: Arquitectura y calidad (3-6 días)
-1. Separar store (estado) de comandos (acciones).
-2. Tipar `data` por tipo de nodo (uniones discriminadas más estrictas).
-3. Tests unitarios de store y export.
-4. E2E con `playwright-cli` automatizado.
+1. Separar store (estado) de comandos (acciones). **Estado: Implementado**
+2. Tipar `data` por tipo de nodo (uniones discriminadas más estrictas). **Estado: Implementado**
+3. Tests unitarios de store y export. **Estado: Implementado**
+4. E2E con `playwright-cli` automatizado. **Estado: Implementado**
 
 **Entregables**
 - Base más mantenible y testeable.

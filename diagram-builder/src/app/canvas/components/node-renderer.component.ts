@@ -1,7 +1,8 @@
 import { Component, HostListener, Input, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiagramNode, Point, ShapeNode, WebNode } from '../../core/models/diagram.model';
-import { DiagramService } from '../../core/services/diagram.service';
+import { DiagramStore } from '../../core/services/diagram-store.service';
+import { DiagramCommands } from '../../core/services/diagram-commands.service';
 import { DraggableDirective } from '../directives/draggable.directive';
 import { StencilService } from '../../stencils/stencil.service';
 import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrapper.component';
@@ -15,8 +16,8 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
       class="absolute select-none hover:ring-2 hover:ring-blue-400 group"
       appDraggable
       [dragDisabled]="isResizing || isEditingText"
-      [snapToGrid]="diagramService.snapToGrid()"
-      [gridSize]="diagramService.gridSize()"
+      [snapToGrid]="store.snapToGrid()"
+      [gridSize]="store.gridSize()"
       [startPosition]="{ x: node.x, y: node.y }"
       (dragStart)="onDragStart()"
       (dragMove)="onDragMove($event)"
@@ -42,7 +43,7 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
 
         <!-- Text Overlay -->
         <foreignObject
-          *ngIf="node.data?.text && !isEditingText"
+          *ngIf="shapeNode()?.data?.text && !isEditingText"
           x="0"
           y="0"
           [attr.width]="node.width"
@@ -51,7 +52,7 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
           <div
             class="w-full h-full flex items-center justify-center text-center p-1 text-sm pointer-events-none"
           >
-            {{ node.data.text }}
+            {{ shapeNode()!.data?.text }}
           </div>
         </foreignObject>
       </svg>
@@ -141,7 +142,8 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
 export class NodeRendererComponent {
   @Input({ required: true }) node!: DiagramNode;
 
-  readonly diagramService = inject(DiagramService);
+  readonly store = inject(DiagramStore);
+  readonly commands = inject(DiagramCommands);
   private stencilService = inject(StencilService);
   private lastDragMoveAt = 0;
   private lastResizeEndAt = 0;
@@ -152,9 +154,13 @@ export class NodeRendererComponent {
   } | null = null;
   isResizing = false;
 
-  isSelected = computed(() => this.diagramService.selection().has(this.node.id));
+  isSelected = computed(() => this.store.selection().has(this.node.id));
   isEditingText = false;
   editTextValue = '';
+
+  shapeNode(): ShapeNode | null {
+    return this.node.type === 'shape' ? (this.node as ShapeNode) : null;
+  }
 
   onSelect(event: MouseEvent) {
     if (Date.now() - this.lastDragMoveAt < 200) {
@@ -165,35 +171,47 @@ export class NodeRendererComponent {
     }
     event.stopPropagation();
     const meta = event.metaKey || event.shiftKey;
-    this.diagramService.toggleSelection(this.node.id, meta);
+    this.commands.toggleSelection(this.node.id, meta);
+
+    if (!this.isEditingText) {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+        active.blur();
+      }
+      const canvasRoot = document.getElementById('canvas-root') as HTMLElement | null;
+      canvasRoot?.focus();
+    }
   }
 
   onDragStart() {
     if (this.isResizing) return;
-    this.diagramService.beginDrag(this.node.id);
+    this.commands.beginDrag(this.node.id);
   }
 
   onDragMove(pos: Point) {
     if (this.isResizing) return;
     this.lastDragMoveAt = Date.now();
-    this.diagramService.dragMove(this.node.id, pos);
+    this.commands.dragMove(this.node.id, pos);
   }
 
   onDragEnd() {
     if (this.isResizing) return;
-    this.diagramService.endDrag();
+    this.commands.endDrag();
   }
 
   onDoubleClick(event: MouseEvent) {
     if (!this.canEditText()) return;
     event.stopPropagation();
     this.isEditingText = true;
-    this.editTextValue = this.node.data?.text ?? '';
+    this.editTextValue = this.shapeNode()?.data?.text ?? '';
   }
 
   onEditTextCommit() {
     if (!this.isEditingText) return;
-    this.diagramService.updateNodeData(this.node.id, { text: this.editTextValue });
+    const node = this.shapeNode();
+    if (node) {
+      this.commands.updateNodeData(this.node.id, { text: this.editTextValue });
+    }
     this.isEditingText = false;
   }
 
@@ -237,7 +255,7 @@ export class NodeRendererComponent {
     event.stopPropagation();
     event.preventDefault();
     const point = this.getPortPoint(port);
-    this.diagramService.startEdgePreview(this.node.id, port, point);
+    this.commands.startEdgePreview(this.node.id, port, point);
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -269,7 +287,7 @@ export class NodeRendererComponent {
       nextY = startNode.y + (startNode.height - nextHeight);
     }
 
-    this.diagramService.updateNode(this.node.id, {
+    this.commands.updateNode(this.node.id, {
       x: nextX,
       y: nextY,
       width: nextWidth,

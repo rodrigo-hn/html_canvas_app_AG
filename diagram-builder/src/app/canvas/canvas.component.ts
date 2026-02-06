@@ -1,7 +1,8 @@
 import { Component, ElementRef, HostListener, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DiagramService } from '../core/services/diagram.service';
+import { DiagramStore } from '../core/services/diagram-store.service';
+import { DiagramCommands } from '../core/services/diagram-commands.service';
 import { NodeRendererComponent } from './components/node-renderer.component';
 import { EdgesLayerComponent } from './components/edges-layer.component';
 import { HtmlExportService } from '../core/services/html-exporter.service';
@@ -14,7 +15,9 @@ import { InspectorComponent } from '../inspector/inspector.component';
   template: `
     <div
       #canvasRoot
+      id="canvas-root"
       class="relative w-full h-full bg-slate-50 overflow-hidden"
+      tabindex="0"
       (click)="onBackgroundClick()"
       (mousedown)="onCanvasMouseDown($event)"
     >
@@ -51,11 +54,7 @@ import { InspectorComponent } from '../inspector/inspector.component';
           Import JSON
         </button>
         <label class="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            [checked]="diagramService.snapToGrid()"
-            (change)="onSnapToggle($event)"
-          />
+          <input type="checkbox" [checked]="store.snapToGrid()" (change)="onSnapToggle($event)" />
           Snap
         </label>
         <label class="flex items-center gap-2 text-sm">
@@ -64,7 +63,7 @@ import { InspectorComponent } from '../inspector/inspector.component';
             type="number"
             min="2"
             class="w-16 border rounded px-1 py-0.5 text-sm"
-            [value]="diagramService.gridSize()"
+            [value]="store.gridSize()"
             (change)="onGridSizeChange($event)"
           />
         </label>
@@ -79,11 +78,11 @@ import { InspectorComponent } from '../inspector/inspector.component';
       </div>
 
       <!-- Grid (simple css pattern) -->
-      @if (diagramService.snapToGrid()) {
+      @if (store.snapToGrid()) {
       <div
         class="absolute inset-0 pointer-events-none opacity-10"
         [style.background-image]="'radial-gradient(#000 1px, transparent 1px)'"
-        [style.background-size]="diagramService.gridSize() + 'px ' + diagramService.gridSize() + 'px'"
+        [style.background-size]="store.gridSize() + 'px ' + store.gridSize() + 'px'"
       ></div>
       }
 
@@ -122,13 +121,14 @@ import { InspectorComponent } from '../inspector/inspector.component';
   ],
 })
 export class CanvasComponent {
-  readonly diagramService = inject(DiagramService);
+  readonly store = inject(DiagramStore);
+  readonly commands = inject(DiagramCommands);
   private htmlExportService = inject(HtmlExportService);
   @ViewChild('canvasRoot', { static: true }) canvasRoot!: ElementRef<HTMLDivElement>;
   autoSaveEnabled = false;
   private autoSaveIntervalId: number | null = null;
-  nodes = this.diagramService.nodes;
-  edges = this.diagramService.edges;
+  nodes = this.store.nodes;
+  edges = this.store.edges;
   selectionBox = { visible: false, x: 0, y: 0, width: 0, height: 0 };
   private isSelecting = false;
   private selectionStart = { x: 0, y: 0 };
@@ -136,35 +136,36 @@ export class CanvasComponent {
   private selectionJustFinishedAt = 0;
 
   onBackgroundClick() {
+    this.canvasRoot.nativeElement.focus();
     if (Date.now() - this.selectionJustFinishedAt < 200) {
       return;
     }
-    if (this.diagramService.edgePreview()) {
+    if (this.store.edgePreview()) {
       return;
     }
-    if (this.diagramService.shouldIgnoreBackgroundClick()) {
+    if (this.commands.shouldIgnoreBackgroundClick()) {
       return;
     }
-    this.diagramService.clearSelection();
+    this.commands.clearSelection();
   }
 
   onSnapToggle(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
-    this.diagramService.setSnapToGrid(checked);
+    this.commands.setSnapToGrid(checked);
   }
 
   onGridSizeChange(event: Event) {
     const value = Number((event.target as HTMLInputElement).value);
-    this.diagramService.setGridSize(value);
+    this.commands.setGridSize(value);
   }
 
   onAutoSaveToggle(event: Event) {
     const checked = (event.target as HTMLInputElement).checked;
     this.autoSaveEnabled = checked;
     if (checked) {
-      this.diagramService.saveToLocalStorage();
+      this.commands.saveToLocalStorage();
       this.autoSaveIntervalId = window.setInterval(() => {
-        this.diagramService.saveToLocalStorage();
+        this.commands.saveToLocalStorage();
       }, 2000);
     } else if (this.autoSaveIntervalId) {
       clearInterval(this.autoSaveIntervalId);
@@ -198,7 +199,7 @@ export class CanvasComponent {
 
   @HostListener('document:mouseup', ['$event'])
   onDocumentMouseUp(event: MouseEvent) {
-    if (this.diagramService.edgePreview()) {
+    if (this.store.edgePreview()) {
       const rect = this.canvasRoot.nativeElement.getBoundingClientRect();
       const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
       this.completeEdge(point);
@@ -226,42 +227,87 @@ export class CanvasComponent {
       })
       .map((node) => node.id);
 
-    this.diagramService.setSelection(selected, this.selectionAdditive);
+    this.commands.setSelection(selected, this.selectionAdditive);
   }
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
+    if (this.handleArrowMove(event)) {
+      return;
+    }
     if (event.key !== 'Delete' && event.key !== 'Backspace') return;
-    const edgeId = this.diagramService.selectedEdgeId();
+    const edgeId = this.store.selectedEdgeId();
     if (!edgeId) return;
     event.preventDefault();
-    this.diagramService.removeEdge(edgeId);
+    this.commands.removeEdge(edgeId);
+  }
+
+  private handleArrowMove(event: KeyboardEvent): boolean {
+    const active = document.activeElement as HTMLElement | null;
+    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+      return false;
+    }
+    const arrowKeys = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
+    if (!arrowKeys.has(event.key)) return false;
+
+    const selectedIds = this.store.selection();
+    if (selectedIds.size === 0) return false;
+
+    event.preventDefault();
+
+    const baseStep = this.store.snapToGrid() ? this.store.gridSize() : 1;
+    const step = event.shiftKey ? baseStep * 5 : baseStep;
+
+    let dx = 0;
+    let dy = 0;
+    switch (event.key) {
+      case 'ArrowUp':
+        dy = -step;
+        break;
+      case 'ArrowDown':
+        dy = step;
+        break;
+      case 'ArrowLeft':
+        dx = -step;
+        break;
+      case 'ArrowRight':
+        dx = step;
+        break;
+    }
+
+    const nodes = this.store.nodes();
+    for (const node of nodes) {
+      if (!selectedIds.has(node.id)) continue;
+      this.commands.updateNode(node.id, { x: node.x + dx, y: node.y + dy });
+    }
+
+    return true;
   }
 
   @HostListener('document:mousemove', ['$event'])
   onEdgePreviewMove(event: MouseEvent) {
-    const preview = this.diagramService.edgePreview();
+    const preview = this.store.edgePreview();
     if (!preview) return;
     const rect = this.canvasRoot.nativeElement.getBoundingClientRect();
     const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
     const nearest = this.findNearestPort(point, preview.sourceId);
     if (nearest && nearest.distance <= 20) {
-      this.diagramService.updateEdgePreview(nearest.point);
+      this.commands.updateEdgePreview(nearest.point);
       return;
     }
-    this.diagramService.updateEdgePreview(point);
+    this.commands.updateEdgePreview(point);
   }
 
   private completeEdge(point: { x: number; y: number }) {
-    const preview = this.diagramService.edgePreview();
+    const preview = this.store.edgePreview();
     if (!preview) return;
     const nearest = this.findNearestPort(point, preview.sourceId);
     if (!nearest) {
-      this.diagramService.clearEdgePreview();
+      this.commands.clearEdgePreview();
       return;
     }
     const edgeId = `e-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-    this.diagramService.addEdge({
+    this.commands.addEdge({
       id: edgeId,
       sourceId: preview.sourceId,
       targetId: nearest.nodeId,
@@ -272,7 +318,7 @@ export class CanvasComponent {
       markerEnd: 'arrow',
       style: { stroke: '#333', strokeWidth: 2 },
     });
-    this.diagramService.clearEdgePreview();
+    this.commands.clearEdgePreview();
   }
 
   private findNearestPort(
@@ -304,8 +350,8 @@ export class CanvasComponent {
 
   exportHtml() {
     const html = this.htmlExportService.exportHtml({
-      nodes: this.diagramService.nodes(),
-      edges: this.diagramService.edges(),
+      nodes: this.store.nodes(),
+      edges: this.store.edges(),
     });
 
     // Download logic
@@ -320,8 +366,8 @@ export class CanvasComponent {
 
   exportSvg() {
     const svg = this.htmlExportService.exportSvg({
-      nodes: this.diagramService.nodes(),
-      edges: this.diagramService.edges(),
+      nodes: this.store.nodes(),
+      edges: this.store.edges(),
     });
     const blob = new Blob([svg], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
@@ -334,8 +380,8 @@ export class CanvasComponent {
 
   async exportPng() {
     const blob = await this.htmlExportService.exportPng({
-      nodes: this.diagramService.nodes(),
-      edges: this.diagramService.edges(),
+      nodes: this.store.nodes(),
+      edges: this.store.edges(),
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -346,7 +392,7 @@ export class CanvasComponent {
   }
 
   exportJson() {
-    const json = this.diagramService.exportJson();
+    const json = this.commands.exportJson();
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -365,7 +411,7 @@ export class CanvasComponent {
       if (!file) return;
       const text = await file.text();
       try {
-        this.diagramService.loadFromJson(text);
+        this.commands.loadFromJson(text);
       } catch (err) {
         alert('Invalid diagram JSON');
       }

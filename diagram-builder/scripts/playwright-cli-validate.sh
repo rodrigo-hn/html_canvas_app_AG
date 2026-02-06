@@ -160,10 +160,20 @@ pw eval "() => ($CLICK_NODE_BY_TEXT)('Proceso', false)" > /dev/null
 pw eval "() => ($SET_INPUT_BY_LABEL)('X', '-10')" > /dev/null
 wait_for "() => ($GET_FIELD_VALUE_BY_LABEL)('X')" '0'
 
-# 9) Export HTML includes edges
+# 9) Keyboard arrows move selected node
+sleep 0.3
+pw eval "() => ($CLICK_NODE_BY_TEXT)('Proceso', false)" > /dev/null
+wait_for "() => ($GET_NODE_STYLE_BY_TEXT)('Proceso')" '"left": "0px"'
+pw eval "() => { window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })); return true; }" > /dev/null
+wait_for "() => { const s = ($GET_NODE_STYLE_BY_TEXT)('Proceso'); return s && s.left !== '0px'; }" true
+
+# 10) Export HTML includes edges
 pw eval "() => { window.__lastExport = null; const orig = URL.createObjectURL; URL.createObjectURL = (blob) => { blob.text().then(t => { window.__lastExport = t; }); return 'blob:mock'; }; return true; }" > /dev/null
 pw eval "() => { const btn = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.trim() === 'Export HTML'); if (btn) btn.click(); return true; }" > /dev/null
 wait_for "async () => { await new Promise(r => setTimeout(r, 100)); return { hasExport: !!window.__lastExport, hasPath: window.__lastExport?.includes('<path') || false, hasMarker: window.__lastExport?.includes('marker') || false }; }" '"hasPath": true'
+
+# 11) Edge arrow visible in canvas (marker-end)
+wait_for "() => { const svg = document.querySelector('app-edges-layer svg'); if (!svg) return false; const path = svg.querySelector('path[marker-end]'); return !!path; }" true
 
 pw close > /dev/null
 

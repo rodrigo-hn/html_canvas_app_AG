@@ -1,0 +1,45 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - generic [ref=e5]:
+      - button "Export HTML" [ref=e6] [cursor=pointer]
+      - button "Export SVG" [ref=e7] [cursor=pointer]
+      - button "Export PNG" [ref=e8] [cursor=pointer]
+      - button "Export JSON" [ref=e9] [cursor=pointer]
+      - button "Import JSON" [ref=e10] [cursor=pointer]
+      - generic [ref=e11]:
+        - checkbox "Snap" [checked] [ref=e12]
+        - text: Snap
+      - generic [ref=e13]:
+        - text: Grid
+        - spinbutton "Grid" [ref=e14]: "20"
+      - generic [ref=e15]:
+        - checkbox "Auto-save" [ref=e16]
+        - text: Auto-save
+    - generic:
+      - img
+    - generic [ref=e18]:
+      - img:
+        - generic:
+          - generic: Start Process
+    - generic [ref=e19]:
+      - img:
+        - generic:
+          - generic: Database
+    - generic [ref=e20]:
+      - img:
+        - generic:
+          - generic: User Task
+    - generic [ref=e23]:
+      - generic:
+        - generic:
+          - button "Save"
+    - generic [ref=e26]:
+      - generic:
+        - generic:
+          - generic:
+            - generic:
+              - generic: User Profile
+              - paragraph: Details regarding the user...
+  - generic [ref=e29]:
+    - heading "Inspector" [level=2] [ref=e30]
+    - generic [ref=e31]: No selection.

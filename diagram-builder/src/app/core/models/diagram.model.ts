@@ -1,4 +1,5 @@
 export type NodeType = 'shape' | 'web-component';
+export type WebComponentType = 'button' | 'input' | 'card';
 
 export interface Point {
   x: number;
@@ -16,15 +17,19 @@ export interface DiagramElement {
   zIndex: number;
 }
 
-export interface DiagramNode extends DiagramElement, Point, Size {
+export interface DiagramNodeBase extends DiagramElement, Point, Size {
   type: NodeType;
-  data: any; // Flexible data bag for specific properties
   rotation?: number;
 }
 
-export interface ShapeNode extends DiagramNode {
+export interface ShapeData {
+  text?: string;
+}
+
+export interface ShapeNode extends DiagramNodeBase {
   type: 'shape';
   shapeType: string; // e.g., 'rectangle', 'bpmn-task'
+  data: ShapeData;
   style?: {
     fill?: string;
     stroke?: string;
@@ -32,10 +37,43 @@ export interface ShapeNode extends DiagramNode {
   };
 }
 
-export interface WebNode extends DiagramNode {
-  type: 'web-component';
-  componentType: string; // e.g., 'button', 'card'
+export interface WebButtonData {
+  text?: string;
+  variant?: 'primary' | 'secondary' | 'success' | 'danger';
 }
+
+export interface WebInputData {
+  label?: string;
+  placeholder?: string;
+  inputType?: string;
+}
+
+export interface WebCardData {
+  title?: string;
+  content?: string;
+}
+
+export interface WebButtonNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'button';
+  data: WebButtonData;
+}
+
+export interface WebInputNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'input';
+  data: WebInputData;
+}
+
+export interface WebCardNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'card';
+  data: WebCardData;
+}
+
+export type WebNode = WebButtonNode | WebInputNode | WebCardNode;
+
+export type DiagramNode = ShapeNode | WebNode;
 
 export interface DiagramEdge extends DiagramElement {
   sourceId: string;
@@ -47,6 +85,7 @@ export interface DiagramEdge extends DiagramElement {
   style?: {
     stroke?: string;
     strokeWidth?: number;
+    cornerRadius?: number;
   };
 }
 

@@ -19,15 +19,15 @@ import { WebCardComponent } from './renderers/web-card.component';
       </app-web-button>
       } @case ('input') {
       <app-web-input
-        [label]="node.data.label"
-        [placeholder]="node.data.placeholder"
+        [label]="node.data.label || ''"
+        [placeholder]="node.data.placeholder || ''"
         [type]="node.data.inputType || 'text'"
       >
       </app-web-input>
       } @case ('card') {
-      <app-web-card [title]="node.data.title" [content]="node.data.content"> </app-web-card>
+      <app-web-card [title]="node.data.title || ''" [content]="node.data.content || ''"> </app-web-card>
       } @default {
-      <div class="text-red-500">Unknown: {{ node.componentType }}</div>
+      <div class="text-red-500">Unknown: {{ $any(node).componentType }}</div>
       } }
     </div>
   `,
