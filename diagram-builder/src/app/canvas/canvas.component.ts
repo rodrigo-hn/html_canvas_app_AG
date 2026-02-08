@@ -23,6 +23,8 @@ import { StencilService } from '../stencils/stencil.service';
       tabindex="0"
       (click)="onBackgroundClick()"
       (mousedown)="onCanvasMouseDown($event)"
+      (dragover)="onCanvasDragOver($event)"
+      (drop)="onCanvasDrop($event)"
     >
       <!-- Toolbar (Simulated) -->
       <div class="absolute top-4 left-4 z-50 flex flex-wrap items-center gap-2 bg-white/90 border border-slate-200 rounded px-2 py-1 shadow-sm">
@@ -117,6 +119,9 @@ import { StencilService } from '../stencils/stencil.service';
                 class="rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-left text-[11px] text-slate-100 hover:border-cyan-500 hover:bg-slate-700"
                 (click)="addPaletteItem(item.key)"
                 [title]="item.label"
+                draggable="true"
+                (dragstart)="onPaletteDragStart($event, item.key)"
+                (dragend)="onPaletteDragEnd()"
               >
                 <div class="flex items-center gap-2">
                   <span class="inline-flex h-8 w-8 items-center justify-center rounded border border-slate-600 bg-slate-900">
@@ -198,6 +203,7 @@ export class CanvasComponent {
   private selectionAdditive = false;
   private selectionJustFinishedAt = 0;
   private insertCount = 0;
+  private draggedPaletteKey: string | null = null;
   isPaletteOpen = true;
   paletteQuery = '';
   paletteGroups = [
@@ -263,6 +269,10 @@ export class CanvasComponent {
     { group: 'bpmn-choreo', key: 'bpmn-choreography-subprocess', label: 'Choreography Subprocess' },
   ];
 
+  constructor() {
+    this.validatePaletteCoverage();
+  }
+
   onBackgroundClick() {
     this.canvasRoot.nativeElement.focus();
     if (Date.now() - this.selectionJustFinishedAt < 200) {
@@ -288,6 +298,42 @@ export class CanvasComponent {
     if (!node) return;
     this.commands.addNode(node);
     this.commands.setSelection([node.id], false);
+  }
+
+  onPaletteDragStart(event: DragEvent, key: string) {
+    this.draggedPaletteKey = key;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'copy';
+      event.dataTransfer.setData('application/x-diagram-component', key);
+      event.dataTransfer.setData('text/plain', key);
+    }
+  }
+
+  onPaletteDragEnd() {
+    this.draggedPaletteKey = null;
+  }
+
+  onCanvasDragOver(event: DragEvent) {
+    const key = this.readDraggedPaletteKey(event);
+    if (!key) return;
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'copy';
+    }
+  }
+
+  onCanvasDrop(event: DragEvent) {
+    const key = this.readDraggedPaletteKey(event);
+    if (!key) return;
+    event.preventDefault();
+    const rect = this.canvasRoot.nativeElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const node = this.buildPaletteNode(key, x, y);
+    if (!node) return;
+    this.commands.addNode(node);
+    this.commands.setSelection([node.id], false);
+    this.draggedPaletteKey = null;
   }
 
   filteredGroupItems(groupId: string) {
@@ -316,6 +362,13 @@ export class CanvasComponent {
 
   shapePreview(key: string): SafeHtml {
     return this.stencilService.getShapeSVG(key, 32, 32);
+  }
+
+  private readDraggedPaletteKey(event: DragEvent): string | null {
+    const transferKey = event.dataTransfer?.getData('application/x-diagram-component')
+      || event.dataTransfer?.getData('text/plain')
+      || null;
+    return transferKey || this.draggedPaletteKey;
   }
 
   onSnapToggle(event: Event) {
@@ -408,10 +461,15 @@ export class CanvasComponent {
       return;
     }
     if (event.key !== 'Delete' && event.key !== 'Backspace') return;
-    const edgeId = this.store.selectedEdgeId();
-    if (!edgeId) return;
     event.preventDefault();
-    this.commands.removeEdge(edgeId);
+    const edgeId = this.store.selectedEdgeId();
+    if (edgeId) {
+      this.commands.removeEdge(edgeId);
+      return;
+    }
+    const selectedNodes = Array.from(this.store.selection());
+    if (selectedNodes.length === 0) return;
+    selectedNodes.forEach((id) => this.commands.removeNode(id));
   }
 
   private handleArrowMove(event: KeyboardEvent): boolean {
@@ -735,6 +793,19 @@ export class CanvasComponent {
     if (labels[shapeType] !== undefined) return labels[shapeType];
     if (isGateway) return '';
     return 'Shape';
+  }
+
+  private validatePaletteCoverage() {
+    const missing: string[] = [];
+    const keys = Array.from(new Set(this.paletteItems.map((i) => i.key)));
+    for (const key of keys) {
+      if (!this.buildPaletteNode(key, 0, 0)) {
+        missing.push(key);
+      }
+    }
+    if (missing.length > 0) {
+      console.warn('Palette items without node builder:', missing);
+    }
   }
 
   exportHtml() {

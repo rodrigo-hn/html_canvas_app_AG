@@ -95,10 +95,22 @@ import { DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/model
       <div class="text-sm text-slate-600">
         {{ selectedNodes().length }} nodes selected.
       </div>
+      <button
+        class="mt-3 w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
+        (click)="deleteSelectedNodes()"
+      >
+        Delete Selected Nodes
+      </button>
       } @else {
       <div class="space-y-4">
         <div class="text-xs text-slate-500">ID: {{ node()!.id }}</div>
         <div class="text-xs text-slate-500">Type: {{ node()!.type }}</div>
+        <button
+          class="w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
+          (click)="deleteCurrentNode()"
+        >
+          Delete Node
+        </button>
 
         <details open>
           <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">
@@ -483,6 +495,18 @@ export class InspectorComponent {
     const edge = this.selectedEdge();
     if (!edge) return;
     this.commands.removeEdge(edge.id);
+  }
+
+  deleteCurrentNode() {
+    const n = this.node();
+    if (!n) return;
+    this.commands.removeNode(n.id);
+  }
+
+  deleteSelectedNodes() {
+    const nodes = this.selectedNodes();
+    if (nodes.length === 0) return;
+    nodes.forEach((n) => this.commands.removeNode(n.id));
   }
 
   resetEdgeBend() {
