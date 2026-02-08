@@ -143,16 +143,43 @@ ${nodesHtml}
       cylinder: BasicShapes.cylinder,
       diamond: BasicShapes.diamond,
       'bpmn-task': BpmnShapes.task,
+      'bpmn-subprocess': BpmnShapes.subprocess,
+      'bpmn-call-activity': BpmnShapes.callActivity,
+      'bpmn-transaction': BpmnShapes.transaction,
+      'bpmn-event-subprocess': BpmnShapes.eventSubprocess,
       'bpmn-start-event': BpmnShapes.eventStart,
+      'bpmn-intermediate-event': BpmnShapes.eventIntermediate,
+      'bpmn-boundary-event': BpmnShapes.eventBoundary,
+      'bpmn-throwing-event': BpmnShapes.eventThrowing,
+      'bpmn-event-message': BpmnShapes.eventMessage,
+      'bpmn-event-timer': BpmnShapes.eventTimer,
+      'bpmn-event-error': BpmnShapes.eventError,
+      'bpmn-event-signal': BpmnShapes.eventSignal,
+      'bpmn-event-escalation': BpmnShapes.eventEscalation,
       'bpmn-end-event': BpmnShapes.eventEnd,
       'bpmn-gateway': BpmnShapes.gateway,
+      'bpmn-gateway-exclusive': BpmnShapes.gatewayExclusive,
+      'bpmn-gateway-inclusive': BpmnShapes.gatewayInclusive,
+      'bpmn-gateway-parallel': BpmnShapes.gatewayParallel,
+      'bpmn-gateway-event-based': BpmnShapes.gatewayEventBased,
       'bpmn-pool': BpmnShapes.pool,
+      'bpmn-lane': BpmnShapes.lane,
+      'bpmn-data-object': BpmnShapes.dataObject,
+      'bpmn-data-store': BpmnShapes.dataStore,
+      'bpmn-group': BpmnShapes.group,
+      'bpmn-text-annotation': BpmnShapes.textAnnotation,
+      'bpmn-choreography-task': BpmnShapes.choreoTask,
+      'bpmn-choreography-subprocess': BpmnShapes.choreoSubprocess,
+      'bpmn-conversation': BpmnShapes.conversation,
+      'bpmn-sequence-flow': BpmnShapes.sequenceFlow,
+      'bpmn-message-flow': BpmnShapes.messageFlow,
+      'bpmn-association': BpmnShapes.association,
     };
     const generator = shapes[node.shapeType];
     if (generator) {
       return generator(node.width, node.height);
     }
-    return `<rect width="${node.width}" height="${node.height}" fill="red"/>`;
+    return `<rect width="${node.width}" height="${node.height}" fill="white" stroke="#111" stroke-width="2" stroke-dasharray="6 4"/>`;
   }
 
   private generateSvgWrapper(node: ShapeNode, innerContent: string): string {
