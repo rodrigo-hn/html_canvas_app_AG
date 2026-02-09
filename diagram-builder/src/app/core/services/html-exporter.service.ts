@@ -73,6 +73,28 @@ ${nodesHtml}
     >
       <path d="M0,0 L0,6 L9,3 z" fill="#333" />
     </marker>
+    <marker
+      id="open-arrow"
+      markerWidth="10"
+      markerHeight="10"
+      refX="9"
+      refY="3"
+      orient="auto"
+      markerUnits="strokeWidth"
+    >
+      <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+    </marker>
+    <marker
+      id="open-circle"
+      markerWidth="10"
+      markerHeight="10"
+      refX="3"
+      refY="3"
+      orient="auto"
+      markerUnits="strokeWidth"
+    >
+      <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+    </marker>
   </defs>
   <rect x="${bounds.minX}" y="${bounds.minY}" width="${bounds.width}" height="${bounds.height}" fill="#f8fafc" />
   ${edgesSvg}
@@ -228,7 +250,9 @@ ${nodesHtml}
         if (!start || !end) return '';
         const stroke = edge.style?.stroke || 'black';
         const strokeWidth = edge.style?.strokeWidth || 1;
-        const marker = edge.markerEnd ? 'url(#arrow)' : '';
+        const markerEnd = edge.markerEnd ? `url(#${edge.markerEnd})` : '';
+        const markerStart = edge.markerStart ? `url(#${edge.markerStart})` : '';
+        const dashArray = edge.style?.dashArray || '';
         const d = this.buildOrthogonalPath(
           start,
           end,
@@ -237,7 +261,7 @@ ${nodesHtml}
           edge.points?.[0] || null,
           edge.style?.cornerRadius || 0
         );
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" marker-end="${marker}" />`;
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
       })
       .filter(Boolean)
       .join('\n');
@@ -256,6 +280,28 @@ ${nodesHtml}
           >
             <path d="M0,0 L0,6 L9,3 z" fill="#333" />
           </marker>
+          <marker
+            id="open-arrow"
+            markerWidth="10"
+            markerHeight="10"
+            refX="9"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+          </marker>
+          <marker
+            id="open-circle"
+            markerWidth="10"
+            markerHeight="10"
+            refX="3"
+            refY="3"
+            orient="auto"
+            markerUnits="strokeWidth"
+          >
+            <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+          </marker>
         </defs>
         ${paths}
       </svg>
@@ -271,7 +317,9 @@ ${nodesHtml}
         if (!start || !end) return '';
         const stroke = edge.style?.stroke || '#333';
         const strokeWidth = edge.style?.strokeWidth || 2;
-        const marker = edge.markerEnd ? 'url(#arrow)' : '';
+        const markerEnd = edge.markerEnd ? `url(#${edge.markerEnd})` : '';
+        const markerStart = edge.markerStart ? `url(#${edge.markerStart})` : '';
+        const dashArray = edge.style?.dashArray || '';
         const d = this.buildOrthogonalPath(
           start,
           end,
@@ -280,7 +328,7 @@ ${nodesHtml}
           edge.points?.[0] || null,
           edge.style?.cornerRadius || 0
         );
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" marker-end="${marker}" />`;
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
       })
       .filter(Boolean)
       .join('\n');

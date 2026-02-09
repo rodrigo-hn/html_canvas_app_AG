@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ViewChild, computed, inject } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, ViewChild, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DiagramStore } from '../../core/services/diagram-store.service';
 import { DiagramCommands } from '../../core/services/diagram-commands.service';
@@ -27,6 +27,28 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         >
           <path d="M0,0 L0,6 L9,3 z" fill="#333" />
         </marker>
+        <marker
+          id="open-arrow"
+          markerWidth="10"
+          markerHeight="10"
+          refX="9"
+          refY="3"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+        </marker>
+        <marker
+          id="open-circle"
+          markerWidth="10"
+          markerHeight="10"
+          refX="3"
+          refY="3"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+        </marker>
       </defs>
 
       @for (edge of edges(); track edge.id) {
@@ -38,7 +60,9 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         stroke-linejoin="round"
         [attr.stroke]="edge.style?.stroke || '#333'"
         [attr.stroke-width]="edge.style?.strokeWidth || 2"
-        [attr.marker-end]="edge.markerEnd ? 'url(#arrow)' : null"
+        [attr.stroke-dasharray]="edge.style?.dashArray || null"
+        [attr.marker-start]="markerStartUrl(edge)"
+        [attr.marker-end]="markerEndUrl(edge)"
         (click)="onEdgeClick(edge, $event)"
       />
       @if (selectedEdgeId() === edge.id) {
@@ -115,6 +139,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
   `,
 })
 export class EdgesLayerComponent {
+  @Input() zoom = 1;
   private store = inject(DiagramStore);
   private commands = inject(DiagramCommands);
   @ViewChild('svgRoot', { static: true }) svgRoot!: ElementRef<SVGSVGElement>;
@@ -186,8 +211,7 @@ export class EdgesLayerComponent {
 
   @HostListener('document:mousemove', ['$event'])
   onDocumentMouseMove(event: MouseEvent) {
-    const rect = this.svgRoot.nativeElement.getBoundingClientRect();
-    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const point = this.toWorldPoint(event.clientX, event.clientY);
     if (this.connectionDrag) {
       this.connectionDrag.currentPoint = point;
       return;
@@ -204,8 +228,7 @@ export class EdgesLayerComponent {
       return;
     }
     if (!this.connectionDrag) return;
-    const rect = this.svgRoot.nativeElement.getBoundingClientRect();
-    const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+    const point = this.toWorldPoint(event.clientX, event.clientY);
     const { edgeId, end } = this.connectionDrag;
     const nearest = this.findNearestPort(point);
     if (nearest) {
@@ -237,6 +260,16 @@ export class EdgesLayerComponent {
     const node = this.nodes().find((n) => n.id === nodeId);
     if (!node) return { x: 0, y: 0 };
     return this.getPortPoint(node, port);
+  }
+
+  markerEndUrl(edge: DiagramEdge): string | null {
+    if (!edge.markerEnd) return null;
+    return `url(#${edge.markerEnd})`;
+  }
+
+  markerStartUrl(edge: DiagramEdge): string | null {
+    if (!edge.markerStart) return null;
+    return `url(#${edge.markerStart})`;
   }
 
   private getPortPoint(node: DiagramNode, port: Port): Point {
@@ -491,5 +524,13 @@ export class EdgesLayerComponent {
     }
     if (!closest || closest.distance > 30) return null;
     return { nodeId: closest.nodeId, port: closest.port };
+  }
+
+  private toWorldPoint(clientX: number, clientY: number): Point {
+    const rect = this.svgRoot.nativeElement.getBoundingClientRect();
+    return {
+      x: (clientX - rect.left) / this.zoom,
+      y: (clientY - rect.top) / this.zoom,
+    };
   }
 }

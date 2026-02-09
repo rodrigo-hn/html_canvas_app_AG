@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DiagramStore } from '../core/services/diagram-store.service';
 import { DiagramCommands } from '../core/services/diagram-commands.service';
-import { DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/models/diagram.model';
+import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/models/diagram.model';
 
 @Component({
   selector: 'app-inspector',
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="h-full w-72 bg-white border-l border-slate-200 p-4 overflow-auto">
+    <div class="h-full w-full bg-white border-l border-slate-200 p-4 overflow-auto">
       <h2 class="text-lg font-semibold mb-4">Inspector</h2>
 
       @if (selectedEdge()) {
@@ -18,6 +18,22 @@ import { DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/model
         <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">Edge</summary>
         <div class="space-y-3">
           <div class="text-xs text-slate-500">ID: {{ selectedEdge()!.id }}</div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('flowType')"
+              >Flow Type</label
+            >
+            <select
+              [id]="edgeFieldId('flowType')"
+              [attr.name]="edgeFieldId('flowType')"
+              class="w-full border rounded px-2 py-1 text-sm"
+              [ngModel]="selectedEdge()!.flowType || 'sequence'"
+              (ngModelChange)="updateEdgeFlowType($event)"
+            >
+              @for (flowType of flowTypes; track flowType.value) {
+              <option [value]="flowType.value">{{ flowType.label }}</option>
+              }
+            </select>
+          </div>
           <button
             class="w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
             (click)="deleteSelectedEdge()"
@@ -366,6 +382,11 @@ export class InspectorComponent {
     'bpmn-pool',
   ];
   readonly componentTypes = ['button', 'input', 'card'];
+  readonly flowTypes: Array<{ value: BpmnFlowType; label: string }> = [
+    { value: 'sequence', label: 'Sequence Flow' },
+    { value: 'message', label: 'Message Flow' },
+    { value: 'association', label: 'Association' },
+  ];
 
   selectedNodes = computed(() => {
     const selectedIds = this.store.selection();
@@ -491,6 +512,18 @@ export class InspectorComponent {
     this.commands.updateEdge(edge.id, { markerEnd: checked ? 'arrow' : undefined });
   }
 
+  updateEdgeFlowType(value: BpmnFlowType) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const defaults = this.edgeFlowDefaults(value);
+    this.commands.updateEdge(edge.id, {
+      flowType: value,
+      markerEnd: defaults.markerEnd,
+      markerStart: defaults.markerStart,
+    });
+    this.commands.setEdgeStyle(edge.id, defaults.style);
+  }
+
   deleteSelectedEdge() {
     const edge = this.selectedEdge();
     if (!edge) return;
@@ -525,5 +558,27 @@ export class InspectorComponent {
     const edge = this.selectedEdge();
     const id = edge?.id ?? 'none';
     return `inspector-edge-${id}-${field}`;
+  }
+
+  private edgeFlowDefaults(flowType: BpmnFlowType) {
+    if (flowType === 'message') {
+      return {
+        markerEnd: 'open-arrow',
+        markerStart: 'open-circle',
+        style: { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4', cornerRadius: 0 },
+      };
+    }
+    if (flowType === 'association') {
+      return {
+        markerEnd: undefined,
+        markerStart: undefined,
+        style: { stroke: '#374151', strokeWidth: 2, dashArray: '3 4', cornerRadius: 0 },
+      };
+    }
+    return {
+      markerEnd: 'arrow',
+      markerStart: undefined,
+      style: { stroke: '#333', strokeWidth: 2, dashArray: undefined, cornerRadius: 0 },
+    };
   }
 }

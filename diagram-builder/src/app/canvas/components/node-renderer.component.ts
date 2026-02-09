@@ -18,6 +18,7 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
       [dragDisabled]="isResizing || isEditingText"
       [snapToGrid]="store.snapToGrid()"
       [gridSize]="store.gridSize()"
+      [zoom]="zoom"
       [startPosition]="{ x: node.x, y: node.y }"
       (dragStart)="onDragStart()"
       (dragMove)="onDragMove($event)"
@@ -141,6 +142,7 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
 })
 export class NodeRendererComponent {
   @Input({ required: true }) node!: DiagramNode;
+  @Input() zoom = 1;
 
   readonly store = inject(DiagramStore);
   readonly commands = inject(DiagramCommands);
@@ -262,8 +264,8 @@ export class NodeRendererComponent {
   onResizeMove(event: MouseEvent) {
     if (!this.isResizing || !this.resizeState) return;
     const { handle, startMouse, startNode } = this.resizeState;
-    const deltaX = event.clientX - startMouse.x;
-    const deltaY = event.clientY - startMouse.y;
+    const deltaX = (event.clientX - startMouse.x) / this.zoom;
+    const deltaY = (event.clientY - startMouse.y) / this.zoom;
     const minWidth = 20;
     const minHeight = 20;
 

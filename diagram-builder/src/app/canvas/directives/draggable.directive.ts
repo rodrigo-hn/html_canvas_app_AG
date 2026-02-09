@@ -25,6 +25,7 @@ export class DraggableDirective {
   @HostListener('mousedown', ['$event'])
   onMouseDown(event: MouseEvent) {
     if (this.dragDisabled) return;
+    if (event.button !== 0) return;
     // Don't drag if clicking on controls/inputs (later)
     if ((event.target as HTMLElement).closest('input, select, textarea, button')) {
       return;

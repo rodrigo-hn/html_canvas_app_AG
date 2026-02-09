@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { DiagramEdge, DiagramNode, Point, ShapeNode, WebNode } from '../models/diagram.model';
+import { DiagramEdge, DiagramNode, Point } from '../models/diagram.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,10 +24,6 @@ export class DiagramStore {
   readonly snapToGrid = this.snapToGridSignal.asReadonly();
   readonly gridSize = this.gridSizeSignal.asReadonly();
   readonly edgePreview = this.edgePreviewSignal.asReadonly();
-
-  constructor() {
-    this.seed();
-  }
 
   getNodes() {
     return this.nodesSignal();
@@ -85,86 +81,4 @@ export class DiagramStore {
     this.edgePreviewSignal.set(preview);
   }
 
-  private seed() {
-    this.updateNodes((nodes) => {
-      const next = [...nodes];
-      next.push({
-        id: '1',
-        type: 'shape',
-        shapeType: 'rectangle',
-        x: 100,
-        y: 100,
-        width: 120,
-        height: 80,
-        zIndex: 1,
-        data: { text: 'Start Process' },
-        style: { fill: '#ffffff', stroke: '#000000', strokeWidth: 2 },
-      } as ShapeNode);
-
-      next.push({
-        id: '2',
-        type: 'shape',
-        shapeType: 'cylinder',
-        x: 300,
-        y: 150,
-        width: 80,
-        height: 100,
-        zIndex: 1,
-        data: { text: 'Database' },
-      } as ShapeNode);
-
-      next.push({
-        id: '3',
-        type: 'shape',
-        shapeType: 'bpmn-task',
-        x: 140,
-        y: 300,
-        width: 140,
-        height: 80,
-        zIndex: 1,
-        data: { text: 'User Task' },
-      } as ShapeNode);
-
-      next.push({
-        id: '4',
-        type: 'web-component',
-        componentType: 'button',
-        x: 400,
-        y: 400,
-        width: 100,
-        height: 40,
-        zIndex: 1,
-        data: { text: 'Save', variant: 'success' },
-      } as WebNode);
-
-      next.push({
-        id: '5',
-        type: 'web-component',
-        componentType: 'card',
-        x: 550,
-        y: 100,
-        width: 300,
-        height: 200,
-        zIndex: 0,
-        data: { title: 'User Profile', content: 'Details regarding the user...' },
-      } as WebNode);
-
-      return next;
-    });
-
-    this.updateEdges((edges) => [
-      ...edges,
-      {
-        id: 'e1',
-        sourceId: '1',
-        targetId: '4',
-        sourcePort: 'right',
-        targetPort: 'left',
-        zIndex: 0,
-        points: [],
-        markerEnd: 'arrow',
-        style: { stroke: '#333', strokeWidth: 2 },
-      },
-    ]);
-  }
 }

@@ -60,4 +60,63 @@ describe('HtmlExportService', () => {
     expect(svg).toContain('marker');
     expect(svg).toContain('<path');
   });
+
+  it('exports message-flow markers and dashed style', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        HtmlExportService,
+        {
+          provide: DomSanitizer,
+          useValue: { bypassSecurityTrustHtml: (v: string) => v },
+        },
+      ],
+    });
+
+    const service = TestBed.inject(HtmlExportService);
+    const svg = service.exportSvg({
+      nodes: [
+        {
+          id: '1',
+          type: 'shape',
+          shapeType: 'rectangle',
+          x: 0,
+          y: 0,
+          width: 100,
+          height: 60,
+          zIndex: 0,
+          data: { text: 'Source' },
+        },
+        {
+          id: '2',
+          type: 'shape',
+          shapeType: 'rectangle',
+          x: 240,
+          y: 0,
+          width: 100,
+          height: 60,
+          zIndex: 0,
+          data: { text: 'Target' },
+        },
+      ],
+      edges: [
+        {
+          id: 'msg',
+          sourceId: '1',
+          targetId: '2',
+          sourcePort: 'right',
+          targetPort: 'left',
+          flowType: 'message',
+          zIndex: 0,
+          points: [],
+          markerEnd: 'open-arrow',
+          markerStart: 'open-circle',
+          style: { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4' },
+        },
+      ],
+    });
+
+    expect(svg).toContain('marker-start="url(#open-circle)"');
+    expect(svg).toContain('marker-end="url(#open-arrow)"');
+    expect(svg).toContain('stroke-dasharray="6 4"');
+  });
 });

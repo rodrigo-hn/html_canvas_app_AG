@@ -1,5 +1,6 @@
 export type NodeType = 'shape' | 'web-component';
 export type WebComponentType = 'button' | 'input' | 'card';
+export type BpmnFlowType = 'sequence' | 'message' | 'association';
 
 export interface Point {
   x: number;
@@ -80,12 +81,16 @@ export interface DiagramEdge extends DiagramElement {
   targetId: string;
   sourcePort?: 'top' | 'right' | 'bottom' | 'left';
   targetPort?: 'top' | 'right' | 'bottom' | 'left';
+  flowType?: BpmnFlowType;
+  label?: string;
   points: Point[];
   markerEnd?: string; // 'arrow'
+  markerStart?: string;
   style?: {
     stroke?: string;
     strokeWidth?: number;
     cornerRadius?: number;
+    dashArray?: string;
   };
 }
 
