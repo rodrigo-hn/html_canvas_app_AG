@@ -6,7 +6,12 @@ export type WebComponentType =
   | 'bpmn-user-task-web'
   | 'bpmn-service-task-web'
   | 'bpmn-manual-task-web'
-  | 'bpmn-subprocess-web';
+  | 'bpmn-subprocess-web'
+  | 'bpmn-start-event-web'
+  | 'bpmn-exclusive-gateway-web'
+  | 'bpmn-end-event-web'
+  | 'bpmn-lane-web'
+  | 'bpmn-pool-web';
 export type BpmnFlowType = 'sequence' | 'message' | 'association';
 
 export interface Point {
@@ -112,6 +117,36 @@ export interface WebBpmnSubprocessNode extends DiagramNodeBase {
   data: WebBpmnTaskData;
 }
 
+export interface WebBpmnStartEventNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-start-event-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnExclusiveGatewayNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-exclusive-gateway-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnEndEventNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-end-event-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnLaneNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-lane-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnPoolNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-pool-web';
+  data: WebBpmnTaskData;
+}
+
 export type WebNode =
   | WebButtonNode
   | WebInputNode
@@ -119,7 +154,12 @@ export type WebNode =
   | WebBpmnUserTaskNode
   | WebBpmnServiceTaskNode
   | WebBpmnManualTaskNode
-  | WebBpmnSubprocessNode;
+  | WebBpmnSubprocessNode
+  | WebBpmnStartEventNode
+  | WebBpmnExclusiveGatewayNode
+  | WebBpmnEndEventNode
+  | WebBpmnLaneNode
+  | WebBpmnPoolNode;
 
 export type DiagramNode = ShapeNode | WebNode;
 

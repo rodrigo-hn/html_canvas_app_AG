@@ -438,6 +438,11 @@ export class InspectorComponent {
     'bpmn-service-task-web',
     'bpmn-manual-task-web',
     'bpmn-subprocess-web',
+    'bpmn-start-event-web',
+    'bpmn-exclusive-gateway-web',
+    'bpmn-end-event-web',
+    'bpmn-lane-web',
+    'bpmn-pool-web',
   ];
   readonly flowTypes: Array<{ value: BpmnFlowType; label: string }> = [
     { value: 'sequence', label: 'Sequence Flow' },
@@ -516,7 +521,12 @@ export class InspectorComponent {
       type === 'bpmn-user-task-web' ||
       type === 'bpmn-service-task-web' ||
       type === 'bpmn-manual-task-web' ||
-      type === 'bpmn-subprocess-web'
+      type === 'bpmn-subprocess-web' ||
+      type === 'bpmn-start-event-web' ||
+      type === 'bpmn-exclusive-gateway-web' ||
+      type === 'bpmn-end-event-web' ||
+      type === 'bpmn-lane-web' ||
+      type === 'bpmn-pool-web'
     );
   }
 

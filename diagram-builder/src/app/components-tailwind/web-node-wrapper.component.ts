@@ -8,6 +8,11 @@ import { WebBpmnUserTaskComponent } from './renderers/web-bpmn-user-task.compone
 import { WebBpmnServiceTaskComponent } from './renderers/web-bpmn-service-task.component';
 import { WebBpmnManualTaskComponent } from './renderers/web-bpmn-manual-task.component';
 import { WebBpmnSubprocessComponent } from './renderers/web-bpmn-subprocess.component';
+import { WebBpmnStartEventComponent } from './renderers/web-bpmn-start-event.component';
+import { WebBpmnExclusiveGatewayComponent } from './renderers/web-bpmn-exclusive-gateway.component';
+import { WebBpmnEndEventComponent } from './renderers/web-bpmn-end-event.component';
+import { WebBpmnLaneComponent } from './renderers/web-bpmn-lane.component';
+import { WebBpmnPoolComponent } from './renderers/web-bpmn-pool.component';
 
 @Component({
   selector: 'app-web-node-wrapper',
@@ -21,6 +26,11 @@ import { WebBpmnSubprocessComponent } from './renderers/web-bpmn-subprocess.comp
     WebBpmnServiceTaskComponent,
     WebBpmnManualTaskComponent,
     WebBpmnSubprocessComponent,
+    WebBpmnStartEventComponent,
+    WebBpmnExclusiveGatewayComponent,
+    WebBpmnEndEventComponent,
+    WebBpmnLaneComponent,
+    WebBpmnPoolComponent,
   ],
   template: `
     <div class="w-full h-full overflow-hidden pointer-events-none">
@@ -64,6 +74,16 @@ import { WebBpmnSubprocessComponent } from './renderers/web-bpmn-subprocess.comp
         [badgeEnabled]="bpmnTaskBadgeEnabled()"
         [variant]="bpmnTaskVariant('purple')"
       ></app-web-bpmn-subprocess>
+      } @case ('bpmn-start-event-web') {
+      <app-web-bpmn-start-event></app-web-bpmn-start-event>
+      } @case ('bpmn-exclusive-gateway-web') {
+      <app-web-bpmn-exclusive-gateway [label]="bpmnTaskText('')"></app-web-bpmn-exclusive-gateway>
+      } @case ('bpmn-end-event-web') {
+      <app-web-bpmn-end-event></app-web-bpmn-end-event>
+      } @case ('bpmn-lane-web') {
+      <app-web-bpmn-lane [label]="bpmnTaskText('Lane')"></app-web-bpmn-lane>
+      } @case ('bpmn-pool-web') {
+      <app-web-bpmn-pool [label]="bpmnTaskText('Pool')"></app-web-bpmn-pool>
       } @default {
       <div class="text-red-500">Unknown: {{ $any(node).componentType }}</div>
       } }

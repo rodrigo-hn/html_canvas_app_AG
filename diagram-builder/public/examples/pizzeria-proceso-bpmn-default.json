@@ -2,295 +2,285 @@
   "nodes": [
     {
       "id": "pool-pizzeria",
-      "type": "shape",
-      "shapeType": "bpmn-pool",
+      "type": "web-component",
+      "componentType": "bpmn-pool-web",
       "x": 40,
-      "y": 80,
-      "width": 2460,
+      "y": 20,
+      "width": 2320,
       "height": 820,
       "zIndex": 0,
-      "data": { "text": "PIZZERIA LA ITALIANA" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": "PIZZERIA LA ITALIANA",
+        "variant": "yellow"
+      }
     },
     {
       "id": "lane-atencion",
-      "type": "shape",
-      "shapeType": "bpmn-lane",
-      "x": 40,
-      "y": 80,
-      "width": 2460,
-      "height": 250,
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 80,
+      "y": 20,
+      "width": 2280,
+      "height": 280,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": "Atencion al Cliente",
+        "variant": "blue"
+      }
     },
     {
       "id": "lane-cocina",
-      "type": "shape",
-      "shapeType": "bpmn-lane",
-      "x": 40,
-      "y": 330,
-      "width": 2460,
-      "height": 260,
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 80,
+      "y": 300,
+      "width": 2280,
+      "height": 170,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": "Cocina",
+        "variant": "blue"
+      }
     },
     {
       "id": "lane-delivery",
-      "type": "shape",
-      "shapeType": "bpmn-lane",
-      "x": 40,
-      "y": 590,
-      "width": 2460,
-      "height": 310,
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 80,
+      "y": 470,
+      "width": 2280,
+      "height": 370,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": "Delivery",
+        "variant": "blue"
+      }
     },
-
-    {
-      "id": "label-atencion",
-      "type": "shape",
-      "shapeType": "rounded-rectangle",
-      "x": 56,
-      "y": 96,
-      "width": 190,
-      "height": 68,
-      "zIndex": 2,
-      "data": { "text": "Atencion al Cliente" },
-      "style": { "fill": "#eef2ff", "stroke": "#334155", "strokeWidth": 1.6 }
-    },
-    {
-      "id": "label-cocina",
-      "type": "shape",
-      "shapeType": "rounded-rectangle",
-      "x": 56,
-      "y": 346,
-      "width": 160,
-      "height": 68,
-      "zIndex": 2,
-      "data": { "text": "Cocina" },
-      "style": { "fill": "#ecfeff", "stroke": "#334155", "strokeWidth": 1.6 }
-    },
-    {
-      "id": "label-delivery",
-      "type": "shape",
-      "shapeType": "rounded-rectangle",
-      "x": 56,
-      "y": 606,
-      "width": 160,
-      "height": 68,
-      "zIndex": 2,
-      "data": { "text": "Delivery" },
-      "style": { "fill": "#f0fdf4", "stroke": "#334155", "strokeWidth": 1.6 }
-    },
-
     {
       "id": "start-pedido",
-      "type": "shape",
-      "shapeType": "bpmn-start-event",
-      "x": 170,
-      "y": 190,
-      "width": 72,
-      "height": 72,
+      "type": "web-component",
+      "componentType": "bpmn-start-event-web",
+      "x": 180,
+      "y": 158,
+      "width": 64,
+      "height": 64,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": "",
+        "iconEnabled": true,
+        "variant": "green"
+      }
     },
     {
       "id": "task-registrar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
       "x": 300,
-      "y": 174,
-      "width": 220,
-      "height": 104,
+      "y": 142,
+      "width": 190,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Registrar pedido", "taskKind": "receive" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Registrar pedido",
+        "iconEnabled": true,
+        "variant": "blue"
+      }
     },
     {
       "id": "task-verificar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 580,
-      "y": 174,
-      "width": 250,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-service-task-web",
+      "x": 560,
+      "y": 142,
+      "width": 220,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Verificar disponibilidad" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Verificar disponibilidad",
+        "iconEnabled": true,
+        "variant": "blue"
+      }
     },
     {
       "id": "gw-disponible",
-      "type": "shape",
-      "shapeType": "bpmn-gateway-exclusive",
-      "x": 900,
-      "y": 170,
-      "width": 110,
-      "height": 110,
+      "type": "web-component",
+      "componentType": "bpmn-exclusive-gateway-web",
+      "x": 860,
+      "y": 142,
+      "width": 96,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fef3c7", "stroke": "#854d0e", "strokeWidth": 2 }
-    },
-    {
-      "id": "label-disponible",
-      "type": "shape",
-      "shapeType": "rounded-rectangle",
-      "x": 854,
-      "y": 98,
-      "width": 200,
-      "height": 58,
-      "zIndex": 3,
-      "data": { "text": "Disponible?" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.4 }
+      "data": {
+        "text": "Disponible?",
+        "iconEnabled": true,
+        "variant": "yellow"
+      }
     },
     {
       "id": "task-confirmar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 1080,
-      "y": 174,
-      "width": 220,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 1030,
+      "y": 142,
+      "width": 190,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Confirmar pedido" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Confirmar pedido",
+        "iconEnabled": true,
+        "variant": "blue"
+      }
     },
     {
       "id": "task-notificar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 1080,
-      "y": 56,
-      "width": 220,
-      "height": 92,
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 1030,
+      "y": 30,
+      "width": 190,
+      "height": 86,
       "zIndex": 3,
-      "data": { "text": "Notificar cliente" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Notificar cliente",
+        "iconEnabled": true,
+        "variant": "red"
+      }
     },
     {
       "id": "end-cancelado",
-      "type": "shape",
-      "shapeType": "bpmn-end-event",
-      "x": 1350,
-      "y": 64,
-      "width": 84,
-      "height": 84,
+      "type": "web-component",
+      "componentType": "bpmn-end-event-web",
+      "x": 1270,
+      "y": 34,
+      "width": 76,
+      "height": 76,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 3 }
+      "data": {
+        "text": "",
+        "iconEnabled": true,
+        "variant": "red"
+      }
     },
-
     {
       "id": "sub-preparar",
-      "type": "shape",
-      "shapeType": "bpmn-subprocess",
-      "x": 1080,
-      "y": 396,
-      "width": 220,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-subprocess-web",
+      "x": 1030,
+      "y": 362,
+      "width": 190,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Preparar pizza", "taskKind": "prepare" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Preparar pizza",
+        "iconEnabled": true,
+        "variant": "purple",
+        "badgeEnabled": true
+      }
     },
     {
       "id": "task-calidad",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 1360,
-      "y": 396,
-      "width": 210,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-manual-task-web",
+      "x": 1280,
+      "y": 362,
+      "width": 190,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Control calidad" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Control calidad",
+        "iconEnabled": true,
+        "variant": "yellow"
+      }
     },
     {
       "id": "gw-aprobada",
-      "type": "shape",
-      "shapeType": "bpmn-gateway-exclusive",
-      "x": 1640,
-      "y": 392,
-      "width": 110,
-      "height": 110,
+      "type": "web-component",
+      "componentType": "bpmn-exclusive-gateway-web",
+      "x": 1530,
+      "y": 362,
+      "width": 96,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fef3c7", "stroke": "#854d0e", "strokeWidth": 2 }
-    },
-    {
-      "id": "label-aprobada",
-      "type": "shape",
-      "shapeType": "rounded-rectangle",
-      "x": 1588,
-      "y": 322,
-      "width": 220,
-      "height": 58,
-      "zIndex": 3,
-      "data": { "text": "Aprobada?" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.4 }
+      "data": {
+        "text": "Aprobada?",
+        "iconEnabled": true,
+        "variant": "yellow"
+      }
     },
     {
       "id": "task-empaquetar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 1820,
-      "y": 396,
-      "width": 220,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-manual-task-web",
+      "x": 1690,
+      "y": 362,
+      "width": 210,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Empaquetar pedido", "taskKind": "pack" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Empaquetar pedido",
+        "iconEnabled": true,
+        "variant": "yellow"
+      }
     },
-
     {
       "id": "task-asignar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 1820,
-      "y": 688,
-      "width": 220,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 1690,
+      "y": 622,
+      "width": 210,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Asignar repartidor", "taskKind": "pickup" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Asignar repartidor",
+        "iconEnabled": true,
+        "variant": "blue"
+      }
     },
     {
       "id": "task-entregar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 2080,
-      "y": 688,
-      "width": 180,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-manual-task-web",
+      "x": 1940,
+      "y": 622,
+      "width": 170,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Entregar pedido", "taskKind": "deliver" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Entregar pedido",
+        "iconEnabled": true,
+        "variant": "yellow"
+      }
     },
     {
       "id": "task-cobrar",
-      "type": "shape",
-      "shapeType": "bpmn-task",
-      "x": 2080,
-      "y": 540,
-      "width": 180,
-      "height": 104,
+      "type": "web-component",
+      "componentType": "bpmn-service-task-web",
+      "x": 1940,
+      "y": 500,
+      "width": 170,
+      "height": 96,
       "zIndex": 3,
-      "data": { "text": "Cobrar" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Cobrar",
+        "iconEnabled": true,
+        "variant": "green"
+      }
     },
     {
       "id": "end-ok",
-      "type": "shape",
-      "shapeType": "bpmn-end-event",
-      "x": 2310,
-      "y": 550,
-      "width": 84,
-      "height": 84,
+      "type": "web-component",
+      "componentType": "bpmn-end-event-web",
+      "x": 2150,
+      "y": 510,
+      "width": 76,
+      "height": 76,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#dcfce7", "stroke": "#166534", "strokeWidth": 3 }
+      "data": {
+        "text": "",
+        "iconEnabled": true,
+        "variant": "green"
+      }
     }
   ],
   "edges": [
@@ -304,7 +294,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e2",
@@ -316,7 +309,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e3",
@@ -328,7 +324,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e4",
@@ -341,7 +340,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e5",
@@ -354,7 +356,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e6",
@@ -366,7 +371,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e7",
@@ -378,7 +386,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e8",
@@ -390,7 +401,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e9",
@@ -402,7 +416,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e10",
@@ -415,7 +432,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e11",
@@ -428,7 +448,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e12",
@@ -440,7 +463,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e13",
@@ -452,7 +478,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e14",
@@ -464,7 +493,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e15",
@@ -476,7 +508,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     }
   ]
 }

@@ -42,7 +42,7 @@ export class HtmlExportService {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body { margin: 0; padding: 0; background-color: #f8fafc; overflow: auto; }
-      .diagram-container { position: relative; width: ${Math.max(bounds.width, 1200)}px; height: ${Math.max(bounds.height, 800)}px; }
+      .diagram-container { position: relative; width: ${bounds.width}px; height: ${bounds.height}px; }
       .diagram-canvas { position: relative; width: 100%; height: 100%; transform: translate(${-bounds.minX}px, ${-bounds.minY}px); transform-origin: top left; }
     </style>
 </head>
@@ -247,6 +247,16 @@ ${nodesHtml}
         return this.renderBpmnWebTask(node, style, '✋', 'yellow', false);
       case 'bpmn-subprocess-web':
         return this.renderBpmnWebTask(node, style, '📦', 'purple', true);
+      case 'bpmn-start-event-web':
+        return this.renderBpmnStartEventWeb(node, style);
+      case 'bpmn-exclusive-gateway-web':
+        return this.renderBpmnExclusiveGatewayWeb(node, style);
+      case 'bpmn-end-event-web':
+        return this.renderBpmnEndEventWeb(node, style);
+      case 'bpmn-lane-web':
+        return this.renderBpmnLaneWeb(node, style, false);
+      case 'bpmn-pool-web':
+        return this.renderBpmnLaneWeb(node, style, true);
       default:
         return `<!-- Unknown component -->`;
     }
@@ -260,18 +270,20 @@ ${nodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.style?.stroke || 'black';
-        const strokeWidth = edge.style?.strokeWidth || 1;
-        const markerEnd = edge.markerEnd ? `url(#${edge.markerEnd})` : '';
-        const markerStart = edge.markerStart ? `url(#${edge.markerStart})` : '';
-        const dashArray = edge.style?.dashArray || '';
+        const stroke = edge.style?.stroke || '#1f2937';
+        const strokeWidth = edge.style?.strokeWidth || 2;
+        const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
+        const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
+        const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
+        const markerStart = markerStartId ? `url(#${markerStartId})` : '';
+        const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
         const d = this.buildOrthogonalPath(
           start,
           end,
           edge.sourcePort || 'right',
           edge.targetPort || 'left',
           edge.points?.[0] || null,
-          edge.style?.cornerRadius || 0
+          edge.style?.cornerRadius ?? this.defaultCornerRadius(edge)
         );
         return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
       })
@@ -327,18 +339,20 @@ ${nodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.style?.stroke || '#333';
+        const stroke = edge.style?.stroke || '#1f2937';
         const strokeWidth = edge.style?.strokeWidth || 2;
-        const markerEnd = edge.markerEnd ? `url(#${edge.markerEnd})` : '';
-        const markerStart = edge.markerStart ? `url(#${edge.markerStart})` : '';
-        const dashArray = edge.style?.dashArray || '';
+        const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
+        const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
+        const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
+        const markerStart = markerStartId ? `url(#${markerStartId})` : '';
+        const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
         const d = this.buildOrthogonalPath(
           start,
           end,
           edge.sourcePort || 'right',
           edge.targetPort || 'left',
           edge.points?.[0] || null,
-          edge.style?.cornerRadius || 0
+          edge.style?.cornerRadius ?? this.defaultCornerRadius(edge)
         );
         return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
       })
@@ -383,6 +397,11 @@ ${nodesHtml}
       case 'bpmn-service-task-web':
       case 'bpmn-manual-task-web':
       case 'bpmn-subprocess-web':
+      case 'bpmn-start-event-web':
+      case 'bpmn-exclusive-gateway-web':
+      case 'bpmn-end-event-web':
+      case 'bpmn-lane-web':
+      case 'bpmn-pool-web':
         text = (web.data as { text?: string }).text || 'Task';
         break;
     }
@@ -399,12 +418,15 @@ ${nodesHtml}
 
   private getBounds(model: DiagramModel) {
     const padding = 40;
+    if (!model.nodes || model.nodes.length === 0) {
+      return { minX: 0, minY: 0, width: 1200, height: 800 };
+    }
     const xs = model.nodes.map((n) => [n.x, n.x + n.width]).flat();
     const ys = model.nodes.map((n) => [n.y, n.y + n.height]).flat();
-    const minX = Math.min(...xs, 0) - padding;
-    const minY = Math.min(...ys, 0) - padding;
-    const maxX = Math.max(...xs, 1200) + padding;
-    const maxY = Math.max(...ys, 800) + padding;
+    const minX = Math.min(...xs) - padding;
+    const minY = Math.min(...ys) - padding;
+    const maxX = Math.max(...xs) + padding;
+    const maxY = Math.max(...ys) + padding;
     return { minX, minY, width: maxX - minX, height: maxY - minY };
   }
 
@@ -460,9 +482,10 @@ ${nodesHtml}
     const endIn = this.pushFromPort(end, targetPort, offset);
     const candidateA = this.orthogonalVia(start, startOut, endIn, end, true);
     const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
-    const scoreA = this.pathScore(candidateA);
-    const scoreB = this.pathScore(candidateB);
-    const best = scoreA <= scoreB ? candidateA : candidateB;
+    const candidateC = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, true);
+    const candidateD = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, false);
+    const candidates = [candidateA, candidateB, candidateC, candidateD];
+    const best = candidates.sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
     if (this.isTargetDirectionCorrect(best, targetPort)) {
       return best;
     }
@@ -470,9 +493,7 @@ ${nodesHtml}
     const endInFlipped = this.pushFromPort(end, flipped, offset);
     const altA = this.orthogonalVia(start, startOut, endInFlipped, end, true);
     const altB = this.orthogonalVia(start, startOut, endInFlipped, end, false);
-    const altScoreA = this.pathScore(altA);
-    const altScoreB = this.pathScore(altB);
-    return altScoreA <= altScoreB ? altA : altB;
+    return [altA, altB].sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
   }
 
   private orthogonalVia(
@@ -486,10 +507,23 @@ ${nodesHtml}
     return [start, startOut, middle, endIn, end];
   }
 
-  private pathScore(points: Array<{ x: number; y: number }>) {
+  private pathScore(points: Array<{ x: number; y: number }>, targetPort: 'top' | 'right' | 'bottom' | 'left') {
     let score = 0;
     for (let i = 1; i < points.length; i++) {
       score += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
+    }
+    let turns = 0;
+    for (let i = 1; i < points.length - 1; i++) {
+      const a = points[i - 1];
+      const b = points[i];
+      const c = points[i + 1];
+      const horizontalThenVertical = a.y === b.y && b.x === c.x;
+      const verticalThenHorizontal = a.x === b.x && b.y === c.y;
+      if (horizontalThenVertical || verticalThenHorizontal) turns++;
+    }
+    score += turns * 8;
+    if (!this.isTargetDirectionCorrect(points, targetPort)) {
+      score += 200;
     }
     return score;
   }
@@ -648,6 +682,29 @@ ${nodesHtml}
     return dy >= 0 ? 'top' : 'bottom';
   }
 
+  private defaultCornerRadius(edge: DiagramModel['edges'][number]): number {
+    if (edge.flowType === 'sequence') return 8;
+    if (edge.flowType === 'message') return 6;
+    return 4;
+  }
+
+  private defaultMarkerEnd(edge: DiagramModel['edges'][number]): string | null {
+    if (edge.flowType === 'association') return null;
+    if (edge.flowType === 'message') return 'open-arrow';
+    return 'arrow';
+  }
+
+  private defaultMarkerStart(edge: DiagramModel['edges'][number]): string | null {
+    if (edge.flowType === 'message') return 'open-circle';
+    return null;
+  }
+
+  private defaultDashArray(edge: DiagramModel['edges'][number]): string {
+    if (edge.flowType === 'message') return '6 4';
+    if (edge.flowType === 'association') return '3 4';
+    return '';
+  }
+
   private renderButton(node: WebButtonNode, style: string): string {
     const variant = node.data.variant || 'primary';
     const variants: any = {
@@ -726,6 +783,50 @@ ${nodesHtml}
           ${this.escapeText(data.text || 'Task')}
         </div>
         ${badgeHtml}
+      </div>
+    `;
+  }
+
+  private renderBpmnStartEventWeb(node: WebNode, style: string): string {
+    const data = node.data as { iconEnabled?: boolean };
+    const iconHtml =
+      data.iconEnabled === false ? '' : `<span style="font-size:16px;color:#4ade80;line-height:1;">✉</span>`;
+    return `
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:3px solid #4ade80;border-radius:9999px;background:transparent;display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
+        ${iconHtml}
+      </div>
+    `;
+  }
+
+  private renderBpmnExclusiveGatewayWeb(node: WebNode, style: string): string {
+    const data = node.data as { text?: string };
+    const label = data.text ? `<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffc233;white-space:nowrap;">${this.escapeText(data.text)}</div>` : '';
+    return `
+      <div style="${style} width:${node.width}px;height:${node.height}px;position:absolute;box-sizing:border-box;">
+        ${label}
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:2px solid #ffc233;background:#0f0f0f;"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#ffc233;line-height:1;">×</div>
+      </div>
+    `;
+  }
+
+  private renderBpmnEndEventWeb(node: WebNode, style: string): string {
+    return `
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:4px solid #f87171;border-radius:9999px;background:rgba(248,113,113,.3);display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
+        <span style="font-size:14px;color:#fecaca;line-height:1;">●</span>
+      </div>
+    `;
+  }
+
+  private renderBpmnLaneWeb(node: WebNode, style: string, isPool: boolean): string {
+    const label = this.escapeText(((node.data as { text?: string }).text || (isPool ? 'Pool' : 'Lane')));
+    const barBg = isPool ? '#ea580c' : '#1f2937';
+    const border = isPool ? '#334155' : '#334155';
+    return `
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${isPool ? 2 : 1}px solid ${border};${isPool ? 'border-radius:6px;' : ''}background:rgba(15,23,42,.2);position:absolute;box-sizing:border-box;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:40px;border-right:1px solid #334155;background:${barBg};display:flex;align-items:center;justify-content:center;${isPool ? 'border-radius:6px 0 0 6px;' : ''}">
+          <div style="font-size:10px;font-weight:${isPool ? 700 : 500};color:${isPool ? '#fff' : '#cbd5e1'};writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;">${label}</div>
+        </div>
       </div>
     `;
   }

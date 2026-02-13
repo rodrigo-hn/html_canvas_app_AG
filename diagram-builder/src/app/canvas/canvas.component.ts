@@ -410,6 +410,11 @@ export class CanvasComponent implements OnInit {
     { group: 'bpmn-web-tasks', key: 'web-bpmn-service-task', label: 'Service Task (Web)' },
     { group: 'bpmn-web-tasks', key: 'web-bpmn-manual-task', label: 'Manual Task (Web)' },
     { group: 'bpmn-web-tasks', key: 'web-bpmn-subprocess-task', label: 'Subprocess (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-start-event', label: 'Start Event (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-exclusive-gateway', label: 'Exclusive Gateway (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-end-event', label: 'End Event (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-lane', label: 'Lane (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-pool', label: 'Pool (Web)' },
 
     { group: 'bpmn-general', key: 'bpmn-pool', label: 'Pool' },
     { group: 'bpmn-general', key: 'bpmn-lane', label: 'Lane' },
@@ -591,6 +596,16 @@ export class CanvasComponent implements OnInit {
         return 'M';
       case 'web-bpmn-subprocess-task':
         return 'SP';
+      case 'web-bpmn-start-event':
+        return 'SE';
+      case 'web-bpmn-exclusive-gateway':
+        return 'XOR';
+      case 'web-bpmn-end-event':
+        return 'EE';
+      case 'web-bpmn-lane':
+        return 'L';
+      case 'web-bpmn-pool':
+        return 'P';
       default:
         return 'WEB';
     }
@@ -1084,6 +1099,66 @@ export class CanvasComponent implements OnInit {
           height: 92,
           zIndex: 1,
           data: { text: 'Subprocess', iconEnabled: true, badgeEnabled: true, variant: 'purple' },
+        } as WebNode;
+      case 'web-bpmn-start-event':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-start-event-web',
+          x,
+          y,
+          width: 40,
+          height: 40,
+          zIndex: 1,
+          data: { text: '', iconEnabled: true, variant: 'green' },
+        } as WebNode;
+      case 'web-bpmn-exclusive-gateway':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-exclusive-gateway-web',
+          x,
+          y,
+          width: 64,
+          height: 64,
+          zIndex: 1,
+          data: { text: 'Disponible?', iconEnabled: true, variant: 'yellow' },
+        } as WebNode;
+      case 'web-bpmn-end-event':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-end-event-web',
+          x,
+          y,
+          width: 40,
+          height: 40,
+          zIndex: 1,
+          data: { text: '', iconEnabled: true, variant: 'red' },
+        } as WebNode;
+      case 'web-bpmn-lane':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-lane-web',
+          x,
+          y,
+          width: 320,
+          height: 120,
+          zIndex: 1,
+          data: { text: 'Lane', variant: 'blue' },
+        } as WebNode;
+      case 'web-bpmn-pool':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-pool-web',
+          x,
+          y,
+          width: 320,
+          height: 140,
+          zIndex: 1,
+          data: { text: 'Pool', variant: 'yellow' },
         } as WebNode;
       case 'bpmn-task':
       case 'bpmn-subprocess':
