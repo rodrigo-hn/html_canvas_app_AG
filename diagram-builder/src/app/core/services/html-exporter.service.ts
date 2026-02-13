@@ -19,6 +19,7 @@ export class HtmlExportService {
   private stencilService = inject(StencilService);
 
   exportHtml(model: DiagramModel): string {
+    const bounds = this.getBounds(model);
     const nodesHtml = model.nodes
       .map((node) => {
         if (node.type === 'shape') {
@@ -41,13 +42,16 @@ export class HtmlExportService {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body { margin: 0; padding: 0; background-color: #f8fafc; overflow: auto; }
-      .diagram-container { position: relative; width: 100vw; height: 100vh; }
+      .diagram-container { position: relative; width: ${Math.max(bounds.width, 1200)}px; height: ${Math.max(bounds.height, 800)}px; }
+      .diagram-canvas { position: relative; width: 100%; height: 100%; transform: translate(${-bounds.minX}px, ${-bounds.minY}px); transform-origin: top left; }
     </style>
 </head>
 <body>
     <div class="diagram-container">
+      <div class="diagram-canvas">
 ${edgesHtml}
 ${nodesHtml}
+      </div>
     </div>
 </body>
 </html>
@@ -235,6 +239,14 @@ ${nodesHtml}
         return this.renderInput(node as WebInputNode, style);
       case 'card':
         return this.renderCard(node as WebCardNode, style);
+      case 'bpmn-user-task-web':
+        return this.renderBpmnWebTask(node, style, '👤', 'blue', false);
+      case 'bpmn-service-task-web':
+        return this.renderBpmnWebTask(node, style, '⚙️', 'blue', false);
+      case 'bpmn-manual-task-web':
+        return this.renderBpmnWebTask(node, style, '✋', 'yellow', false);
+      case 'bpmn-subprocess-web':
+        return this.renderBpmnWebTask(node, style, '📦', 'purple', true);
       default:
         return `<!-- Unknown component -->`;
     }
@@ -366,6 +378,12 @@ ${nodesHtml}
         break;
       case 'input':
         text = (web.data as WebInputNode['data']).label || 'Input';
+        break;
+      case 'bpmn-user-task-web':
+      case 'bpmn-service-task-web':
+      case 'bpmn-manual-task-web':
+      case 'bpmn-subprocess-web':
+        text = (web.data as { text?: string }).text || 'Task';
         break;
     }
     text = this.escapeText(text.toString());
@@ -668,5 +686,47 @@ ${nodesHtml}
             </p>
         </div>
       </div>`;
+  }
+
+  private renderBpmnWebTask(
+    node: WebNode,
+    style: string,
+    icon: string,
+    defaultVariant: 'blue' | 'yellow' | 'green' | 'purple' | 'red',
+    supportsBadge: boolean
+  ): string {
+    const data = node.data as {
+      text?: string;
+      iconEnabled?: boolean;
+      badgeEnabled?: boolean;
+      variant?: 'blue' | 'yellow' | 'green' | 'purple' | 'red';
+    };
+    const variant = data.variant || defaultVariant;
+    const colors: Record<string, { border: string; accent: string }> = {
+      blue: { border: '#60a5fa', accent: '#60a5fa' },
+      yellow: { border: '#ffc233', accent: '#ffc233' },
+      green: { border: '#4ade80', accent: '#4ade80' },
+      purple: { border: '#a78bfa', accent: '#a78bfa' },
+      red: { border: '#f87171', accent: '#f87171' },
+    };
+    const tone = colors[variant] || colors[defaultVariant];
+    const iconHtml =
+      data.iconEnabled === false
+        ? ''
+        : `<div style="position:absolute;left:6px;top:4px;font-size:11px;color:${tone.accent};">${icon}</div>`;
+    const badgeHtml =
+      supportsBadge && data.badgeEnabled !== false
+        ? `<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:2px;width:16px;height:16px;border:1px solid ${tone.border};border-radius:2px;background:#0f0f0f;color:${tone.accent};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;line-height:1;">+</div>`
+        : '';
+
+    return `
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:2px solid ${tone.border};border-radius:8px;background:#0f0f0f;color:#ffffff;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;position:absolute;box-sizing:border-box;">
+        ${iconHtml}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:500;line-height:1.2;">
+          ${this.escapeText(data.text || 'Task')}
+        </div>
+        ${badgeHtml}
+      </div>
+    `;
   }
 }

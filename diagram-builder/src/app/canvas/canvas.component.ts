@@ -386,6 +386,7 @@ export class CanvasComponent implements OnInit {
   paletteGroups = [
     { id: 'general', title: 'General', open: true },
     { id: 'web', title: 'Web Components', open: false },
+    { id: 'bpmn-web-tasks', title: 'BPMN Web Tasks', open: true },
     { id: 'bpmn-general', title: 'BPMN 2.0 General', open: true },
     { id: 'bpmn-tasks', title: 'BPMN 2.0 Tasks', open: true },
     { id: 'bpmn-events', title: 'BPMN 2.0 Events', open: true },
@@ -405,6 +406,10 @@ export class CanvasComponent implements OnInit {
     { group: 'web', key: 'web-button', label: 'Button' },
     { group: 'web', key: 'web-input', label: 'Input' },
     { group: 'web', key: 'web-card', label: 'Card' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-user-task', label: 'User Task (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-service-task', label: 'Service Task (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-manual-task', label: 'Manual Task (Web)' },
+    { group: 'bpmn-web-tasks', key: 'web-bpmn-subprocess-task', label: 'Subprocess (Web)' },
 
     { group: 'bpmn-general', key: 'bpmn-pool', label: 'Pool' },
     { group: 'bpmn-general', key: 'bpmn-lane', label: 'Lane' },
@@ -578,6 +583,14 @@ export class CanvasComponent implements OnInit {
         return 'IN';
       case 'web-card':
         return 'CARD';
+      case 'web-bpmn-user-task':
+        return 'U';
+      case 'web-bpmn-service-task':
+        return 'S';
+      case 'web-bpmn-manual-task':
+        return 'M';
+      case 'web-bpmn-subprocess-task':
+        return 'SP';
       default:
         return 'WEB';
     }
@@ -1023,6 +1036,54 @@ export class CanvasComponent implements OnInit {
           height: 140,
           zIndex: 1,
           data: { title: 'Card', content: 'Card content' },
+        } as WebNode;
+      case 'web-bpmn-user-task':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-user-task-web',
+          x,
+          y,
+          width: 160,
+          height: 84,
+          zIndex: 1,
+          data: { text: 'User Task', iconEnabled: true, variant: 'blue' },
+        } as WebNode;
+      case 'web-bpmn-service-task':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-service-task-web',
+          x,
+          y,
+          width: 160,
+          height: 84,
+          zIndex: 1,
+          data: { text: 'Service Task', iconEnabled: true, variant: 'blue' },
+        } as WebNode;
+      case 'web-bpmn-manual-task':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-manual-task-web',
+          x,
+          y,
+          width: 160,
+          height: 84,
+          zIndex: 1,
+          data: { text: 'Manual Task', iconEnabled: true, variant: 'yellow' },
+        } as WebNode;
+      case 'web-bpmn-subprocess-task':
+        return {
+          id: this.createNodeId('n'),
+          type: 'web-component',
+          componentType: 'bpmn-subprocess-web',
+          x,
+          y,
+          width: 180,
+          height: 92,
+          zIndex: 1,
+          data: { text: 'Subprocess', iconEnabled: true, badgeEnabled: true, variant: 'purple' },
         } as WebNode;
       case 'bpmn-task':
       case 'bpmn-subprocess':

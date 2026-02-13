@@ -119,4 +119,51 @@ describe('HtmlExportService', () => {
     expect(svg).toContain('marker-end="url(#open-arrow)"');
     expect(svg).toContain('stroke-dasharray="6 4"');
   });
+
+  it('exports HTML including classic web components even with negative coordinates', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        HtmlExportService,
+        {
+          provide: DomSanitizer,
+          useValue: { bypassSecurityTrustHtml: (v: string) => v },
+        },
+      ],
+    });
+
+    const service = TestBed.inject(HtmlExportService);
+    const html = service.exportHtml({
+      nodes: [
+        {
+          id: 'btn-1',
+          type: 'web-component',
+          componentType: 'button',
+          x: 640,
+          y: -80,
+          width: 110,
+          height: 42,
+          zIndex: 1,
+          data: { text: 'Button', variant: 'primary' },
+        },
+        {
+          id: 'card-1',
+          type: 'web-component',
+          componentType: 'card',
+          x: 260,
+          y: -160,
+          width: 260,
+          height: 140,
+          zIndex: 1,
+          data: { title: 'Card', content: 'Card content' },
+        },
+      ],
+      edges: [],
+    });
+
+    expect(html).toContain('diagram-canvas');
+    expect(html).toContain('transform: translate(');
+    expect(html).toContain('>Button<');
+    expect(html).toContain('>Card<');
+    expect(html).toContain('Card content');
+  });
 });

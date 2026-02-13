@@ -1,5 +1,12 @@
 export type NodeType = 'shape' | 'web-component';
-export type WebComponentType = 'button' | 'input' | 'card';
+export type WebComponentType =
+  | 'button'
+  | 'input'
+  | 'card'
+  | 'bpmn-user-task-web'
+  | 'bpmn-service-task-web'
+  | 'bpmn-manual-task-web'
+  | 'bpmn-subprocess-web';
 export type BpmnFlowType = 'sequence' | 'message' | 'association';
 
 export interface Point {
@@ -74,7 +81,45 @@ export interface WebCardNode extends DiagramNodeBase {
   data: WebCardData;
 }
 
-export type WebNode = WebButtonNode | WebInputNode | WebCardNode;
+export interface WebBpmnTaskData {
+  text?: string;
+  iconEnabled?: boolean;
+  badgeEnabled?: boolean;
+  variant?: 'blue' | 'yellow' | 'green' | 'purple' | 'red';
+}
+
+export interface WebBpmnUserTaskNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-user-task-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnServiceTaskNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-service-task-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnManualTaskNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-manual-task-web';
+  data: WebBpmnTaskData;
+}
+
+export interface WebBpmnSubprocessNode extends DiagramNodeBase {
+  type: 'web-component';
+  componentType: 'bpmn-subprocess-web';
+  data: WebBpmnTaskData;
+}
+
+export type WebNode =
+  | WebButtonNode
+  | WebInputNode
+  | WebCardNode
+  | WebBpmnUserTaskNode
+  | WebBpmnServiceTaskNode
+  | WebBpmnManualTaskNode
+  | WebBpmnSubprocessNode;
 
 export type DiagramNode = ShapeNode | WebNode;
 

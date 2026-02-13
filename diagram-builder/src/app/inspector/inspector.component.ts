@@ -259,6 +259,55 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 }
               </select>
             </div>
+            @if (isBpmnWebTaskNode()) {
+            <div>
+              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('webBpmnText')"
+                >Text</label
+              >
+              <input
+                [id]="fieldId('webBpmnText')"
+                [attr.name]="fieldId('webBpmnText')"
+                type="text"
+                class="w-full border rounded px-2 py-1 text-sm"
+                [ngModel]="webTaskNodeText()"
+                (ngModelChange)="updateData('text', $event)"
+              />
+            </div>
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                [checked]="webTaskIconEnabled()"
+                (change)="updateBooleanData('iconEnabled', $event)"
+              />
+              Icon enabled
+            </label>
+            @if (isSubprocessWebTaskNode()) {
+            <label class="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                [checked]="webTaskBadgeEnabled()"
+                (change)="updateBooleanData('badgeEnabled', $event)"
+              />
+              Subprocess badge enabled
+            </label>
+            }
+            <div>
+              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('webBpmnVariant')"
+                >Variant</label
+              >
+              <select
+                [id]="fieldId('webBpmnVariant')"
+                [attr.name]="fieldId('webBpmnVariant')"
+                class="w-full border rounded px-2 py-1 text-sm"
+                [ngModel]="webTaskVariant()"
+                (ngModelChange)="updateData('variant', $event)"
+              >
+                @for (variant of bpmnWebTaskVariants; track variant.value) {
+                <option [value]="variant.value">{{ variant.label }}</option>
+                }
+              </select>
+            </div>
+            }
             @if (isButtonNode()) {
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('webText')"
@@ -381,11 +430,26 @@ export class InspectorComponent {
     'bpmn-gateway',
     'bpmn-pool',
   ];
-  readonly componentTypes = ['button', 'input', 'card'];
+  readonly componentTypes = [
+    'button',
+    'input',
+    'card',
+    'bpmn-user-task-web',
+    'bpmn-service-task-web',
+    'bpmn-manual-task-web',
+    'bpmn-subprocess-web',
+  ];
   readonly flowTypes: Array<{ value: BpmnFlowType; label: string }> = [
     { value: 'sequence', label: 'Sequence Flow' },
     { value: 'message', label: 'Message Flow' },
     { value: 'association', label: 'Association' },
+  ];
+  readonly bpmnWebTaskVariants = [
+    { value: 'blue', label: 'Blue' },
+    { value: 'yellow', label: 'Yellow' },
+    { value: 'green', label: 'Green' },
+    { value: 'purple', label: 'Purple' },
+    { value: 'red', label: 'Red' },
   ];
 
   selectedNodes = computed(() => {
@@ -446,6 +510,54 @@ export class InspectorComponent {
     return this.webNode()?.componentType === 'card';
   }
 
+  isBpmnWebTaskNode(): boolean {
+    const type = this.webNode()?.componentType;
+    return (
+      type === 'bpmn-user-task-web' ||
+      type === 'bpmn-service-task-web' ||
+      type === 'bpmn-manual-task-web' ||
+      type === 'bpmn-subprocess-web'
+    );
+  }
+
+  isSubprocessWebTaskNode(): boolean {
+    return this.webNode()?.componentType === 'bpmn-subprocess-web';
+  }
+
+  webTaskNodeText(): string {
+    const node = this.webNode();
+    if (!node) return '';
+    if (
+      node.componentType !== 'bpmn-user-task-web' &&
+      node.componentType !== 'bpmn-service-task-web' &&
+      node.componentType !== 'bpmn-manual-task-web' &&
+      node.componentType !== 'bpmn-subprocess-web'
+    ) {
+      return '';
+    }
+    return node.data.text || '';
+  }
+
+  webTaskIconEnabled(): boolean {
+    const node = this.webNode();
+    if (!this.isBpmnWebTaskNode() || !node) return true;
+    return (node.data as { iconEnabled?: boolean }).iconEnabled ?? true;
+  }
+
+  webTaskBadgeEnabled(): boolean {
+    const node = this.webNode();
+    if (!node || node.componentType !== 'bpmn-subprocess-web') return true;
+    return (node.data as { badgeEnabled?: boolean }).badgeEnabled ?? true;
+  }
+
+  webTaskVariant(): 'blue' | 'yellow' | 'green' | 'purple' | 'red' {
+    const node = this.webNode();
+    if (!this.isBpmnWebTaskNode() || !node) return 'blue';
+    return (
+      (node.data as { variant?: 'blue' | 'yellow' | 'green' | 'purple' | 'red' }).variant || 'blue'
+    );
+  }
+
   updateNumber(field: keyof DiagramNode, value: number) {
     const n = this.node();
     if (!n) return;
@@ -471,6 +583,11 @@ export class InspectorComponent {
     const n = this.node();
     if (!n) return;
     this.commands.updateNodeData(n.id, { [key]: value });
+  }
+
+  updateBooleanData(key: string, event: Event) {
+    const checked = (event.target as HTMLInputElement).checked;
+    this.updateData(key, checked);
   }
 
   updateEdgeStyle(style: { stroke?: string; strokeWidth?: number; cornerRadius?: number }) {
