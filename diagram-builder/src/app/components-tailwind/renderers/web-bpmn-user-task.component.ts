@@ -8,14 +8,13 @@ import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant } from './bpmn-web-task.tokens
   imports: [CommonModule],
   template: `
     <div
-      class="relative h-full w-full rounded-[8px] border-2 text-white"
+      class="relative h-full w-full text-white"
       [ngStyle]="containerStyle()"
-      style="padding: 0.8rem 1.2rem; font-family: 'DM Sans', sans-serif;"
     >
       @if (iconEnabled) {
-      <div class="absolute text-[11px]" style="left: 6px; top: 4px;" [ngStyle]="iconStyle()">👤</div>
+      <div class="absolute" [ngStyle]="iconStyle()">👤</div>
       }
-      <div class="flex h-full items-center justify-center text-center text-[0.8rem] font-medium leading-tight">
+      <div class="flex h-full items-center justify-center text-center leading-tight" [ngStyle]="textStyle()">
         {{ text }}
       </div>
     </div>
@@ -32,10 +31,32 @@ export class WebBpmnUserTaskComponent {
       'background-color': BPMN_WEB_TASK_TOKENS.background,
       color: BPMN_WEB_TASK_TOKENS.text,
       'border-color': tone.border,
+      'border-width': `${BPMN_WEB_TASK_TOKENS.stroke.task}px`,
+      borderStyle: 'solid',
+      'border-radius': BPMN_WEB_TASK_TOKENS.taskRadius,
+      padding: BPMN_WEB_TASK_TOKENS.taskPadding,
+      'font-family': BPMN_WEB_TASK_TOKENS.fontFamily,
+      'min-width': BPMN_WEB_TASK_TOKENS.taskMinWidth,
+      'flex-shrink': 0,
+      cursor: BPMN_WEB_TASK_TOKENS.interaction.cursor,
+      transition: BPMN_WEB_TASK_TOKENS.interaction.transition,
     };
   }
 
   iconStyle() {
-    return { color: BPMN_WEB_TASK_TOKENS.variants[this.variant].accent };
+    return {
+      color: BPMN_WEB_TASK_TOKENS.variants[this.variant].accent,
+      left: BPMN_WEB_TASK_TOKENS.icon.left,
+      top: BPMN_WEB_TASK_TOKENS.icon.top,
+      'font-size': BPMN_WEB_TASK_TOKENS.icon.size,
+      'line-height': '1',
+    };
+  }
+
+  textStyle() {
+    return {
+      'font-size': BPMN_WEB_TASK_TOKENS.typography.taskSize,
+      'font-weight': BPMN_WEB_TASK_TOKENS.typography.taskWeight,
+    };
   }
 }
