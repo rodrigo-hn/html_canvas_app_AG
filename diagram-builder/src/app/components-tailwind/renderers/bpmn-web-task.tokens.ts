@@ -24,9 +24,9 @@ export const BPMN_WEB_TASK_TOKENS = {
     labelWeight: 500,
   },
   icon: {
-    size: '11px',
-    left: '8px',
-    top: '6px',
+    size: '16px',
+    left: '7px',
+    top: '5px',
   },
   badge: {
     size: '14px',

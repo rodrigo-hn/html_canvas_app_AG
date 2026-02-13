@@ -770,7 +770,7 @@ ${nodesHtml}
     const iconHtml =
       data.iconEnabled === false
         ? ''
-        : `<div style="position:absolute;left:6px;top:4px;font-size:11px;color:${tone.accent};">${icon}</div>`;
+        : `<div style="position:absolute;left:7px;top:5px;font-size:14px;color:${tone.accent};line-height:1;">${icon}</div>`;
     const badgeHtml =
       supportsBadge && data.badgeEnabled !== false
         ? `<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:2px;width:16px;height:16px;border:1px solid ${tone.border};border-radius:2px;background:#0f0f0f;color:${tone.accent};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;line-height:1;">+</div>`
