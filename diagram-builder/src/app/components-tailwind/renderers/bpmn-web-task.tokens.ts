@@ -42,7 +42,7 @@ export const BPMN_WEB_TASK_TOKENS = {
     red: { border: '#f87171', accent: '#fca5a5' },
   } satisfies Record<BpmnWebTaskVariant, { border: string; accent: string }>,
   lane: {
-    background: 'rgba(15,23,42,0.22)',
+    background: 'rgba(15,23,42,0.94)',
     sidebar: '#253246',
     sidebarText: '#dbe3ef',
     border: '#41516a',

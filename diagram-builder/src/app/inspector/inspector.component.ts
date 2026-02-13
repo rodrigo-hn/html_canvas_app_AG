@@ -47,17 +47,27 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
             Reset Bend
           </button>
           <div>
-            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('stroke')"
-              >Stroke</label
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('color')"
+              >Color</label
             >
-            <input
-              [id]="edgeFieldId('stroke')"
-              [attr.name]="edgeFieldId('stroke')"
-              type="text"
-              class="w-full border rounded px-2 py-1 text-sm"
-              [ngModel]="selectedEdge()!.style?.stroke || '#333'"
-              (ngModelChange)="updateEdgeStyle({ stroke: $event })"
-            />
+            <div class="flex items-center gap-2">
+              <input
+                [id]="edgeFieldId('color')"
+                [attr.name]="edgeFieldId('color')"
+                type="color"
+                class="h-9 w-14 border rounded px-1 py-1 bg-white"
+                [ngModel]="edgeColor()"
+                (ngModelChange)="updateEdgeColor($event)"
+              />
+              <input
+                [id]="edgeFieldId('colorHex')"
+                [attr.name]="edgeFieldId('colorHex')"
+                type="text"
+                class="flex-1 border rounded px-2 py-1 text-sm"
+                [ngModel]="edgeColor()"
+                (ngModelChange)="updateEdgeColor($event)"
+              />
+            </div>
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('strokeWidth')"
@@ -606,6 +616,21 @@ export class InspectorComponent {
     this.commands.setEdgeStyle(edge.id, style);
   }
 
+  edgeColor(): string {
+    const edge = this.selectedEdge();
+    if (!edge) return '#1f2937';
+    return edge.color || edge.style?.stroke || '#1f2937';
+  }
+
+  updateEdgeColor(value: string) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const normalized = this.normalizeColor(value);
+    if (!normalized) return;
+    this.commands.updateEdge(edge.id, { color: normalized });
+    this.commands.setEdgeStyle(edge.id, { stroke: normalized });
+  }
+
   updateEdgeStyleNumber(field: 'strokeWidth', value: number) {
     const edge = this.selectedEdge();
     if (!edge) return;
@@ -644,6 +669,7 @@ export class InspectorComponent {
     if (!edge) return;
     const defaults = this.edgeFlowDefaults(value);
     this.commands.updateEdge(edge.id, {
+      color: defaults.color,
       flowType: value,
       markerEnd: defaults.markerEnd,
       markerStart: defaults.markerStart,
@@ -690,6 +716,7 @@ export class InspectorComponent {
   private edgeFlowDefaults(flowType: BpmnFlowType) {
     if (flowType === 'message') {
       return {
+        color: '#1f2937',
         markerEnd: 'open-arrow',
         markerStart: 'open-circle',
         style: { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4', cornerRadius: 0 },
@@ -697,15 +724,29 @@ export class InspectorComponent {
     }
     if (flowType === 'association') {
       return {
+        color: '#374151',
         markerEnd: undefined,
         markerStart: undefined,
         style: { stroke: '#374151', strokeWidth: 2, dashArray: '3 4', cornerRadius: 0 },
       };
     }
     return {
+      color: '#333333',
       markerEnd: 'arrow',
       markerStart: undefined,
       style: { stroke: '#333', strokeWidth: 2, dashArray: undefined, cornerRadius: 0 },
     };
+  }
+
+  private normalizeColor(value: string): string | null {
+    const raw = String(value || '').trim();
+    if (/^#([0-9a-fA-F]{6})$/.test(raw)) return raw;
+    if (/^#([0-9a-fA-F]{3})$/.test(raw)) {
+      const r = raw[1];
+      const g = raw[2];
+      const b = raw[3];
+      return `#${r}${r}${g}${g}${b}${b}`;
+    }
+    return null;
   }
 }

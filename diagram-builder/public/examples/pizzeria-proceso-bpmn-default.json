@@ -295,9 +295,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e2",
@@ -310,9 +311,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e3",
@@ -325,9 +327,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e4",
@@ -341,9 +344,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e5",
@@ -357,9 +361,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e6",
@@ -372,9 +377,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e7",
@@ -387,9 +393,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e8",
@@ -402,9 +409,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e9",
@@ -417,9 +425,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e10",
@@ -433,9 +442,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e11",
@@ -449,9 +459,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e12",
@@ -464,9 +475,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e13",
@@ -479,9 +491,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e14",
@@ -494,9 +507,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     },
     {
       "id": "e15",
@@ -509,9 +523,10 @@
       "points": [],
       "markerEnd": "arrow",
       "style": {
-        "stroke": "#1f2937",
+        "stroke": "#9fa1a3",
         "strokeWidth": 2
-      }
+      },
+      "color": "#9fa1a3"
     }
   ]
 }

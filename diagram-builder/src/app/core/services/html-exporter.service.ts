@@ -20,14 +20,14 @@ export class HtmlExportService {
 
   exportHtml(model: DiagramModel): string {
     const bounds = this.getBounds(model);
-    const nodesHtml = model.nodes
-      .map((node) => {
-        if (node.type === 'shape') {
-          return this.renderShape(node as ShapeNode);
-        } else {
-          return this.renderWebComponent(node as WebNode);
-        }
-      })
+    const sortedNodes = [...model.nodes].sort((a, b) => a.zIndex - b.zIndex);
+    const backgroundNodesHtml = sortedNodes
+      .filter((node) => node.zIndex <= 0)
+      .map((node) => this.renderNodeHtml(node))
+      .join('\n');
+    const foregroundNodesHtml = sortedNodes
+      .filter((node) => node.zIndex > 0)
+      .map((node) => this.renderNodeHtml(node))
       .join('\n');
 
     const edgesHtml = this.renderEdges(model);
@@ -49,8 +49,9 @@ export class HtmlExportService {
 <body>
     <div class="diagram-container">
       <div class="diagram-canvas">
+${backgroundNodesHtml}
 ${edgesHtml}
-${nodesHtml}
+${foregroundNodesHtml}
       </div>
     </div>
 </body>
@@ -60,8 +61,16 @@ ${nodesHtml}
 
   exportSvg(model: DiagramModel): string {
     const bounds = this.getBounds(model);
+    const sortedNodes = [...model.nodes].sort((a, b) => a.zIndex - b.zIndex);
+    const backgroundNodesSvg = sortedNodes
+      .filter((node) => node.zIndex <= 0)
+      .map((node) => this.renderNodeSvg(node))
+      .join('\n');
     const edgesSvg = this.renderEdgesSvg(model);
-    const nodesSvg = model.nodes.map((node) => this.renderNodeSvg(node)).join('\n');
+    const foregroundNodesSvg = sortedNodes
+      .filter((node) => node.zIndex > 0)
+      .map((node) => this.renderNodeSvg(node))
+      .join('\n');
 
     return `
 <svg xmlns="http://www.w3.org/2000/svg" width="${bounds.width}" height="${bounds.height}" viewBox="${bounds.minX} ${bounds.minY} ${bounds.width} ${bounds.height}">
@@ -75,7 +84,7 @@ ${nodesHtml}
       orient="auto"
       markerUnits="strokeWidth"
     >
-      <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+      <path d="M0,0 L0,6 L9,3 z" fill="context-stroke" />
     </marker>
     <marker
       id="open-arrow"
@@ -86,7 +95,7 @@ ${nodesHtml}
       orient="auto"
       markerUnits="strokeWidth"
     >
-      <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+      <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
     </marker>
     <marker
       id="open-circle"
@@ -97,14 +106,22 @@ ${nodesHtml}
       orient="auto"
       markerUnits="strokeWidth"
     >
-      <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+      <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
     </marker>
   </defs>
   <rect x="${bounds.minX}" y="${bounds.minY}" width="${bounds.width}" height="${bounds.height}" fill="#f8fafc" />
+  ${backgroundNodesSvg}
   ${edgesSvg}
-  ${nodesSvg}
+  ${foregroundNodesSvg}
 </svg>
     `;
+  }
+
+  private renderNodeHtml(node: DiagramNode): string {
+    if (node.type === 'shape') {
+      return this.renderShape(node as ShapeNode);
+    }
+    return this.renderWebComponent(node as WebNode);
   }
 
   async exportPng(model: DiagramModel): Promise<Blob> {
@@ -270,7 +287,7 @@ ${nodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.style?.stroke || '#1f2937';
+        const stroke = edge.color || edge.style?.stroke || '#1f2937';
         const strokeWidth = edge.style?.strokeWidth || 2;
         const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
         const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
@@ -302,7 +319,7 @@ ${nodesHtml}
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+            <path d="M0,0 L0,6 L9,3 z" fill="context-stroke" />
           </marker>
           <marker
             id="open-arrow"
@@ -313,7 +330,7 @@ ${nodesHtml}
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+            <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
           </marker>
           <marker
             id="open-circle"
@@ -324,7 +341,7 @@ ${nodesHtml}
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+            <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
           </marker>
         </defs>
         ${paths}
@@ -339,7 +356,7 @@ ${nodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.style?.stroke || '#1f2937';
+        const stroke = edge.color || edge.style?.stroke || '#1f2937';
         const strokeWidth = edge.style?.strokeWidth || 2;
         const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
         const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
@@ -726,8 +743,8 @@ ${nodesHtml}
            ? `<label class="mb-1 text-sm font-bold text-gray-700">${node.data.label}</label>`
            : ''
        }
-       <input type="${node.data.inputType || 'text'}" 
-              placeholder="${node.data.placeholder || ''}" 
+       <input type="${node.data.inputType || 'text'}"
+              placeholder="${node.data.placeholder || ''}"
               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
      </div>`;
   }
@@ -822,8 +839,9 @@ ${nodesHtml}
     const label = this.escapeText(((node.data as { text?: string }).text || (isPool ? 'Pool' : 'Lane')));
     const barBg = isPool ? '#ea580c' : '#1f2937';
     const border = isPool ? '#334155' : '#334155';
+    const bg = isPool ? 'rgba(15,23,42,.2)' : 'rgba(15,23,42,.94)';
     return `
-      <div style="${style} width:${node.width}px;height:${node.height}px;border:${isPool ? 2 : 1}px solid ${border};${isPool ? 'border-radius:6px;' : ''}background:rgba(15,23,42,.2);position:absolute;box-sizing:border-box;">
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${isPool ? 2 : 1}px solid ${border};${isPool ? 'border-radius:6px;' : ''}background:${bg};position:absolute;box-sizing:border-box;">
         <div style="position:absolute;left:0;top:0;bottom:0;width:40px;border-right:1px solid #334155;background:${barBg};display:flex;align-items:center;justify-content:center;${isPool ? 'border-radius:6px 0 0 6px;' : ''}">
           <div style="font-size:10px;font-weight:${isPool ? 700 : 500};color:${isPool ? '#fff' : '#cbd5e1'};writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;">${label}</div>
         </div>

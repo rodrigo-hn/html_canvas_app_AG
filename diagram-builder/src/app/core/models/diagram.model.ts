@@ -166,6 +166,7 @@ export type DiagramNode = ShapeNode | WebNode;
 export interface DiagramEdge extends DiagramElement {
   sourceId: string;
   targetId: string;
+  color?: string;
   sourcePort?: 'top' | 'right' | 'bottom' | 'left';
   targetPort?: 'top' | 'right' | 'bottom' | 'left';
   flowType?: BpmnFlowType;

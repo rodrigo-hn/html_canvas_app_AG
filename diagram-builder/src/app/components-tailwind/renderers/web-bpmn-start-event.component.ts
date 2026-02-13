@@ -25,7 +25,7 @@ export class WebBpmnStartEventComponent {
 
   iconStyle() {
     return {
-      'font-size': '14px',
+      'font-size': '16px',
       color: BPMN_WEB_TASK_TOKENS.variants.green.accent,
       'line-height': '1',
     };

@@ -962,6 +962,7 @@ export class CanvasComponent implements OnInit {
       id: edgeId,
       sourceId: preview.sourceId,
       targetId: nearest.nodeId,
+      color: defaults.color,
       sourcePort: preview.sourcePort,
       targetPort: nearest.port,
       flowType,
@@ -1410,16 +1411,16 @@ export class CanvasComponent implements OnInit {
     // Normalize edge style by flow type.
     this.edges().forEach((edge) => {
       if (edge.flowType === 'message') {
-        this.commands.updateEdge(edge.id, { markerStart: 'open-circle', markerEnd: 'open-arrow' });
+        this.commands.updateEdge(edge.id, { color: '#1f2937', markerStart: 'open-circle', markerEnd: 'open-arrow' });
         this.commands.setEdgeStyle(edge.id, { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4', cornerRadius: 6 });
         return;
       }
       if (edge.flowType === 'association') {
-        this.commands.updateEdge(edge.id, { markerStart: undefined, markerEnd: undefined });
+        this.commands.updateEdge(edge.id, { color: '#334155', markerStart: undefined, markerEnd: undefined });
         this.commands.setEdgeStyle(edge.id, { stroke: '#334155', strokeWidth: 2, dashArray: '3 4', cornerRadius: 4 });
         return;
       }
-      this.commands.updateEdge(edge.id, { markerStart: undefined, markerEnd: 'arrow' });
+      this.commands.updateEdge(edge.id, { color: '#1f2937', markerStart: undefined, markerEnd: 'arrow' });
       this.commands.setEdgeStyle(edge.id, { stroke: '#1f2937', strokeWidth: 2, dashArray: undefined, cornerRadius: 8 });
     });
 
@@ -1495,6 +1496,7 @@ export class CanvasComponent implements OnInit {
   private flowStyleDefaults(flowType: BpmnFlowType) {
     if (flowType === 'message') {
       return {
+        color: '#1f2937',
         markerEnd: 'open-arrow',
         markerStart: 'open-circle',
         style: { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4', cornerRadius: 0 },
@@ -1502,12 +1504,14 @@ export class CanvasComponent implements OnInit {
     }
     if (flowType === 'association') {
       return {
+        color: '#374151',
         markerEnd: undefined,
         markerStart: undefined,
         style: { stroke: '#374151', strokeWidth: 2, dashArray: '3 4', cornerRadius: 0 },
       };
     }
     return {
+      color: '#333333',
       markerEnd: 'arrow',
       markerStart: undefined,
       style: { stroke: '#333', strokeWidth: 2, dashArray: undefined, cornerRadius: 0 },

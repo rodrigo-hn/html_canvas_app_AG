@@ -13,7 +13,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
   template: `
     <svg
       #svgRoot
-      class="absolute inset-0 pointer-events-none w-full h-full overflow-visible"
+      class="absolute inset-0 z-[1] pointer-events-none w-full h-full overflow-visible"
     >
       <defs>
         <marker
@@ -25,7 +25,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+          <path d="M0,0 L0,6 L9,3 z" fill="context-stroke" />
         </marker>
         <marker
           id="open-arrow"
@@ -36,7 +36,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <path d="M1,1 L9,3 L1,5" fill="none" stroke="#333" stroke-width="1.5" />
+          <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
         </marker>
         <marker
           id="open-circle"
@@ -47,7 +47,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <circle cx="3" cy="3" r="2" fill="#fff" stroke="#333" stroke-width="1.2" />
+          <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
         </marker>
       </defs>
 
@@ -66,16 +66,6 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         (click)="onEdgeClick(edge, $event)"
       />
       @if (selectedEdgeId() === edge.id) {
-      <path
-        [attr.d]="edgePath(edge)"
-        fill="none"
-        stroke="#2563eb"
-        stroke-width="4"
-        stroke-opacity="0.3"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        pointer-events="none"
-      />
       <circle
         [attr.cx]="edgePortPoint(edge, 'source').x"
         [attr.cy]="edgePortPoint(edge, 'source').y"
@@ -275,7 +265,7 @@ export class EdgesLayerComponent {
   }
 
   edgeStroke(edge: DiagramEdge): string {
-    return edge.style?.stroke || '#1f2937';
+    return edge.color || edge.style?.stroke || '#1f2937';
   }
 
   edgeStrokeWidth(edge: DiagramEdge): number {

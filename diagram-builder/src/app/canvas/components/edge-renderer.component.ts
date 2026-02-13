@@ -19,13 +19,13 @@ import { DiagramStore } from '../../core/services/diagram-store.service';
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <path d="M0,0 L0,6 L9,3 z" fill="#333" />
+          <path d="M0,0 L0,6 L9,3 z" fill="context-stroke" />
         </marker>
       </defs>
       <path
         [attr.d]="pathData()"
         fill="none"
-        [attr.stroke]="edge.style?.stroke || 'black'"
+        [attr.stroke]="edge.color || edge.style?.stroke || 'black'"
         [attr.stroke-width]="edge.style?.strokeWidth || 1"
         [attr.marker-end]="edge.markerEnd ? 'url(#arrow)' : null"
       />
