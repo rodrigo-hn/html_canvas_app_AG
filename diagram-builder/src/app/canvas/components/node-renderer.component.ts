@@ -128,18 +128,22 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
       @if (isSelected()) {
       <div
         class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -top-2 left-1/2 -translate-x-1/2 cursor-crosshair"
+        title="Conectar desde puerto superior"
         (mousedown)="startEdge('top', $event)"
       ></div>
       <div
         class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -right-2 top-1/2 -translate-y-1/2 cursor-crosshair"
+        title="Conectar desde puerto derecho"
         (mousedown)="startEdge('right', $event)"
       ></div>
       <div
         class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -bottom-2 left-1/2 -translate-x-1/2 cursor-crosshair"
+        title="Conectar desde puerto inferior"
         (mousedown)="startEdge('bottom', $event)"
       ></div>
       <div
         class="absolute w-3 h-3 rounded-full bg-white border border-indigo-500 -left-2 top-1/2 -translate-y-1/2 cursor-crosshair"
+        title="Conectar desde puerto izquierdo"
         (mousedown)="startEdge('left', $event)"
       ></div>
       }

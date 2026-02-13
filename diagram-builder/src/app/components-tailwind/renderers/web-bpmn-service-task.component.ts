@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant } from './bpmn-web-task.tokens';
+import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant, bpmnIconSvg } from './bpmn-web-task.tokens';
 
 @Component({
   selector: 'app-web-bpmn-service-task',
@@ -12,7 +12,7 @@ import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant } from './bpmn-web-task.tokens
       [ngStyle]="containerStyle()"
     >
       @if (iconEnabled) {
-      <div class="absolute" [ngStyle]="iconStyle()">⚙️</div>
+      <div class="absolute" [ngStyle]="iconStyle()" [innerHTML]="iconSvg()"></div>
       }
       <div class="flex h-full items-center justify-center text-center leading-tight" [ngStyle]="textStyle()">
         {{ text }}
@@ -45,11 +45,8 @@ export class WebBpmnServiceTaskComponent {
 
   iconStyle() {
     return {
-      color: BPMN_WEB_TASK_TOKENS.variants[this.variant].accent,
       left: BPMN_WEB_TASK_TOKENS.icon.left,
       top: BPMN_WEB_TASK_TOKENS.icon.top,
-      'font-size': BPMN_WEB_TASK_TOKENS.icon.size,
-      'line-height': '1',
     };
   }
 
@@ -58,5 +55,13 @@ export class WebBpmnServiceTaskComponent {
       'font-size': BPMN_WEB_TASK_TOKENS.typography.taskSize,
       'font-weight': BPMN_WEB_TASK_TOKENS.typography.taskWeight,
     };
+  }
+
+  iconSvg(): string {
+    return bpmnIconSvg(
+      'service',
+      BPMN_WEB_TASK_TOKENS.variants[this.variant].accent,
+      BPMN_WEB_TASK_TOKENS.icon.sizePx
+    );
   }
 }

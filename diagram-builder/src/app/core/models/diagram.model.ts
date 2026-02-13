@@ -167,6 +167,7 @@ export interface DiagramEdge extends DiagramElement {
   sourceId: string;
   targetId: string;
   color?: string;
+  labelPosition?: Point;
   sourcePort?: 'top' | 'right' | 'bottom' | 'left';
   targetPort?: 'top' | 'right' | 'bottom' | 'left';
   flowType?: BpmnFlowType;

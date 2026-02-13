@@ -145,6 +145,42 @@ interface CanvasFrame {
           />
           Auto-save
         </label>
+        <div class="ml-2 flex items-center gap-1 rounded border border-slate-300 bg-slate-50 px-1 py-1">
+          <span class="px-1 text-[11px] font-semibold text-slate-600">Contrast</span>
+          <button
+            class="rounded px-2 py-1 text-xs"
+            [class.bg-slate-700]="contrastPreset === 'light'"
+            [class.text-white]="contrastPreset === 'light'"
+            [class.bg-white]="contrastPreset !== 'light'"
+            [class.text-slate-700]="contrastPreset !== 'light'"
+            (click)="applyContrastPreset('light')"
+            title="Bordes claros para fondo oscuro"
+          >
+            Claro
+          </button>
+          <button
+            class="rounded px-2 py-1 text-xs"
+            [class.bg-slate-700]="contrastPreset === 'medium'"
+            [class.text-white]="contrastPreset === 'medium'"
+            [class.bg-white]="contrastPreset !== 'medium'"
+            [class.text-slate-700]="contrastPreset !== 'medium'"
+            (click)="applyContrastPreset('medium')"
+            title="Contraste equilibrado"
+          >
+            Medio
+          </button>
+          <button
+            class="rounded px-2 py-1 text-xs"
+            [class.bg-slate-700]="contrastPreset === 'high'"
+            [class.text-white]="contrastPreset === 'high'"
+            [class.bg-white]="contrastPreset !== 'high'"
+            [class.text-slate-700]="contrastPreset !== 'high'"
+            (click)="applyContrastPreset('high')"
+            title="Máximo contraste para tema oscuro"
+          >
+            Alto
+          </button>
+        </div>
         @if (activeFlowType) {
         <span class="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900">
           Draw {{ activeFlowType }} flow
@@ -153,6 +189,13 @@ interface CanvasFrame {
           Cancel
         </button>
         }
+      </div>
+      }
+
+      @if (activeFlowType) {
+      <div class="absolute left-1/2 top-20 z-50 -translate-x-1/2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow">
+        <div class="font-semibold">Modo conexión activo: {{ flowTypeLabel(activeFlowType) }}</div>
+        <div>Selecciona un nodo, arrastra desde un puerto y suelta en otro nodo.</div>
       </div>
       }
 
@@ -380,6 +423,7 @@ export class CanvasComponent implements OnInit {
   pagePreset: 'Infinite' | 'A4' | 'A3' | '16:9' | 'Custom' = 'Infinite';
   pageWidth = 1280;
   pageHeight = 720;
+  contrastPreset: 'light' | 'medium' | 'high' = 'medium';
   frames: CanvasFrame[] = [];
   selectedFrameId: string | null = null;
   paletteQuery = '';
@@ -465,6 +509,7 @@ export class CanvasComponent implements OnInit {
 
   ngOnInit() {
     this.initializeViewMode();
+    this.applyContrastPreset(this.contrastPreset);
     void this.loadStartupExample();
   }
 
@@ -1341,6 +1386,66 @@ export class CanvasComponent implements OnInit {
     this.activeFlowType = null;
   }
 
+  flowTypeLabel(flowType: BpmnFlowType): string {
+    if (flowType === 'message') return 'Message Flow';
+    if (flowType === 'association') return 'Association';
+    return 'Sequence Flow';
+  }
+
+  applyContrastPreset(preset: 'light' | 'medium' | 'high') {
+    this.contrastPreset = preset;
+    const palette =
+      preset === 'high'
+        ? {
+            edge: '#ffffff',
+            gatewayBorder: '#facc15',
+            gatewayLabel: '#fef08a',
+            startBorder: '#4ade80',
+            startIcon: '#bbf7d0',
+            endBorder: '#f87171',
+            endIcon: '#fecaca',
+            endFill: 'rgba(248,113,113,0.24)',
+          }
+        : preset === 'light'
+        ? {
+            edge: '#d1d5db',
+            gatewayBorder: '#fbbf24',
+            gatewayLabel: '#fde68a',
+            startBorder: '#34d399',
+            startIcon: '#a7f3d0',
+            endBorder: '#fb7185',
+            endIcon: '#fecdd3',
+            endFill: 'rgba(251,113,133,0.20)',
+          }
+        : {
+            edge: '#9fa1a3',
+            gatewayBorder: '#f59e0b',
+            gatewayLabel: '#fcd34d',
+            startBorder: '#34d399',
+            startIcon: '#a7f3d0',
+            endBorder: '#f87171',
+            endIcon: '#fecaca',
+            endFill: 'rgba(248,113,113,0.20)',
+          };
+
+    this.edges().forEach((edge) => {
+      this.commands.updateEdge(edge.id, { color: palette.edge });
+      this.commands.setEdgeStyle(edge.id, { stroke: palette.edge });
+    });
+
+    const rootStyle = this.canvasRoot?.nativeElement?.style;
+    if (rootStyle) {
+      rootStyle.setProperty('--bpmn-gateway-border', palette.gatewayBorder);
+      rootStyle.setProperty('--bpmn-gateway-label', palette.gatewayLabel);
+      rootStyle.setProperty('--bpmn-gateway-symbol', palette.gatewayLabel);
+      rootStyle.setProperty('--bpmn-start-border', palette.startBorder);
+      rootStyle.setProperty('--bpmn-start-icon', palette.startIcon);
+      rootStyle.setProperty('--bpmn-end-border', palette.endBorder);
+      rootStyle.setProperty('--bpmn-end-icon', palette.endIcon);
+      rootStyle.setProperty('--bpmn-end-fill', palette.endFill);
+    }
+  }
+
   onCanvasWheel(event: WheelEvent) {
     if (!event.ctrlKey && !event.metaKey) return;
     event.preventDefault();
@@ -1650,6 +1755,7 @@ export class CanvasComponent implements OnInit {
       }
       const json = await response.text();
       this.commands.loadFromJson(json);
+      this.applyContrastPreset(this.contrastPreset);
     } catch (error) {
       console.warn('Startup example could not be loaded', error);
     }

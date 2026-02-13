@@ -1,9 +1,17 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DiagramStore } from '../core/services/diagram-store.service';
 import { DiagramCommands } from '../core/services/diagram-commands.service';
-import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from '../core/models/diagram.model';
+import {
+  BpmnFlowType,
+  DiagramEdge,
+  DiagramNode,
+  Point,
+  ShapeNode,
+  WebComponentType,
+  WebNode,
+} from '../core/models/diagram.model';
 
 @Component({
   selector: 'app-inspector',
@@ -34,6 +42,35 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
               }
             </select>
           </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('label')"
+              >Label</label
+            >
+            <input
+              [id]="edgeFieldId('label')"
+              [attr.name]="edgeFieldId('label')"
+              type="text"
+              class="w-full border rounded px-2 py-1 text-sm"
+              [ngModel]="selectedEdge()!.label || ''"
+              (ngModelChange)="updateEdgeLabel($event)"
+            />
+          </div>
+          <label class="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              [checked]="!!selectedEdge()!.labelPosition"
+              (change)="toggleEdgeManualLabelPosition($event)"
+            />
+            Manual label position
+          </label>
+          @if (selectedEdge()!.labelPosition) {
+          <button
+            class="w-full bg-slate-200 text-slate-700 text-sm px-3 py-1 rounded hover:bg-slate-300"
+            (click)="resetEdgeLabelPosition()"
+          >
+            Reset Label Position
+          </button>
+          }
           <button
             class="w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
             (click)="deleteSelectedEdge()"
@@ -56,18 +93,25 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [attr.name]="edgeFieldId('color')"
                 type="color"
                 class="h-9 w-14 border rounded px-1 py-1 bg-white"
-                [ngModel]="edgeColor()"
-                (ngModelChange)="updateEdgeColor($event)"
+                [value]="edgeColor()"
+                (input)="onEdgeColorPickerInput($event)"
               />
               <input
                 [id]="edgeFieldId('colorHex')"
                 [attr.name]="edgeFieldId('colorHex')"
                 type="text"
                 class="flex-1 border rounded px-2 py-1 text-sm"
-                [ngModel]="edgeColor()"
-                (ngModelChange)="updateEdgeColor($event)"
+                [ngModel]="edgeColorInput()"
+                (ngModelChange)="onEdgeColorTextInput($event)"
               />
             </div>
+            @if (edgeColorError()) {
+            <div class="mt-1 text-xs text-red-600">
+              {{ edgeColorError() }}
+            </div>
+            } @else {
+            <div class="mt-1 text-xs text-slate-500">Formato: #RRGGBB o #RGB</div>
+            }
           </div>
           <div>
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('strokeWidth')"
@@ -82,6 +126,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
               [ngModel]="selectedEdge()!.style?.strokeWidth || 2"
               (ngModelChange)="updateEdgeStyleNumber('strokeWidth', $event)"
             />
+            @if (edgeValidationError('strokeWidth')) {
+            <div class="mt-1 text-xs text-red-600">{{ edgeValidationError('strokeWidth') }}</div>
+            }
           </div>
           <label class="flex items-center gap-2 text-sm">
             <input
@@ -104,6 +151,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
               [ngModel]="selectedEdge()!.style?.cornerRadius || 0"
               (ngModelChange)="updateEdgeCornerRadius($event)"
             />
+            @if (edgeValidationError('cornerRadius')) {
+            <div class="mt-1 text-xs text-red-600">{{ edgeValidationError('cornerRadius') }}</div>
+            }
           </div>
           <label class="flex items-center gap-2 text-sm">
             <input
@@ -154,6 +204,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [ngModel]="node()!.x"
                 (ngModelChange)="updateNumber('x', $event)"
               />
+              @if (nodeValidationError('x')) {
+              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('x') }}</div>
+              }
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('y')">Y</label>
@@ -166,6 +219,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [ngModel]="node()!.y"
                 (ngModelChange)="updateNumber('y', $event)"
               />
+              @if (nodeValidationError('y')) {
+              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('y') }}</div>
+              }
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('width')">Width</label>
@@ -178,6 +234,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [ngModel]="node()!.width"
                 (ngModelChange)="updateNumber('width', $event)"
               />
+              @if (nodeValidationError('width')) {
+              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('width') }}</div>
+              }
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('height')">Height</label>
@@ -190,6 +249,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [ngModel]="node()!.height"
                 (ngModelChange)="updateNumber('height', $event)"
               />
+              @if (nodeValidationError('height')) {
+              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('height') }}</div>
+              }
             </div>
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('zIndex')"
@@ -204,6 +266,9 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
                 [ngModel]="node()!.zIndex"
                 (ngModelChange)="updateNumber('zIndex', $event)"
               />
+              @if (nodeValidationError('zIndex')) {
+              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('zIndex') }}</div>
+              }
             </div>
           </div>
         </details>
@@ -428,6 +493,12 @@ import { BpmnFlowType, DiagramNode, ShapeNode, WebComponentType, WebNode } from 
 export class InspectorComponent {
   private store = inject(DiagramStore);
   private commands = inject(DiagramCommands);
+  private nodeValidationErrorsSignal = signal<Record<string, string>>({});
+  private edgeValidationErrorsSignal = signal<Record<string, string>>({});
+  private edgeColorInputSignal = signal<string>('#1f2937');
+  private edgeColorErrorSignal = signal<string | null>(null);
+  private lastEdgeId: string | null = null;
+  private lastNodeId: string | null = null;
   readonly shapeTypes = [
     'rectangle',
     'rounded-rectangle',
@@ -479,6 +550,30 @@ export class InspectorComponent {
   });
 
   node = computed(() => this.selectedNodes()[0] || null);
+
+  constructor() {
+    effect(() => {
+      const edge = this.selectedEdge();
+      const edgeId = edge?.id ?? null;
+      if (edgeId !== this.lastEdgeId) {
+        this.lastEdgeId = edgeId;
+        if (!edge) {
+          this.edgeColorInputSignal.set('#1f2937');
+          this.edgeColorErrorSignal.set(null);
+        } else {
+          this.edgeColorInputSignal.set(edge.color || edge.style?.stroke || '#1f2937');
+          this.edgeColorErrorSignal.set(null);
+        }
+        this.edgeValidationErrorsSignal.set({});
+      }
+
+      const nodeId = this.node()?.id ?? null;
+      if (nodeId !== this.lastNodeId) {
+        this.lastNodeId = nodeId;
+        this.nodeValidationErrorsSignal.set({});
+      }
+    });
+  }
 
   shapeNode(): ShapeNode | null {
     const n = this.node();
@@ -581,10 +676,13 @@ export class InspectorComponent {
   updateNumber(field: keyof DiagramNode, value: number) {
     const n = this.node();
     if (!n) return;
-    const parsed = Number(value);
-    if (Number.isNaN(parsed)) return;
-    const clamped = Math.max(0, parsed);
-    this.commands.updateNode(n.id, { [field]: clamped });
+    const validation = this.validateNumber(value, 0, `${String(field)} must be >= 0`);
+    if (!validation.valid) {
+      this.setNodeValidationError(String(field), validation.message);
+      return;
+    }
+    this.clearNodeValidationError(String(field));
+    this.commands.updateNode(n.id, { [field]: validation.value! });
   }
 
   updateShapeType(value: string) {
@@ -622,11 +720,39 @@ export class InspectorComponent {
     return edge.color || edge.style?.stroke || '#1f2937';
   }
 
-  updateEdgeColor(value: string) {
+  edgeColorInput(): string {
+    return this.edgeColorInputSignal();
+  }
+
+  edgeColorError(): string | null {
+    return this.edgeColorErrorSignal();
+  }
+
+  onEdgeColorPickerInput(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.updateEdgeColor(value, false);
+  }
+
+  onEdgeColorTextInput(value: string) {
+    this.updateEdgeColor(value, true);
+  }
+
+  updateEdgeColor(value: string, fromTextInput: boolean) {
     const edge = this.selectedEdge();
     if (!edge) return;
-    const normalized = this.normalizeColor(value);
-    if (!normalized) return;
+    const raw = String(value || '').trim();
+    this.edgeColorInputSignal.set(raw);
+    const normalized = this.normalizeColor(raw);
+    if (!normalized) {
+      this.edgeColorErrorSignal.set('Color inválido. Usa #RRGGBB o #RGB.');
+      if (!fromTextInput) {
+        this.edgeColorInputSignal.set(edge.color || edge.style?.stroke || '#1f2937');
+        this.edgeColorErrorSignal.set(null);
+      }
+      return;
+    }
+    this.edgeColorErrorSignal.set(null);
+    this.edgeColorInputSignal.set(normalized);
     this.commands.updateEdge(edge.id, { color: normalized });
     this.commands.setEdgeStyle(edge.id, { stroke: normalized });
   }
@@ -634,19 +760,25 @@ export class InspectorComponent {
   updateEdgeStyleNumber(field: 'strokeWidth', value: number) {
     const edge = this.selectedEdge();
     if (!edge) return;
-    const parsed = Number(value);
-    if (Number.isNaN(parsed)) return;
-    const clamped = Math.max(1, parsed);
-    this.commands.setEdgeStyle(edge.id, { [field]: clamped });
+    const validation = this.validateNumber(value, 1, 'Stroke width must be >= 1');
+    if (!validation.valid) {
+      this.setEdgeValidationError(field, validation.message);
+      return;
+    }
+    this.clearEdgeValidationError(field);
+    this.commands.setEdgeStyle(edge.id, { [field]: validation.value! });
   }
 
   updateEdgeCornerRadius(value: number) {
     const edge = this.selectedEdge();
     if (!edge) return;
-    const parsed = Number(value);
-    if (Number.isNaN(parsed)) return;
-    const clamped = Math.max(0, parsed);
-    this.commands.setEdgeStyle(edge.id, { cornerRadius: clamped });
+    const validation = this.validateNumber(value, 0, 'Corner radius must be >= 0');
+    if (!validation.valid) {
+      this.setEdgeValidationError('cornerRadius', validation.message);
+      return;
+    }
+    this.clearEdgeValidationError('cornerRadius');
+    this.commands.setEdgeStyle(edge.id, { cornerRadius: validation.value! });
   }
 
   toggleEdgeCurves(event: Event) {
@@ -675,6 +807,32 @@ export class InspectorComponent {
       markerStart: defaults.markerStart,
     });
     this.commands.setEdgeStyle(edge.id, defaults.style);
+    this.edgeColorInputSignal.set(defaults.color);
+    this.edgeColorErrorSignal.set(null);
+  }
+
+  updateEdgeLabel(value: string) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const normalized = String(value ?? '');
+    this.commands.updateEdge(edge.id, { label: normalized.length > 0 ? normalized : undefined });
+  }
+
+  toggleEdgeManualLabelPosition(event: Event) {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    const checked = (event.target as HTMLInputElement).checked;
+    if (!checked) {
+      this.commands.updateEdge(edge.id, { labelPosition: undefined });
+      return;
+    }
+    this.commands.updateEdge(edge.id, { labelPosition: this.defaultEdgeLabelPoint(edge) });
+  }
+
+  resetEdgeLabelPosition() {
+    const edge = this.selectedEdge();
+    if (!edge) return;
+    this.commands.updateEdge(edge.id, { labelPosition: undefined });
   }
 
   deleteSelectedEdge() {
@@ -713,6 +871,14 @@ export class InspectorComponent {
     return `inspector-edge-${id}-${field}`;
   }
 
+  nodeValidationError(field: string): string | null {
+    return this.nodeValidationErrorsSignal()[field] || null;
+  }
+
+  edgeValidationError(field: string): string | null {
+    return this.edgeValidationErrorsSignal()[field] || null;
+  }
+
   private edgeFlowDefaults(flowType: BpmnFlowType) {
     if (flowType === 'message') {
       return {
@@ -748,5 +914,67 @@ export class InspectorComponent {
       return `#${r}${r}${g}${g}${b}${b}`;
     }
     return null;
+  }
+
+  private validateNumber(
+    value: number,
+    min: number,
+    minMessage: string
+  ): { valid: boolean; value?: number; message?: string } {
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) {
+      return { valid: false, message: 'Value must be a number' };
+    }
+    if (parsed < min) {
+      return { valid: false, message: minMessage };
+    }
+    return { valid: true, value: parsed };
+  }
+
+  private setNodeValidationError(field: string, message?: string) {
+    this.nodeValidationErrorsSignal.update((prev) => ({ ...prev, [field]: message || 'Invalid value' }));
+  }
+
+  private clearNodeValidationError(field: string) {
+    this.nodeValidationErrorsSignal.update((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  private setEdgeValidationError(field: string, message?: string) {
+    this.edgeValidationErrorsSignal.update((prev) => ({ ...prev, [field]: message || 'Invalid value' }));
+  }
+
+  private clearEdgeValidationError(field: string) {
+    this.edgeValidationErrorsSignal.update((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  private defaultEdgeLabelPoint(edge: DiagramEdge): Point {
+    const source = this.store.nodes().find((n) => n.id === edge.sourceId);
+    const target = this.store.nodes().find((n) => n.id === edge.targetId);
+    if (!source || !target) return { x: 0, y: 0 };
+    const start = this.getPortPoint(source, edge.sourcePort || 'right');
+    const end = this.getPortPoint(target, edge.targetPort || 'left');
+    return { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+  }
+
+  private getPortPoint(node: DiagramNode, port: 'top' | 'right' | 'bottom' | 'left'): Point {
+    switch (port) {
+      case 'top':
+        return { x: node.x + node.width / 2, y: node.y };
+      case 'right':
+        return { x: node.x + node.width, y: node.y + node.height / 2 };
+      case 'bottom':
+        return { x: node.x + node.width / 2, y: node.y + node.height };
+      case 'left':
+      default:
+        return { x: node.x, y: node.y + node.height / 2 };
+    }
   }
 }

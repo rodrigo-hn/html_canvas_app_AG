@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DiagramStore } from '../../core/services/diagram-store.service';
 import { DiagramCommands } from '../../core/services/diagram-commands.service';
 import { DiagramEdge, DiagramNode, Point } from '../../core/models/diagram.model';
+import { EDGE_MARKER_TOKENS } from '../../core/styles/bpmn-visual-tokens';
 
 type Port = 'top' | 'right' | 'bottom' | 'left';
 
@@ -18,10 +19,10 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
       <defs>
         <marker
           id="arrow"
-          markerWidth="10"
-          markerHeight="10"
-          refX="9"
-          refY="3"
+          [attr.markerWidth]="markerTokens.arrow.markerWidth"
+          [attr.markerHeight]="markerTokens.arrow.markerHeight"
+          [attr.refX]="markerTokens.arrow.refX"
+          [attr.refY]="markerTokens.arrow.refY"
           orient="auto"
           markerUnits="strokeWidth"
         >
@@ -29,25 +30,25 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         </marker>
         <marker
           id="open-arrow"
-          markerWidth="10"
-          markerHeight="10"
-          refX="9"
-          refY="3"
+          [attr.markerWidth]="markerTokens.openArrow.markerWidth"
+          [attr.markerHeight]="markerTokens.openArrow.markerHeight"
+          [attr.refX]="markerTokens.openArrow.refX"
+          [attr.refY]="markerTokens.openArrow.refY"
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
+          <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" [attr.stroke-width]="markerTokens.openArrow.strokeWidth" />
         </marker>
         <marker
           id="open-circle"
-          markerWidth="10"
-          markerHeight="10"
-          refX="3"
-          refY="3"
+          [attr.markerWidth]="markerTokens.openCircle.markerWidth"
+          [attr.markerHeight]="markerTokens.openCircle.markerHeight"
+          [attr.refX]="markerTokens.openCircle.refX"
+          [attr.refY]="markerTokens.openCircle.refY"
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
+          <circle [attr.cx]="markerTokens.openCircle.refX" [attr.cy]="markerTokens.openCircle.refY" [attr.r]="markerTokens.openCircle.radius" fill="#fff" stroke="context-stroke" [attr.stroke-width]="markerTokens.openCircle.strokeWidth" />
         </marker>
       </defs>
 
@@ -64,7 +65,19 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         [attr.marker-start]="markerStartUrl(edge)"
         [attr.marker-end]="markerEndUrl(edge)"
         (click)="onEdgeClick(edge, $event)"
+        (dblclick)="onEdgeDoubleClick(edge, $event)"
       />
+      @if (edge.label) {
+      <text
+        [attr.x]="edgeLabelPoint(edge).x"
+        [attr.y]="edgeLabelPoint(edge).y"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        class="pointer-events-none select-none fill-slate-800 text-[11px] font-semibold"
+      >
+        {{ edge.label }}
+      </text>
+      }
       @if (selectedEdgeId() === edge.id) {
       <circle
         [attr.cx]="edgePortPoint(edge, 'source').x"
@@ -75,7 +88,9 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         stroke-width="2"
         class="pointer-events-auto cursor-grab"
         (mousedown)="onEdgeHandleDown(edge, 'source', $event)"
-      />
+      >
+        <title>Editar anclaje de origen</title>
+      </circle>
       <circle
         [attr.cx]="edgePortPoint(edge, 'target').x"
         [attr.cy]="edgePortPoint(edge, 'target').y"
@@ -85,18 +100,38 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         stroke-width="2"
         class="pointer-events-auto cursor-grab"
         (mousedown)="onEdgeHandleDown(edge, 'target', $event)"
-      />
+      >
+        <title>Editar anclaje de destino</title>
+      </circle>
+      @for (bend of edgeBendPoints(edge); track bend.index) {
       <circle
-        [attr.cx]="getBendPoint(edge).x"
-        [attr.cy]="getBendPoint(edge).y"
+        [attr.cx]="bend.point.x"
+        [attr.cy]="bend.point.y"
         r="5"
         fill="#fff"
         stroke="#10b981"
         stroke-width="2"
         class="pointer-events-auto cursor-grab"
-        (mousedown)="onBendHandleDown(edge, $event)"
-        (dblclick)="clearBend(edge, $event)"
-      />
+        (mousedown)="onBendHandleDown(edge, bend.index, $event)"
+        (dblclick)="removeBendPoint(edge, bend.index, $event)"
+      >
+        <title>Arrastra para curvar. Doble click para eliminar.</title>
+      </circle>
+      }
+      @if (edge.label) {
+      <circle
+        [attr.cx]="edgeLabelPoint(edge).x"
+        [attr.cy]="edgeLabelPoint(edge).y"
+        r="5"
+        fill="#fff"
+        stroke="#7c3aed"
+        stroke-width="2"
+        class="pointer-events-auto cursor-grab"
+        (mousedown)="onLabelHandleDown(edge, $event)"
+      >
+        <title>Arrastra para mover etiqueta.</title>
+      </circle>
+      }
       }
       }
 
@@ -129,6 +164,7 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
   `,
 })
 export class EdgesLayerComponent {
+  readonly markerTokens = EDGE_MARKER_TOKENS;
   @Input() zoom = 1;
   private store = inject(DiagramStore);
   private commands = inject(DiagramCommands);
@@ -143,7 +179,8 @@ export class EdgesLayerComponent {
     fixedPoint: Point;
     currentPoint: Point;
   } | null = null;
-  private bendDrag: { edgeId: string } | null = null;
+  private bendDrag: { edgeId: string; pointIndex: number } | null = null;
+  private labelDrag: { edgeId: string } | null = null;
 
   previewPath = computed(() => {
     const preview = this.preview();
@@ -165,6 +202,19 @@ export class EdgesLayerComponent {
 
   onEdgeClick(edge: DiagramEdge, event: MouseEvent) {
     event.stopPropagation();
+    if (event.shiftKey) {
+      const point = this.toWorldPoint(event.clientX, event.clientY);
+      this.addBendPoint(edge, point);
+      this.commands.selectEdge(edge.id);
+      return;
+    }
+    this.commands.selectEdge(edge.id);
+  }
+
+  onEdgeDoubleClick(edge: DiagramEdge, event: MouseEvent) {
+    event.stopPropagation();
+    const point = this.toWorldPoint(event.clientX, event.clientY);
+    this.addBendPoint(edge, point);
     this.commands.selectEdge(edge.id);
   }
 
@@ -187,16 +237,25 @@ export class EdgesLayerComponent {
     };
   }
 
-  onBendHandleDown(edge: DiagramEdge, event: MouseEvent) {
+  onBendHandleDown(edge: DiagramEdge, pointIndex: number, event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
     this.commands.selectEdge(edge.id);
-    this.bendDrag = { edgeId: edge.id };
+    this.bendDrag = { edgeId: edge.id, pointIndex };
   }
 
-  clearBend(edge: DiagramEdge, event: MouseEvent) {
+  removeBendPoint(edge: DiagramEdge, pointIndex: number, event: MouseEvent) {
     event.stopPropagation();
-    this.commands.updateEdge(edge.id, { points: [] });
+    const next = [...(edge.points || [])];
+    next.splice(pointIndex, 1);
+    this.commands.updateEdge(edge.id, { points: next });
+  }
+
+  onLabelHandleDown(edge: DiagramEdge, event: MouseEvent) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.commands.selectEdge(edge.id);
+    this.labelDrag = { edgeId: edge.id };
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -207,7 +266,18 @@ export class EdgesLayerComponent {
       return;
     }
     if (this.bendDrag) {
-      this.commands.updateEdge(this.bendDrag.edgeId, { points: [point] });
+      const edge = this.edges().find((e) => e.id === this.bendDrag!.edgeId);
+      if (!edge) return;
+      const current = [...(edge.points || [])];
+      const snapped = this.snapBendPoint(edge, this.bendDrag.pointIndex, point);
+      current[this.bendDrag.pointIndex] = snapped;
+      this.commands.updateEdge(edge.id, { points: current });
+      return;
+    }
+    if (this.labelDrag) {
+      const edge = this.edges().find((e) => e.id === this.labelDrag!.edgeId);
+      if (!edge) return;
+      this.commands.updateEdge(edge.id, { labelPosition: point });
     }
   }
 
@@ -215,6 +285,10 @@ export class EdgesLayerComponent {
   onDocumentMouseUp(event: MouseEvent) {
     if (this.bendDrag) {
       this.bendDrag = null;
+      return;
+    }
+    if (this.labelDrag) {
+      this.labelDrag = null;
       return;
     }
     if (!this.connectionDrag) return;
@@ -239,7 +313,7 @@ export class EdgesLayerComponent {
     const targetPort = edge.targetPort || 'left';
     const start = this.getPortPoint(sourceNode, sourcePort);
     const end = this.getPortPoint(targetNode, targetPort);
-    const manual = edge.points?.[0] || null;
+    const manual = edge.points || [];
     const radius = edge.style?.cornerRadius ?? this.defaultCornerRadius(edge);
     return this.buildOrthogonalPath(start, end, sourcePort, targetPort, manual, radius);
   }
@@ -297,14 +371,24 @@ export class EdgesLayerComponent {
     end: Point,
     sourcePort: Port,
     targetPort?: Port,
-    manualPoint?: Point | null,
+    manualPoints?: Point[] | null,
     cornerRadius = 0
   ): string {
     const target = targetPort || this.guessTargetPort(start, end);
-    if (manualPoint) {
-      const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
-      const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
-      const points = this.simplifyPoints(this.trimBacktracks([...first, ...second.slice(1)]));
+    if (manualPoints && manualPoints.length > 0) {
+      const via = manualPoints;
+      let all: Point[] = [];
+      let segmentStart = start;
+      let segmentStartPort = sourcePort;
+      for (const p of via) {
+        const segmentEndPort = this.guessTargetPort(segmentStart, p);
+        const segment = this.routePoints(segmentStart, p, segmentStartPort, segmentEndPort);
+        all = all.length === 0 ? segment : [...all, ...segment.slice(1)];
+        segmentStart = p;
+        segmentStartPort = this.oppositePort(segmentEndPort);
+      }
+      const lastSegment = this.routePoints(segmentStart, end, this.guessTargetPort(segmentStart, end), target);
+      const points = this.simplifyPoints(this.trimBacktracks([...all, ...lastSegment.slice(1)]));
       return this.pointsToPath(points, cornerRadius);
     }
     const points = this.simplifyPoints(this.trimBacktracks(this.routePoints(start, end, sourcePort, target)));
@@ -312,7 +396,7 @@ export class EdgesLayerComponent {
   }
 
   private routePoints(start: Point, end: Point, sourcePort: Port, targetPort: Port): Point[] {
-    const offset = 20;
+    const offset = 24;
     const startOut = this.pushFromPort(start, sourcePort, offset);
     const endIn = this.pushFromPort(end, targetPort, offset);
 
@@ -320,8 +404,11 @@ export class EdgesLayerComponent {
     const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
     const candidateC = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, true);
     const candidateD = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, false);
-    const candidates = [candidateA, candidateB, candidateC, candidateD];
-    const best = candidates.sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
+    const candidateE = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 3), endIn, end, true);
+    const candidateF = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 3), endIn, end, false);
+    const straightCandidate = this.straightOrSingleBend(start, end, startOut, endIn);
+    const candidates = [straightCandidate, candidateA, candidateB, candidateC, candidateD, candidateE, candidateF];
+    const best = candidates.sort((a, b) => this.pathScore(a, targetPort, start, end) - this.pathScore(b, targetPort, start, end))[0];
     if (this.isTargetDirectionCorrect(best, targetPort)) {
       return best;
     }
@@ -329,7 +416,7 @@ export class EdgesLayerComponent {
     const endInFlipped = this.pushFromPort(end, flipped, offset);
     const altA = this.orthogonalVia(start, startOut, endInFlipped, end, true);
     const altB = this.orthogonalVia(start, startOut, endInFlipped, end, false);
-    return [altA, altB].sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
+    return [altA, altB].sort((a, b) => this.pathScore(a, targetPort, start, end) - this.pathScore(b, targetPort, start, end))[0];
   }
 
   private orthogonalVia(
@@ -343,7 +430,7 @@ export class EdgesLayerComponent {
     return [start, startOut, middle, endIn, end];
   }
 
-  private pathScore(points: Point[], targetPort: Port): number {
+  private pathScore(points: Point[], targetPort: Port, start: Point, end: Point): number {
     let score = 0;
     for (let i = 1; i < points.length; i++) {
       score += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
@@ -357,11 +444,19 @@ export class EdgesLayerComponent {
       const verticalThenHorizontal = a.x === b.x && b.y === c.y;
       if (horizontalThenVertical || verticalThenHorizontal) turns++;
     }
-    score += turns * 8;
+    score += turns * 20;
+    score += this.containerCollisionPenalty(points, start, end);
     if (!this.isTargetDirectionCorrect(points, targetPort)) {
       score += 200;
     }
     return score;
+  }
+
+  private straightOrSingleBend(start: Point, end: Point, startOut: Point, endIn: Point): Point[] {
+    if (startOut.x === endIn.x || startOut.y === endIn.y) {
+      return [start, startOut, endIn, end];
+    }
+    return [start, startOut, { x: endIn.x, y: startOut.y }, endIn, end];
   }
 
   private pushFromPort(point: Point, port: Port, offset: number, invert = false): Point {
@@ -530,14 +625,17 @@ export class EdgesLayerComponent {
     return null;
   }
 
-  getBendPoint(edge: DiagramEdge): Point {
-    if (edge.points?.[0]) return edge.points[0];
-    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
-    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
-    if (!sourceNode || !targetNode) return { x: 0, y: 0 };
-    const start = this.getPortPoint(sourceNode, edge.sourcePort || 'right');
-    const end = this.getPortPoint(targetNode, edge.targetPort || 'left');
-    return { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+  edgeBendPoints(edge: DiagramEdge): Array<{ index: number; point: Point }> {
+    const points = edge.points || [];
+    return points.map((point, index) => ({ index, point }));
+  }
+
+  edgeLabelPoint(edge: DiagramEdge): Point {
+    if (edge.labelPosition) return edge.labelPosition;
+    const pathPoints = this.edgePathPoints(edge);
+    if (pathPoints.length === 0) return { x: 0, y: 0 };
+    const mid = Math.floor(pathPoints.length / 2);
+    return pathPoints[mid];
   }
 
   private findNearestPort(point: Point): { nodeId: string; port: Port } | null {
@@ -568,5 +666,160 @@ export class EdgesLayerComponent {
       x: (clientX - rect.left) / this.zoom,
       y: (clientY - rect.top) / this.zoom,
     };
+  }
+
+  private addBendPoint(edge: DiagramEdge, point: Point) {
+    const snapped = this.snapToGrid(point);
+    const current = [...(edge.points || [])];
+    const insertAt = this.findBendInsertIndex(edge, snapped);
+    current.splice(insertAt, 0, snapped);
+    this.commands.updateEdge(edge.id, { points: current });
+  }
+
+  private snapBendPoint(edge: DiagramEdge, pointIndex: number, point: Point): Point {
+    const snappedGrid = this.snapToGrid(point);
+    const endpoints = this.getEdgeEndpoints(edge);
+    if (!endpoints) return snappedGrid;
+    const currentBends = [...(edge.points || [])];
+    const prev = pointIndex > 0 ? currentBends[pointIndex - 1] : endpoints.start;
+    const next = pointIndex < currentBends.length - 1 ? currentBends[pointIndex + 1] : endpoints.end;
+    const threshold = 10;
+    let x = snappedGrid.x;
+    let y = snappedGrid.y;
+    if (prev && Math.abs(prev.x - x) <= threshold) x = prev.x;
+    if (next && Math.abs(next.x - x) <= threshold) x = next.x;
+    if (prev && Math.abs(prev.y - y) <= threshold) y = prev.y;
+    if (next && Math.abs(next.y - y) <= threshold) y = next.y;
+    return { x, y };
+  }
+
+  private snapToGrid(point: Point): Point {
+    if (!this.store.snapToGrid()) return point;
+    const grid = this.store.gridSize();
+    return {
+      x: Math.round(point.x / grid) * grid,
+      y: Math.round(point.y / grid) * grid,
+    };
+  }
+
+  private edgePathPoints(edge: DiagramEdge): Point[] {
+    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
+    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
+    if (!sourceNode || !targetNode) return [];
+    const sourcePort = edge.sourcePort || 'right';
+    const targetPort = edge.targetPort || 'left';
+    const start = this.getPortPoint(sourceNode, sourcePort);
+    const end = this.getPortPoint(targetNode, targetPort);
+    const manual = edge.points || [];
+    const target = targetPort || this.guessTargetPort(start, end);
+    if (manual.length > 0) {
+      let all: Point[] = [];
+      let segmentStart = start;
+      let segmentStartPort = sourcePort;
+      for (const p of manual) {
+        const segmentEndPort = this.guessTargetPort(segmentStart, p);
+        const segment = this.routePoints(segmentStart, p, segmentStartPort, segmentEndPort);
+        all = all.length === 0 ? segment : [...all, ...segment.slice(1)];
+        segmentStart = p;
+        segmentStartPort = this.oppositePort(segmentEndPort);
+      }
+      const lastSegment = this.routePoints(segmentStart, end, this.guessTargetPort(segmentStart, end), target);
+      return this.simplifyPoints(this.trimBacktracks([...all, ...lastSegment.slice(1)]));
+    }
+    return this.simplifyPoints(this.trimBacktracks(this.routePoints(start, end, sourcePort, target)));
+  }
+
+  private containerCollisionPenalty(points: Point[], start: Point, end: Point): number {
+    if (points.length < 2) return 0;
+    const containers = this.nodes().filter(
+      (node) => this.isContainerNode(node) && !this.pointInsideNode(start, node) && !this.pointInsideNode(end, node)
+    );
+    if (containers.length === 0) return 0;
+    let penalty = 0;
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1];
+      const b = points[i];
+      for (const c of containers) {
+        if (this.segmentIntersectsRect(a, b, c)) {
+          penalty += 220;
+        }
+      }
+    }
+    return penalty;
+  }
+
+  private pointInsideNode(point: Point, node: DiagramNode): boolean {
+    return point.x >= node.x && point.x <= node.x + node.width && point.y >= node.y && point.y <= node.y + node.height;
+  }
+
+  private isContainerNode(node: DiagramNode): boolean {
+    if (node.type === 'shape') {
+      return node.shapeType === 'bpmn-lane' || node.shapeType === 'bpmn-pool';
+    }
+    if (node.type === 'web-component') {
+      return node.componentType === 'bpmn-lane-web' || node.componentType === 'bpmn-pool-web';
+    }
+    return false;
+  }
+
+  private segmentIntersectsRect(a: Point, b: Point, node: DiagramNode): boolean {
+    const minX = node.x + 1;
+    const minY = node.y + 1;
+    const maxX = node.x + node.width - 1;
+    const maxY = node.y + node.height - 1;
+    const isHorizontal = a.y === b.y;
+    const isVertical = a.x === b.x;
+    if (!isHorizontal && !isVertical) return false;
+    if (isHorizontal) {
+      if (a.y <= minY || a.y >= maxY) return false;
+      const left = Math.min(a.x, b.x);
+      const right = Math.max(a.x, b.x);
+      return right > minX && left < maxX;
+    }
+    if (a.x <= minX || a.x >= maxX) return false;
+    const top = Math.min(a.y, b.y);
+    const bottom = Math.max(a.y, b.y);
+    return bottom > minY && top < maxY;
+  }
+
+  private findBendInsertIndex(edge: DiagramEdge, point: Point): number {
+    const endpoints = this.getEdgeEndpoints(edge);
+    if (!endpoints) return (edge.points || []).length;
+    const refs = [endpoints.start, ...(edge.points || []), endpoints.end];
+    let bestIndex = refs.length - 1;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < refs.length - 1; i++) {
+      const distance = this.distancePointToSegment(point, refs[i], refs[i + 1]);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestIndex = i + 1;
+      }
+    }
+    return Math.max(0, bestIndex - 1);
+  }
+
+  private getEdgeEndpoints(edge: DiagramEdge): { start: Point; end: Point } | null {
+    const sourceNode = this.nodes().find((n) => n.id === edge.sourceId);
+    const targetNode = this.nodes().find((n) => n.id === edge.targetId);
+    if (!sourceNode || !targetNode) return null;
+    return {
+      start: this.getPortPoint(sourceNode, edge.sourcePort || 'right'),
+      end: this.getPortPoint(targetNode, edge.targetPort || 'left'),
+    };
+  }
+
+  private distancePointToSegment(point: Point, a: Point, b: Point): number {
+    const abx = b.x - a.x;
+    const aby = b.y - a.y;
+    const apx = point.x - a.x;
+    const apy = point.y - a.y;
+    const lengthSq = abx * abx + aby * aby;
+    if (lengthSq === 0) {
+      return Math.hypot(point.x - a.x, point.y - a.y);
+    }
+    const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / lengthSq));
+    const projectionX = a.x + t * abx;
+    const projectionY = a.y + t * aby;
+    return Math.hypot(point.x - projectionX, point.y - projectionY);
   }
 }

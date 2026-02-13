@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import {
+  DiagramEdge,
   DiagramModel,
   DiagramNode,
+  Point,
   ShapeNode,
   WebButtonNode,
   WebCardNode,
@@ -11,6 +13,14 @@ import {
 import { BasicShapes } from '../../stencils/shapes/basic.shapes';
 import { BpmnShapes } from '../../stencils/shapes/bpmn.shapes';
 import { StencilService } from '../../stencils/stencil.service';
+import {
+  BPMN_VISUAL_TOKENS,
+  EDGE_MARKER_TOKENS,
+  bpmnIconSvg,
+  bpmnTaskTone,
+  type BpmnTaskIconKind,
+  type BpmnWebTaskVariant,
+} from '../styles/bpmn-visual-tokens';
 
 @Injectable({
   providedIn: 'root',
@@ -77,10 +87,10 @@ ${foregroundNodesHtml}
   <defs>
     <marker
       id="arrow"
-      markerWidth="10"
-      markerHeight="10"
-      refX="9"
-      refY="3"
+      markerWidth="${EDGE_MARKER_TOKENS.arrow.markerWidth}"
+      markerHeight="${EDGE_MARKER_TOKENS.arrow.markerHeight}"
+      refX="${EDGE_MARKER_TOKENS.arrow.refX}"
+      refY="${EDGE_MARKER_TOKENS.arrow.refY}"
       orient="auto"
       markerUnits="strokeWidth"
     >
@@ -88,25 +98,25 @@ ${foregroundNodesHtml}
     </marker>
     <marker
       id="open-arrow"
-      markerWidth="10"
-      markerHeight="10"
-      refX="9"
-      refY="3"
+      markerWidth="${EDGE_MARKER_TOKENS.openArrow.markerWidth}"
+      markerHeight="${EDGE_MARKER_TOKENS.openArrow.markerHeight}"
+      refX="${EDGE_MARKER_TOKENS.openArrow.refX}"
+      refY="${EDGE_MARKER_TOKENS.openArrow.refY}"
       orient="auto"
       markerUnits="strokeWidth"
     >
-      <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
+      <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="${EDGE_MARKER_TOKENS.openArrow.strokeWidth}" />
     </marker>
     <marker
       id="open-circle"
-      markerWidth="10"
-      markerHeight="10"
-      refX="3"
-      refY="3"
+      markerWidth="${EDGE_MARKER_TOKENS.openCircle.markerWidth}"
+      markerHeight="${EDGE_MARKER_TOKENS.openCircle.markerHeight}"
+      refX="${EDGE_MARKER_TOKENS.openCircle.refX}"
+      refY="${EDGE_MARKER_TOKENS.openCircle.refY}"
       orient="auto"
       markerUnits="strokeWidth"
     >
-      <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
+      <circle cx="${EDGE_MARKER_TOKENS.openCircle.refX}" cy="${EDGE_MARKER_TOKENS.openCircle.refY}" r="${EDGE_MARKER_TOKENS.openCircle.radius}" fill="#fff" stroke="context-stroke" stroke-width="${EDGE_MARKER_TOKENS.openCircle.strokeWidth}" />
     </marker>
   </defs>
   <rect x="${bounds.minX}" y="${bounds.minY}" width="${bounds.width}" height="${bounds.height}" fill="#f8fafc" />
@@ -257,13 +267,13 @@ ${foregroundNodesHtml}
       case 'card':
         return this.renderCard(node as WebCardNode, style);
       case 'bpmn-user-task-web':
-        return this.renderBpmnWebTask(node, style, '👤', 'blue', false);
+        return this.renderBpmnWebTask(node, style, 'user', 'blue', false);
       case 'bpmn-service-task-web':
-        return this.renderBpmnWebTask(node, style, '⚙️', 'blue', false);
+        return this.renderBpmnWebTask(node, style, 'service', 'blue', false);
       case 'bpmn-manual-task-web':
-        return this.renderBpmnWebTask(node, style, '✋', 'yellow', false);
+        return this.renderBpmnWebTask(node, style, 'manual', 'yellow', false);
       case 'bpmn-subprocess-web':
-        return this.renderBpmnWebTask(node, style, '📦', 'purple', true);
+        return this.renderBpmnWebTask(node, style, 'subprocess', 'purple', true);
       case 'bpmn-start-event-web':
         return this.renderBpmnStartEventWeb(node, style);
       case 'bpmn-exclusive-gateway-web':
@@ -294,15 +304,19 @@ ${foregroundNodesHtml}
         const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
         const markerStart = markerStartId ? `url(#${markerStartId})` : '';
         const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
-        const d = this.buildOrthogonalPath(
+        const points = this.buildOrthogonalPoints(
           start,
           end,
           edge.sourcePort || 'right',
           edge.targetPort || 'left',
-          edge.points?.[0] || null,
-          edge.style?.cornerRadius ?? this.defaultCornerRadius(edge)
+          edge.points || []
         );
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
+        const d = this.pointsToPath(points, edge.style?.cornerRadius ?? this.defaultCornerRadius(edge));
+        const labelPoint = this.edgeLabelPoint(edge, points);
+        const label = edge.label
+          ? `<text x="${labelPoint.x}" y="${labelPoint.y}" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">${this.escapeText(edge.label)}</text>`
+          : '';
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />${label}`;
       })
       .filter(Boolean)
       .join('\n');
@@ -312,10 +326,10 @@ ${foregroundNodesHtml}
         <defs>
           <marker
             id="arrow"
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="3"
+            markerWidth="${EDGE_MARKER_TOKENS.arrow.markerWidth}"
+            markerHeight="${EDGE_MARKER_TOKENS.arrow.markerHeight}"
+            refX="${EDGE_MARKER_TOKENS.arrow.refX}"
+            refY="${EDGE_MARKER_TOKENS.arrow.refY}"
             orient="auto"
             markerUnits="strokeWidth"
           >
@@ -323,25 +337,25 @@ ${foregroundNodesHtml}
           </marker>
           <marker
             id="open-arrow"
-            markerWidth="10"
-            markerHeight="10"
-            refX="9"
-            refY="3"
+            markerWidth="${EDGE_MARKER_TOKENS.openArrow.markerWidth}"
+            markerHeight="${EDGE_MARKER_TOKENS.openArrow.markerHeight}"
+            refX="${EDGE_MARKER_TOKENS.openArrow.refX}"
+            refY="${EDGE_MARKER_TOKENS.openArrow.refY}"
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="1.5" />
+            <path d="M1,1 L9,3 L1,5" fill="none" stroke="context-stroke" stroke-width="${EDGE_MARKER_TOKENS.openArrow.strokeWidth}" />
           </marker>
           <marker
             id="open-circle"
-            markerWidth="10"
-            markerHeight="10"
-            refX="3"
-            refY="3"
+            markerWidth="${EDGE_MARKER_TOKENS.openCircle.markerWidth}"
+            markerHeight="${EDGE_MARKER_TOKENS.openCircle.markerHeight}"
+            refX="${EDGE_MARKER_TOKENS.openCircle.refX}"
+            refY="${EDGE_MARKER_TOKENS.openCircle.refY}"
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <circle cx="3" cy="3" r="2" fill="#fff" stroke="context-stroke" stroke-width="1.2" />
+            <circle cx="${EDGE_MARKER_TOKENS.openCircle.refX}" cy="${EDGE_MARKER_TOKENS.openCircle.refY}" r="${EDGE_MARKER_TOKENS.openCircle.radius}" fill="#fff" stroke="context-stroke" stroke-width="${EDGE_MARKER_TOKENS.openCircle.strokeWidth}" />
           </marker>
         </defs>
         ${paths}
@@ -363,15 +377,19 @@ ${foregroundNodesHtml}
         const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
         const markerStart = markerStartId ? `url(#${markerStartId})` : '';
         const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
-        const d = this.buildOrthogonalPath(
+        const points = this.buildOrthogonalPoints(
           start,
           end,
           edge.sourcePort || 'right',
           edge.targetPort || 'left',
-          edge.points?.[0] || null,
-          edge.style?.cornerRadius ?? this.defaultCornerRadius(edge)
+          edge.points || []
         );
-        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />`;
+        const d = this.pointsToPath(points, edge.style?.cornerRadius ?? this.defaultCornerRadius(edge));
+        const labelPoint = this.edgeLabelPoint(edge, points);
+        const label = edge.label
+          ? `<text x="${labelPoint.x}" y="${labelPoint.y}" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">${this.escapeText(edge.label)}</text>`
+          : '';
+        return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="${dashArray}" marker-start="${markerStart}" marker-end="${markerEnd}" />${label}`;
       })
       .filter(Boolean)
       .join('\n');
@@ -469,23 +487,29 @@ ${foregroundNodesHtml}
     }
   }
 
-  private buildOrthogonalPath(
+  private buildOrthogonalPoints(
     start: { x: number; y: number },
     end: { x: number; y: number },
     sourcePort: 'top' | 'right' | 'bottom' | 'left',
     targetPort: 'top' | 'right' | 'bottom' | 'left',
-    manualPoint?: { x: number; y: number } | null,
-    cornerRadius = 0
-  ): string {
+    manualPoints: Array<{ x: number; y: number }>
+  ): Array<{ x: number; y: number }> {
     const target = targetPort || this.guessTargetPort(start, end);
-    if (manualPoint) {
-      const first = this.routePoints(start, manualPoint, sourcePort, this.guessTargetPort(start, manualPoint));
-      const second = this.routePoints(manualPoint, end, this.guessTargetPort(manualPoint, end), target);
-      const points = this.simplifyPoints(this.trimBacktracks([...first, ...second.slice(1)]));
-      return this.pointsToPath(points, cornerRadius);
+    if (manualPoints.length > 0) {
+      let all: Array<{ x: number; y: number }> = [];
+      let segmentStart = start;
+      let segmentStartPort = sourcePort;
+      for (const manualPoint of manualPoints) {
+        const segmentEndPort = this.guessTargetPort(segmentStart, manualPoint);
+        const segment = this.routePoints(segmentStart, manualPoint, segmentStartPort, segmentEndPort);
+        all = all.length === 0 ? segment : [...all, ...segment.slice(1)];
+        segmentStart = manualPoint;
+        segmentStartPort = this.oppositePort(segmentEndPort);
+      }
+      const lastSegment = this.routePoints(segmentStart, end, this.guessTargetPort(segmentStart, end), target);
+      return this.simplifyPoints(this.trimBacktracks([...all, ...lastSegment.slice(1)]));
     }
-    const points = this.simplifyPoints(this.trimBacktracks(this.routePoints(start, end, sourcePort, target)));
-    return this.pointsToPath(points, cornerRadius);
+    return this.simplifyPoints(this.trimBacktracks(this.routePoints(start, end, sourcePort, target)));
   }
 
   private routePoints(
@@ -722,6 +746,39 @@ ${foregroundNodesHtml}
     return '';
   }
 
+  private edgeLabelPoint(edge: DiagramEdge, points: Point[]): Point {
+    if (edge.labelPosition) return edge.labelPosition;
+    if (points.length === 0) return { x: 0, y: 0 };
+    if (points.length === 1) return points[0];
+    return this.polylineMidpoint(points);
+  }
+
+  private polylineMidpoint(points: Point[]): Point {
+    let totalLength = 0;
+    const segments: Array<{ from: Point; to: Point; length: number }> = [];
+    for (let i = 1; i < points.length; i++) {
+      const from = points[i - 1];
+      const to = points[i];
+      const length = Math.hypot(to.x - from.x, to.y - from.y);
+      segments.push({ from, to, length });
+      totalLength += length;
+    }
+    if (totalLength <= 0) return points[Math.floor(points.length / 2)];
+    const half = totalLength / 2;
+    let traveled = 0;
+    for (const segment of segments) {
+      if (traveled + segment.length >= half) {
+        const local = (half - traveled) / segment.length;
+        return {
+          x: segment.from.x + (segment.to.x - segment.from.x) * local,
+          y: segment.from.y + (segment.to.y - segment.from.y) * local,
+        };
+      }
+      traveled += segment.length;
+    }
+    return points[points.length - 1];
+  }
+
   private renderButton(node: WebButtonNode, style: string): string {
     const variant = node.data.variant || 'primary';
     const variants: any = {
@@ -765,38 +822,33 @@ ${foregroundNodesHtml}
   private renderBpmnWebTask(
     node: WebNode,
     style: string,
-    icon: string,
-    defaultVariant: 'blue' | 'yellow' | 'green' | 'purple' | 'red',
+    iconKind: BpmnTaskIconKind,
+    defaultVariant: BpmnWebTaskVariant,
     supportsBadge: boolean
   ): string {
     const data = node.data as {
       text?: string;
       iconEnabled?: boolean;
       badgeEnabled?: boolean;
-      variant?: 'blue' | 'yellow' | 'green' | 'purple' | 'red';
+      variant?: BpmnWebTaskVariant;
     };
     const variant = data.variant || defaultVariant;
-    const colors: Record<string, { border: string; accent: string }> = {
-      blue: { border: '#60a5fa', accent: '#60a5fa' },
-      yellow: { border: '#ffc233', accent: '#ffc233' },
-      green: { border: '#4ade80', accent: '#4ade80' },
-      purple: { border: '#a78bfa', accent: '#a78bfa' },
-      red: { border: '#f87171', accent: '#f87171' },
-    };
-    const tone = colors[variant] || colors[defaultVariant];
+    const tone = bpmnTaskTone(variant, defaultVariant);
+    const iconSizePx = BPMN_VISUAL_TOKENS.icon.sizePx;
+    const iconHtmlSvg = bpmnIconSvg(iconKind, tone.accent, iconSizePx);
     const iconHtml =
       data.iconEnabled === false
         ? ''
-        : `<div style="position:absolute;left:7px;top:5px;font-size:14px;color:${tone.accent};line-height:1;">${icon}</div>`;
+        : `<div style="position:absolute;left:${BPMN_VISUAL_TOKENS.icon.left};top:${BPMN_VISUAL_TOKENS.icon.top};line-height:1;">${iconHtmlSvg}</div>`;
     const badgeHtml =
       supportsBadge && data.badgeEnabled !== false
-        ? `<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:2px;width:16px;height:16px;border:1px solid ${tone.border};border-radius:2px;background:#0f0f0f;color:${tone.accent};display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;line-height:1;">+</div>`
+        ? `<div style="position:absolute;left:50%;transform:translateX(-50%);bottom:${BPMN_VISUAL_TOKENS.badge.bottom};width:${BPMN_VISUAL_TOKENS.badge.sizePx}px;height:${BPMN_VISUAL_TOKENS.badge.sizePx}px;border:${BPMN_VISUAL_TOKENS.stroke.task}px solid ${tone.border};border-radius:${BPMN_VISUAL_TOKENS.badge.radius};background:${BPMN_VISUAL_TOKENS.background};color:${tone.accent};display:flex;align-items:center;justify-content:center;font-size:${BPMN_VISUAL_TOKENS.badge.fontSizePx}px;font-weight:700;line-height:1;">+</div>`
         : '';
 
     return `
-      <div style="${style} width:${node.width}px;height:${node.height}px;border:2px solid ${tone.border};border-radius:8px;background:#0f0f0f;color:#ffffff;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;position:absolute;box-sizing:border-box;">
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${BPMN_VISUAL_TOKENS.stroke.task}px solid ${tone.border};border-radius:${supportsBadge ? BPMN_VISUAL_TOKENS.subprocessRadius : BPMN_VISUAL_TOKENS.taskRadius};background:${BPMN_VISUAL_TOKENS.background};color:${BPMN_VISUAL_TOKENS.text};padding:${BPMN_VISUAL_TOKENS.taskPadding};font-family:${BPMN_VISUAL_TOKENS.fontFamily};position:absolute;box-sizing:border-box;min-width:${BPMN_VISUAL_TOKENS.taskMinWidth};">
         ${iconHtml}
-        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:500;line-height:1.2;">
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:${BPMN_VISUAL_TOKENS.typography.taskSize};font-weight:${BPMN_VISUAL_TOKENS.typography.taskWeight};line-height:1.2;">
           ${this.escapeText(data.text || 'Task')}
         </div>
         ${badgeHtml}
@@ -807,9 +859,11 @@ ${foregroundNodesHtml}
   private renderBpmnStartEventWeb(node: WebNode, style: string): string {
     const data = node.data as { iconEnabled?: boolean };
     const iconHtml =
-      data.iconEnabled === false ? '' : `<span style="font-size:16px;color:#4ade80;line-height:1;">✉</span>`;
+      data.iconEnabled === false
+        ? ''
+        : `<span style="line-height:1;">${bpmnIconSvg('start', 'var(--bpmn-start-icon, #6ee7b7)', 16)}</span>`;
     return `
-      <div style="${style} width:${node.width}px;height:${node.height}px;border:3px solid #4ade80;border-radius:9999px;background:transparent;display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${BPMN_VISUAL_TOKENS.stroke.eventStart}px solid var(--bpmn-start-border, ${BPMN_VISUAL_TOKENS.variants.green.border});border-radius:9999px;background:transparent;display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
         ${iconHtml}
       </div>
     `;
@@ -817,33 +871,35 @@ ${foregroundNodesHtml}
 
   private renderBpmnExclusiveGatewayWeb(node: WebNode, style: string): string {
     const data = node.data as { text?: string };
-    const label = data.text ? `<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffc233;white-space:nowrap;">${this.escapeText(data.text)}</div>` : '';
+    const label = data.text ? `<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:${BPMN_VISUAL_TOKENS.typography.labelSize};font-weight:${BPMN_VISUAL_TOKENS.typography.labelWeight};color:var(--bpmn-gateway-label, ${BPMN_VISUAL_TOKENS.variants.yellow.accent});white-space:nowrap;">${this.escapeText(data.text)}</div>` : '';
     return `
       <div style="${style} width:${node.width}px;height:${node.height}px;position:absolute;box-sizing:border-box;">
         ${label}
-        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:2px solid #ffc233;background:#0f0f0f;"></div>
-        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#ffc233;line-height:1;">×</div>
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:${BPMN_VISUAL_TOKENS.stroke.gateway}px solid var(--bpmn-gateway-border, ${BPMN_VISUAL_TOKENS.variants.yellow.border});background:${BPMN_VISUAL_TOKENS.background};"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:var(--bpmn-gateway-symbol, ${BPMN_VISUAL_TOKENS.variants.yellow.accent});line-height:1;">×</div>
       </div>
     `;
   }
 
   private renderBpmnEndEventWeb(node: WebNode, style: string): string {
     return `
-      <div style="${style} width:${node.width}px;height:${node.height}px;border:4px solid #f87171;border-radius:9999px;background:rgba(248,113,113,.3);display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
-        <span style="font-size:14px;color:#fecaca;line-height:1;">●</span>
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${BPMN_VISUAL_TOKENS.stroke.eventEnd}px solid var(--bpmn-end-border, ${BPMN_VISUAL_TOKENS.variants.red.border});border-radius:9999px;background:var(--bpmn-end-fill, rgba(248,113,113,0.20));display:flex;align-items:center;justify-content:center;position:absolute;box-sizing:border-box;">
+        <span style="font-size:10px;color:var(--bpmn-end-icon, ${BPMN_VISUAL_TOKENS.variants.red.accent});line-height:1;">●</span>
       </div>
     `;
   }
 
   private renderBpmnLaneWeb(node: WebNode, style: string, isPool: boolean): string {
     const label = this.escapeText(((node.data as { text?: string }).text || (isPool ? 'Pool' : 'Lane')));
-    const barBg = isPool ? '#ea580c' : '#1f2937';
-    const border = isPool ? '#334155' : '#334155';
-    const bg = isPool ? 'rgba(15,23,42,.2)' : 'rgba(15,23,42,.94)';
+    const barBg = isPool ? BPMN_VISUAL_TOKENS.pool.sidebar : BPMN_VISUAL_TOKENS.lane.sidebar;
+    const border = isPool ? BPMN_VISUAL_TOKENS.pool.border : BPMN_VISUAL_TOKENS.lane.border;
+    const bg = isPool ? BPMN_VISUAL_TOKENS.pool.background : BPMN_VISUAL_TOKENS.lane.background;
+    const textColor = isPool ? BPMN_VISUAL_TOKENS.pool.sidebarText : BPMN_VISUAL_TOKENS.lane.sidebarText;
+    const textWeight = isPool ? 700 : BPMN_VISUAL_TOKENS.typography.labelWeight;
     return `
-      <div style="${style} width:${node.width}px;height:${node.height}px;border:${isPool ? 2 : 1}px solid ${border};${isPool ? 'border-radius:6px;' : ''}background:${bg};position:absolute;box-sizing:border-box;">
-        <div style="position:absolute;left:0;top:0;bottom:0;width:40px;border-right:1px solid #334155;background:${barBg};display:flex;align-items:center;justify-content:center;${isPool ? 'border-radius:6px 0 0 6px;' : ''}">
-          <div style="font-size:10px;font-weight:${isPool ? 700 : 500};color:${isPool ? '#fff' : '#cbd5e1'};writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;">${label}</div>
+      <div style="${style} width:${node.width}px;height:${node.height}px;border:${isPool ? BPMN_VISUAL_TOKENS.stroke.pool : BPMN_VISUAL_TOKENS.stroke.lane}px solid ${border};${isPool ? 'border-radius:6px;' : ''}background:${bg};position:absolute;box-sizing:border-box;">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:40px;border-right:${BPMN_VISUAL_TOKENS.stroke.lane}px solid ${border};background:${barBg};display:flex;align-items:center;justify-content:center;${isPool ? 'border-radius:6px 0 0 6px;' : ''}">
+          <div style="font-size:${BPMN_VISUAL_TOKENS.typography.labelSize};font-weight:${textWeight};color:${textColor};font-family:${BPMN_VISUAL_TOKENS.fontFamily};writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;">${label}</div>
         </div>
       </div>
     `;

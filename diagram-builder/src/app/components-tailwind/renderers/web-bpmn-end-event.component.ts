@@ -19,15 +19,15 @@ export class WebBpmnEndEventComponent {
     return {
       borderStyle: 'solid',
       'border-width': `${BPMN_WEB_TASK_TOKENS.stroke.eventEnd}px`,
-      'border-color': BPMN_WEB_TASK_TOKENS.variants.red.border,
-      background: 'rgba(248,113,113,0.20)',
+      'border-color': `var(--bpmn-end-border, ${BPMN_WEB_TASK_TOKENS.variants.red.border})`,
+      background: `var(--bpmn-end-fill, rgba(248,113,113,0.20))`,
     };
   }
 
   iconStyle() {
     return {
       'font-size': '10px',
-      color: BPMN_WEB_TASK_TOKENS.variants.red.accent,
+      color: `var(--bpmn-end-icon, ${BPMN_WEB_TASK_TOKENS.variants.red.accent})`,
       'line-height': '1',
     };
   }

@@ -24,13 +24,13 @@ export class WebBpmnExclusiveGatewayComponent {
     return {
       borderStyle: 'solid',
       'border-width': `${BPMN_WEB_TASK_TOKENS.stroke.gateway}px`,
-      'border-color': BPMN_WEB_TASK_TOKENS.variants.yellow.border,
+      'border-color': `var(--bpmn-gateway-border, ${BPMN_WEB_TASK_TOKENS.variants.yellow.border})`,
     };
   }
 
   symbolStyle() {
     return {
-      color: BPMN_WEB_TASK_TOKENS.variants.yellow.accent,
+      color: `var(--bpmn-gateway-symbol, ${BPMN_WEB_TASK_TOKENS.variants.yellow.accent})`,
       'font-size': '20px',
       'font-weight': 700,
       'line-height': '1',
@@ -39,7 +39,7 @@ export class WebBpmnExclusiveGatewayComponent {
 
   labelStyle() {
     return {
-      color: BPMN_WEB_TASK_TOKENS.variants.yellow.accent,
+      color: `var(--bpmn-gateway-label, ${BPMN_WEB_TASK_TOKENS.variants.yellow.accent})`,
       'font-size': BPMN_WEB_TASK_TOKENS.typography.labelSize,
       'font-weight': BPMN_WEB_TASK_TOKENS.typography.labelWeight,
       opacity: 0.92,

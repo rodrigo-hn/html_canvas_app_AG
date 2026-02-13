@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant } from './bpmn-web-task.tokens';
+import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant, bpmnIconSvg } from './bpmn-web-task.tokens';
 
 @Component({
   selector: 'app-web-bpmn-subprocess',
@@ -12,7 +12,7 @@ import { BPMN_WEB_TASK_TOKENS, BpmnWebTaskVariant } from './bpmn-web-task.tokens
       [ngStyle]="containerStyle()"
     >
       @if (iconEnabled) {
-      <div class="absolute" [ngStyle]="iconStyle()">📦</div>
+      <div class="absolute" [ngStyle]="iconStyle()" [innerHTML]="iconSvg()"></div>
       }
       <div class="flex h-full items-center justify-center text-center leading-tight" [ngStyle]="textStyle()">
         {{ text }}
@@ -54,11 +54,8 @@ export class WebBpmnSubprocessComponent {
 
   iconStyle() {
     return {
-      color: BPMN_WEB_TASK_TOKENS.variants[this.variant].accent,
       left: BPMN_WEB_TASK_TOKENS.icon.left,
       top: BPMN_WEB_TASK_TOKENS.icon.top,
-      'font-size': BPMN_WEB_TASK_TOKENS.icon.size,
-      'line-height': '1',
     };
   }
 
@@ -68,9 +65,9 @@ export class WebBpmnSubprocessComponent {
       color: tone.accent,
       'border-color': tone.border,
       'border-width': `${BPMN_WEB_TASK_TOKENS.stroke.task}px`,
-      width: BPMN_WEB_TASK_TOKENS.badge.size,
-      height: BPMN_WEB_TASK_TOKENS.badge.size,
-      'font-size': BPMN_WEB_TASK_TOKENS.badge.fontSize,
+      width: `${BPMN_WEB_TASK_TOKENS.badge.sizePx}px`,
+      height: `${BPMN_WEB_TASK_TOKENS.badge.sizePx}px`,
+      'font-size': `${BPMN_WEB_TASK_TOKENS.badge.fontSizePx}px`,
       'font-weight': 700,
       'border-radius': BPMN_WEB_TASK_TOKENS.badge.radius,
       bottom: BPMN_WEB_TASK_TOKENS.badge.bottom,
@@ -82,5 +79,13 @@ export class WebBpmnSubprocessComponent {
       'font-size': BPMN_WEB_TASK_TOKENS.typography.taskSize,
       'font-weight': BPMN_WEB_TASK_TOKENS.typography.taskWeight,
     };
+  }
+
+  iconSvg(): string {
+    return bpmnIconSvg(
+      'subprocess',
+      BPMN_WEB_TASK_TOKENS.variants[this.variant].accent,
+      BPMN_WEB_TASK_TOKENS.icon.sizePx
+    );
   }
 }
