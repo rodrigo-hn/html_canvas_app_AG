@@ -25,6 +25,8 @@ export interface DiagramNodeBase extends DiagramElement, Point, Size {
 
 export interface ShapeData {
   text?: string;
+  taskKind?: 'receive' | 'prepare' | 'bake' | 'pack' | 'deliver' | 'pickup' | string;
+  eventMarker?: 'check' | 'cross' | 'message' | 'timer' | 'signal' | string;
 }
 
 export interface ShapeNode extends DiagramNodeBase {

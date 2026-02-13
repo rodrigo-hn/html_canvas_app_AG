@@ -78,6 +78,7 @@ interface CanvasFrame {
         </button>
         <button (click)="zoomIn()" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">+</button>
         <button (click)="fitToContent()" class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800">Fit</button>
+        <button (click)="applyBpmnPreset()" class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800">Preset</button>
         <button
           (click)="toggleFocusMode()"
           class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800"
@@ -444,8 +445,8 @@ export class CanvasComponent implements OnInit {
     { group: 'bpmn-choreo', key: 'bpmn-choreography-task', label: 'Choreography Task' },
     { group: 'bpmn-choreo', key: 'bpmn-choreography-subprocess', label: 'Choreography Subprocess' },
   ];
-  private readonly startupExampleUrl = '/examples/pizzeria-confirmacion-entrega.json';
-  private readonly startupPresentationExampleUrl = '/examples/pizzeria-confirmacion-entrega-presentation.json';
+  private readonly startupExampleUrl = '/examples/pizzeria-proceso-bpmn-default.json';
+  private readonly startupPresentationExampleUrl = '/examples/pizzeria-proceso-bpmn-default.json';
 
   constructor() {
     this.loadUiSettings();
@@ -1239,6 +1240,71 @@ export class CanvasComponent implements OnInit {
     this.zoomLevel = Math.max(0.3, Math.min(2.5, Math.min(fitX, fitY)));
     this.panX = padding - bounds.minX * this.zoomLevel;
     this.panY = padding - bounds.minY * this.zoomLevel;
+  }
+
+  applyBpmnPreset() {
+    const rows = this.buildRows();
+    const xStart = 220;
+    const xGap = 42;
+    rows.forEach((row, rowIndex) => {
+      let x = xStart;
+      const rowY = 180 + rowIndex * 180;
+      row.forEach((node) => {
+        this.commands.updateNode(node.id, { x, y: rowY });
+        x += node.width + xGap;
+      });
+    });
+
+    // Normalize visual style by type.
+    this.nodes().forEach((node) => {
+      if (node.type !== 'shape') return;
+      const isLane = node.shapeType === 'bpmn-lane' || node.shapeType === 'bpmn-pool';
+      const isGateway = node.shapeType.startsWith('bpmn-gateway');
+      const isEndEvent = node.shapeType === 'bpmn-end-event';
+      const style = isLane
+        ? { fill: 'transparent', stroke: '#1f2937', strokeWidth: 2 }
+        : isGateway
+        ? { fill: '#fef3c7', stroke: '#854d0e', strokeWidth: 2 }
+        : isEndEvent
+        ? { fill: '#fee2e2', stroke: '#7f1d1d', strokeWidth: 3 }
+        : { fill: '#ffffff', stroke: '#1f2937', strokeWidth: 2 };
+      this.commands.updateNode(node.id, { style });
+    });
+
+    // Normalize edge style by flow type.
+    this.edges().forEach((edge) => {
+      if (edge.flowType === 'message') {
+        this.commands.updateEdge(edge.id, { markerStart: 'open-circle', markerEnd: 'open-arrow' });
+        this.commands.setEdgeStyle(edge.id, { stroke: '#1f2937', strokeWidth: 2, dashArray: '6 4', cornerRadius: 6 });
+        return;
+      }
+      if (edge.flowType === 'association') {
+        this.commands.updateEdge(edge.id, { markerStart: undefined, markerEnd: undefined });
+        this.commands.setEdgeStyle(edge.id, { stroke: '#334155', strokeWidth: 2, dashArray: '3 4', cornerRadius: 4 });
+        return;
+      }
+      this.commands.updateEdge(edge.id, { markerStart: undefined, markerEnd: 'arrow' });
+      this.commands.setEdgeStyle(edge.id, { stroke: '#1f2937', strokeWidth: 2, dashArray: undefined, cornerRadius: 8 });
+    });
+
+    this.fitToContent();
+  }
+
+  private buildRows() {
+    const nonContainers = this
+      .nodes()
+      .filter((node) => node.type === 'shape')
+      .filter((node) => node.shapeType !== 'bpmn-lane' && node.shapeType !== 'bpmn-pool')
+      .sort((a, b) => a.y - b.y);
+    const rows: DiagramNode[][] = [];
+    const threshold = 120;
+    nonContainers.forEach((node) => {
+      const row = rows.find((r) => Math.abs(r[0].y - node.y) < threshold);
+      if (row) row.push(node);
+      else rows.push([node]);
+    });
+    rows.forEach((row) => row.sort((a, b) => a.x - b.x));
+    return rows;
   }
 
   minimapNodeRect(node: DiagramNode) {

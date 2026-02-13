@@ -134,7 +134,7 @@
       "width": 220,
       "height": 98,
       "zIndex": 3,
-      "data": { "text": "Recibir Orden" },
+      "data": { "text": "Recibir Orden", "taskKind": "receive" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -184,7 +184,7 @@
       "width": 205,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Preparar Pizza" },
+      "data": { "text": "Preparar Pizza", "taskKind": "prepare" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -209,7 +209,7 @@
       "width": 205,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Preparar Pizza" },
+      "data": { "text": "Preparar Pizza", "taskKind": "prepare" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -234,7 +234,7 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Hornear Pizza" },
+      "data": { "text": "Hornear Pizza", "taskKind": "bake" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -259,7 +259,7 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Empacar Pedido" },
+      "data": { "text": "Empacar Pedido", "taskKind": "pack" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -284,7 +284,7 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Entregar Pedido" },
+      "data": { "text": "Entregar Pedido", "taskKind": "deliver" },
       "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
     },
     {
@@ -371,7 +371,7 @@
       "width": 320,
       "height": 68,
       "zIndex": 3,
-      "data": { "text": "Recoger y Entregar" },
+      "data": { "text": "Recoger y Entregar", "taskKind": "pickup" },
       "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
     }
   ],

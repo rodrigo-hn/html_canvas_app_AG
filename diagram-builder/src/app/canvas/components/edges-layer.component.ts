@@ -58,9 +58,9 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         fill="none"
         stroke-linecap="round"
         stroke-linejoin="round"
-        [attr.stroke]="edge.style?.stroke || '#333'"
-        [attr.stroke-width]="edge.style?.strokeWidth || 2"
-        [attr.stroke-dasharray]="edge.style?.dashArray || null"
+        [attr.stroke]="edgeStroke(edge)"
+        [attr.stroke-width]="edgeStrokeWidth(edge)"
+        [attr.stroke-dasharray]="edgeDashArray(edge)"
         [attr.marker-start]="markerStartUrl(edge)"
         [attr.marker-end]="markerEndUrl(edge)"
         (click)="onEdgeClick(edge, $event)"
@@ -250,7 +250,7 @@ export class EdgesLayerComponent {
     const start = this.getPortPoint(sourceNode, sourcePort);
     const end = this.getPortPoint(targetNode, targetPort);
     const manual = edge.points?.[0] || null;
-    const radius = edge.style?.cornerRadius || 0;
+    const radius = edge.style?.cornerRadius ?? this.defaultCornerRadius(edge);
     return this.buildOrthogonalPath(start, end, sourcePort, targetPort, manual, radius);
   }
 
@@ -263,13 +263,30 @@ export class EdgesLayerComponent {
   }
 
   markerEndUrl(edge: DiagramEdge): string | null {
-    if (!edge.markerEnd) return null;
-    return `url(#${edge.markerEnd})`;
+    const markerEnd = edge.markerEnd || this.defaultMarkerEnd(edge);
+    if (!markerEnd) return null;
+    return `url(#${markerEnd})`;
   }
 
   markerStartUrl(edge: DiagramEdge): string | null {
-    if (!edge.markerStart) return null;
-    return `url(#${edge.markerStart})`;
+    const markerStart = edge.markerStart || this.defaultMarkerStart(edge);
+    if (!markerStart) return null;
+    return `url(#${markerStart})`;
+  }
+
+  edgeStroke(edge: DiagramEdge): string {
+    return edge.style?.stroke || '#1f2937';
+  }
+
+  edgeStrokeWidth(edge: DiagramEdge): number {
+    return edge.style?.strokeWidth || 2;
+  }
+
+  edgeDashArray(edge: DiagramEdge): string | null {
+    if (edge.style?.dashArray) return edge.style.dashArray;
+    if (edge.flowType === 'message') return '6 4';
+    if (edge.flowType === 'association') return '3 4';
+    return null;
   }
 
   private getPortPoint(node: DiagramNode, port: Port): Point {
@@ -311,9 +328,10 @@ export class EdgesLayerComponent {
 
     const candidateA = this.orthogonalVia(start, startOut, endIn, end, true);
     const candidateB = this.orthogonalVia(start, startOut, endIn, end, false);
-    const scoreA = this.pathScore(candidateA);
-    const scoreB = this.pathScore(candidateB);
-    const best = scoreA <= scoreB ? candidateA : candidateB;
+    const candidateC = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, true);
+    const candidateD = this.orthogonalVia(start, this.pushFromPort(start, sourcePort, offset * 2), endIn, end, false);
+    const candidates = [candidateA, candidateB, candidateC, candidateD];
+    const best = candidates.sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
     if (this.isTargetDirectionCorrect(best, targetPort)) {
       return best;
     }
@@ -321,9 +339,7 @@ export class EdgesLayerComponent {
     const endInFlipped = this.pushFromPort(end, flipped, offset);
     const altA = this.orthogonalVia(start, startOut, endInFlipped, end, true);
     const altB = this.orthogonalVia(start, startOut, endInFlipped, end, false);
-    const altScoreA = this.pathScore(altA);
-    const altScoreB = this.pathScore(altB);
-    return altScoreA <= altScoreB ? altA : altB;
+    return [altA, altB].sort((a, b) => this.pathScore(a, targetPort) - this.pathScore(b, targetPort))[0];
   }
 
   private orthogonalVia(
@@ -337,10 +353,23 @@ export class EdgesLayerComponent {
     return [start, startOut, middle, endIn, end];
   }
 
-  private pathScore(points: Point[]): number {
+  private pathScore(points: Point[], targetPort: Port): number {
     let score = 0;
     for (let i = 1; i < points.length; i++) {
       score += Math.abs(points[i].x - points[i - 1].x) + Math.abs(points[i].y - points[i - 1].y);
+    }
+    let turns = 0;
+    for (let i = 1; i < points.length - 1; i++) {
+      const a = points[i - 1];
+      const b = points[i];
+      const c = points[i + 1];
+      const horizontalThenVertical = a.y === b.y && b.x === c.x;
+      const verticalThenHorizontal = a.x === b.x && b.y === c.y;
+      if (horizontalThenVertical || verticalThenHorizontal) turns++;
+    }
+    score += turns * 8;
+    if (!this.isTargetDirectionCorrect(points, targetPort)) {
+      score += 200;
     }
     return score;
   }
@@ -492,6 +521,23 @@ export class EdgesLayerComponent {
       return dx >= 0 ? 'left' : 'right';
     }
     return dy >= 0 ? 'top' : 'bottom';
+  }
+
+  private defaultCornerRadius(edge: DiagramEdge): number {
+    if (edge.flowType === 'sequence') return 8;
+    if (edge.flowType === 'message') return 6;
+    return 4;
+  }
+
+  private defaultMarkerEnd(edge: DiagramEdge): string | null {
+    if (edge.flowType === 'association') return null;
+    if (edge.flowType === 'message') return 'open-arrow';
+    return 'arrow';
+  }
+
+  private defaultMarkerStart(edge: DiagramEdge): string | null {
+    if (edge.flowType === 'message') return 'open-circle';
+    return null;
   }
 
   getBendPoint(edge: DiagramEdge): Point {

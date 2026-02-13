@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPMN 2.0 - Proceso de Pizzería</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --bg-card: #1a1a1a;
+            --accent-orange: #ff6b35;
+            --accent-yellow: #ffc233;
+            --accent-green: #4ade80;
+            --accent-blue: #60a5fa;
+            --accent-purple: #a78bfa;
+            --accent-red: #f87171;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --border-color: #333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+
+        .header {
+            padding: 2rem 3rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent-orange), var(--accent-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .bpmn-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-orange);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-orange);
+            margin-top: 1rem;
+        }
+
+        .bpmn-badge::before {
+            content: "✓";
+            color: var(--accent-green);
+        }
+
+        .diagram-container {
+            padding: 2rem;
+            overflow-x: auto;
+        }
+
+        .pool {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            min-width: 1500px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .pool-header {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 1rem 0.5rem;
+            background: linear-gradient(180deg, var(--accent-orange) 0%, #cc5529 100%);
+            border-radius: 10px 0 0 10px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pool-content {
+            display: flex;
+        }
+
+        .lanes {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .lane {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 160px;
+            position: relative;
+        }
+
+        .lane:last-child {
+            border-bottom: none;
+        }
+
+        .lane-label {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            padding: 1rem 0.5rem;
+            background: #252525;
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            min-width: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .lane-content {
+            flex: 1;
+            padding: 1.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        /* BPMN Elements */
+        .start-event {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--accent-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .start-event.message::after {
+            content: "✉";
+            font-size: 16px;
+            color: var(--accent-green);
+        }
+
+        .end-event {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--accent-red);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            flex-shrink: 0;
+        }
+
+        .end-event.filled {
+            background: var(--accent-red);
+        }
+
+        .task {
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-blue);
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.8rem;
+            min-width: 110px;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
+        }
+
+        .task.user::before {
+            content: "👤";
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 11px;
+        }
+
+        .task.service::before {
+            content: "⚙️";
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 11px;
+        }
+
+        .task.manual::before {
+            content: "✋";
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 11px;
+        }
+
+        .gateway {
+            width: 44px;
+            height: 44px;
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-yellow);
+            transform: rotate(45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .gateway:hover {
+            box-shadow: 0 4px 12px rgba(255, 194, 51, 0.3);
+        }
+
+        .gateway span {
+            transform: rotate(-45deg);
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-yellow);
+        }
+
+        .gateway.exclusive span::after {
+            content: "×";
+        }
+
+        .gateway.parallel span::after {
+            content: "+";
+        }
+
+        .flow {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .flow-line {
+            height: 2px;
+            background: var(--text-secondary);
+            width: 35px;
+        }
+
+        .flow-arrow {
+            width: 0;
+            height: 0;
+            border-left: 8px solid var(--text-secondary);
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+        }
+
+        .subprocess {
+            background: var(--bg-dark);
+            border: 2px solid var(--accent-purple);
+            border-radius: 8px;
+            padding: 0.8rem 1.2rem;
+            font-size: 0.8rem;
+            min-width: 130px;
+            text-align: center;
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .subprocess:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(167, 139, 250, 0.3);
+        }
+
+        .subprocess::after {
+            content: "+";
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--accent-purple);
+            background: var(--bg-dark);
+            width: 16px;
+            height: 16px;
+            border: 1px solid var(--accent-purple);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Labels */
+        .element-label {
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .gateway-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .gateway-label {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.65rem;
+            color: var(--accent-yellow);
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* SVG Connectors Layer */
+        .connectors-layer {
+            position: absolute;
+            top: 0;
+            left: 40px; /* offset for lane labels */
+            width: calc(100% - 40px);
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .connectors-layer svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .connector-line {
+            stroke: var(--text-secondary);
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .connector-arrow {
+            fill: var(--text-secondary);
+        }
+
+        /* Legend */
+        .legend {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .legend h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-orange);
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .legend-symbol {
+            flex-shrink: 0;
+        }
+
+        .legend-symbol.start {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--accent-green);
+            border-radius: 50%;
+        }
+
+        .legend-symbol.end {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--accent-red);
+            border-radius: 50%;
+            background: var(--accent-red);
+        }
+
+        .legend-symbol.task {
+            width: 50px;
+            height: 24px;
+            border: 2px solid var(--accent-blue);
+            border-radius: 4px;
+            background: var(--bg-dark);
+        }
+
+        .legend-symbol.gateway {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent-yellow);
+            transform: rotate(45deg);
+            background: var(--bg-dark);
+        }
+
+        .legend-symbol.subprocess {
+            width: 50px;
+            height: 24px;
+            border: 2px solid var(--accent-purple);
+            border-radius: 4px;
+            background: var(--bg-dark);
+        }
+
+        /* Validation Panel */
+        .validation-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .validation-panel h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .validation-panel h3::before {
+            content: "✓";
+        }
+
+        .validation-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .validation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .validation-item::before {
+            content: "✓";
+            color: var(--accent-green);
+            flex-shrink: 0;
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: fixed;
+            background: #222;
+            border: 1px solid var(--accent-orange);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.8rem;
+            max-width: 250px;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-title {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .tooltip-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-blue);
+            margin-bottom: 0.3rem;
+        }
+
+        /* Process Description */
+        .process-desc {
+            background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .process-desc h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--accent-yellow);
+        }
+
+        .process-desc p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1.5rem;
+            }
+            .diagram-container {
+                padding: 1rem;
+            }
+        }
+
+        /* Animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .start-event {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Vertical connector styling */
+        .vertical-connector {
+            position: absolute;
+            width: 2px;
+            background: var(--text-secondary);
+        }
+
+        .vertical-connector::after {
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: -4px;
+            width: 0;
+            height: 0;
+            border-top: 6px solid var(--text-secondary);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+        }
+
+        /* Connection point markers */
+        .connection-out {
+            position: relative;
+        }
+
+        .connection-out::after {
+            content: "";
+            position: absolute;
+            right: -18px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 2px;
+            background: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍕 Proceso de Pedido de Pizza</h1>
+        <p>Diagrama BPMN 2.0 - Proceso completo desde la recepción del pedido hasta la entrega</p>
+        <div class="bpmn-badge">BPMN 2.0 Compliant - ISO/IEC 19510</div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="process-desc">
+            <h3>📋 Descripción del Proceso</h3>
+            <p>Este diagrama modela el proceso de negocio de una pizzería desde que el cliente realiza un pedido hasta su entrega. 
+            El proceso incluye la recepción del pedido, verificación de disponibilidad, preparación de la pizza, control de calidad, 
+            y finalmente la entrega al cliente. Se contemplan flujos alternativos para ingredientes no disponibles y rechazos de calidad.</p>
+        </div>
+
+        <!-- Pool: Pizzería -->
+        <div class="pool" id="mainPool">
+            <div class="pool-content">
+                <div class="pool-header">PIZZERÍA "LA ITALIANA"</div>
+                <div class="lanes">
+                    <!-- SVG Layer for connectors between lanes -->
+                    <svg class="connectors-layer" id="connectorsSvg">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#a0a0a0"/>
+                            </marker>
+                            <marker id="arrowhead-down" markerWidth="7" markerHeight="10" refX="3.5" refY="9" orient="auto">
+                                <polygon points="0 0, 7 0, 3.5 10" fill="#a0a0a0"/>
+                            </marker>
+                        </defs>
+                        <!-- Connection 1: Confirmar pedido → Preparar pizza -->
+                        <path id="conn1" class="connector-line" marker-end="url(#arrowhead-down)" d=""/>
+                        <!-- Connection 2: Empaquetar pedido → Asignar repartidor -->
+                        <path id="conn2" class="connector-line" marker-end="url(#arrowhead-down)" d=""/>
+                    </svg>
+
+                    <!-- Lane: Atención al Cliente -->
+                    <div class="lane" id="lane1">
+                        <div class="lane-label">Atención al Cliente</div>
+                        <div class="lane-content">
+                            <div class="start-event message" data-tooltip="Evento de inicio por mensaje: el cliente envía un pedido" data-type="Start Event (Message)">
+                                <span class="element-label">Pedido recibido</span>
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="task user" data-tooltip="El empleado registra los datos del pedido del cliente" data-type="User Task">
+                                Registrar<br>pedido
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="task service" data-tooltip="Sistema verifica stock de ingredientes automáticamente" data-type="Service Task">
+                                Verificar<br>disponibilidad
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="gateway-wrapper">
+                                <span class="gateway-label">¿Disponible?</span>
+                                <div class="gateway exclusive" data-tooltip="Gateway exclusivo: solo una ruta se ejecuta según disponibilidad" data-type="Exclusive Gateway (XOR)"><span></span></div>
+                            </div>
+                            <div class="flow"><div class="flow-line" style="width: 50px;"></div><div class="flow-arrow"></div></div>
+                            <div class="task user connection-out" id="confirmarPedido" data-tooltip="Confirmar pedido al cliente por teléfono o app" data-type="User Task">
+                                Confirmar<br>pedido
+                            </div>
+                            <!-- Spacer to align with elements below -->
+                            <div style="width: 100px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Lane: Cocina -->
+                    <div class="lane" id="lane2">
+                        <div class="lane-label">Cocina</div>
+                        <div class="lane-content">
+                            <!-- Spacer to align subprocess under confirmar pedido -->
+                            <div style="width: 520px;"></div>
+                            <div class="subprocess" id="prepararPizza" data-tooltip="Subproceso que incluye: preparar masa, agregar ingredientes, hornear" data-type="Subprocess (Collapsed)">
+                                Preparar<br>pizza
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="task manual" data-tooltip="El chef verifica la calidad visual y de cocción" data-type="Manual Task">
+                                Control de<br>calidad
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="gateway-wrapper">
+                                <span class="gateway-label">¿Aprobada?</span>
+                                <div class="gateway exclusive" data-tooltip="Gateway exclusivo: si no pasa control, se rehace" data-type="Exclusive Gateway (XOR)"><span></span></div>
+                            </div>
+                            <div class="flow"><div class="flow-line" style="width: 50px;"></div><div class="flow-arrow"></div></div>
+                            <div class="task manual connection-out" id="empaquetarPedido" data-tooltip="Empaquetar pizza en caja térmica para entrega" data-type="Manual Task">
+                                Empaquetar<br>pedido
+                            </div>
+                            <div style="width: 50px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Lane: Delivery -->
+                    <div class="lane" id="lane3">
+                        <div class="lane-label">Delivery</div>
+                        <div class="lane-content">
+                            <!-- Spacer to align with empaquetar above -->
+                            <div style="width: 935px;"></div>
+                            <div class="task user" id="asignarRepartidor" data-tooltip="Asignar repartidor disponible más cercano" data-type="User Task">
+                                Asignar<br>repartidor
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="task manual" data-tooltip="Repartidor transporta el pedido al domicilio" data-type="Manual Task">
+                                Entregar<br>pedido
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="task service" data-tooltip="Sistema procesa pago (efectivo, tarjeta o app)" data-type="Service Task">
+                                Procesar<br>pago
+                            </div>
+                            <div class="flow"><div class="flow-line"></div><div class="flow-arrow"></div></div>
+                            <div class="end-event filled" data-tooltip="Fin exitoso del proceso: pedido completado" data-type="End Event">
+                                <span class="element-label">Pedido entregado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flujos alternativos (descripción) -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 300px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="color: var(--accent-red); margin-bottom: 0.75rem; font-size: 0.9rem;">⚠️ Flujos Alternativos</h4>
+                <ul style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.8; padding-left: 1.2rem;">
+                    <li><strong>Ingredientes no disponibles:</strong> Se notifica al cliente y se ofrece alternativa o cancelación</li>
+                    <li><strong>Pizza no pasa control de calidad:</strong> Se repite el subproceso de preparación</li>
+                    <li><strong>Cliente no disponible:</strong> Se reintenta entrega o se devuelve el pedido</li>
+                </ul>
+            </div>
+
+            <div style="flex: 1; min-width: 300px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+                <h4 style="color: var(--accent-purple); margin-bottom: 0.75rem; font-size: 0.9rem;">📦 Contenido del Subproceso "Preparar Pizza"</h4>
+                <ol style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.8; padding-left: 1.2rem;">
+                    <li>Preparar masa fresca</li>
+                    <li>Agregar salsa de tomate</li>
+                    <li>Añadir ingredientes según pedido</li>
+                    <li>Hornear a 450°F por 12-15 min</li>
+                    <li>Dejar reposar 2 minutos</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Validation Panel -->
+        <div class="validation-panel">
+            <h3>Validación BPMN 2.0</h3>
+            <div class="validation-list">
+                <div class="validation-item">Proceso tiene exactamente un evento de inicio</div>
+                <div class="validation-item">Todos los flujos de secuencia conectan elementos válidos</div>
+                <div class="validation-item">Gateways exclusivos tienen múltiples flujos de salida</div>
+                <div class="validation-item">Pool define correctamente el participante del proceso</div>
+                <div class="validation-item">Lanes definen roles/departamentos claramente</div>
+                <div class="validation-item">Tareas usan tipos específicos (User, Service, Manual)</div>
+                <div class="validation-item">Subproceso está correctamente identificado</div>
+                <div class="validation-item">Evento de fin termina correctamente el proceso</div>
+                <div class="validation-item">Nombres de actividades en forma verbal activa</div>
+                <div class="validation-item">Flujos entre lanes cruzan correctamente los límites</div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="legend">
+            <h3>🔑 Leyenda de Símbolos BPMN 2.0</h3>
+            <div class="legend-grid">
+                <div class="legend-item">
+                    <div class="legend-symbol start"></div>
+                    <span>Start Event (Mensaje) - Inicia el proceso</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-symbol end"></div>
+                    <span>End Event - Finaliza el proceso</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-symbol task"></div>
+                    <span>Task (Actividad) - Unidad de trabajo</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-symbol gateway"></div>
+                    <span>Exclusive Gateway (XOR) - Decisión</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-symbol subprocess"></div>
+                    <span>Subprocess - Proceso anidado</span>
+                </div>
+                <div class="legend-item">
+                    <div class="flow" style="width: 50px;"><div class="flow-line" style="width: 35px;"></div><div class="flow-arrow"></div></div>
+                    <span>Sequence Flow - Flujo de secuencia</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="tooltip" id="tooltip">
+        <div class="tooltip-type"></div>
+        <div class="tooltip-title"></div>
+        <div class="tooltip-desc"></div>
+    </div>
+
+    <script>
+        // Draw SVG connectors between lanes
+        function drawConnectors() {
+            const svg = document.getElementById('connectorsSvg');
+            const pool = document.getElementById('mainPool');
+            const poolRect = pool.getBoundingClientRect();
+            const lanesContainer = document.querySelector('.lanes');
+            const lanesRect = lanesContainer.getBoundingClientRect();
+            
+            // Get element positions relative to the lanes container
+            const confirmar = document.getElementById('confirmarPedido');
+            const preparar = document.getElementById('prepararPizza');
+            const empaquetar = document.getElementById('empaquetarPedido');
+            const asignar = document.getElementById('asignarRepartidor');
+            
+            const confirmarRect = confirmar.getBoundingClientRect();
+            const prepararRect = preparar.getBoundingClientRect();
+            const empaquetarRect = empaquetar.getBoundingClientRect();
+            const asignarRect = asignar.getBoundingClientRect();
+            
+            // Calculate positions relative to SVG
+            const offsetX = 40; // lane label width
+            
+            // Connection 1: Confirmar pedido → Preparar pizza
+            const x1 = confirmarRect.left - lanesRect.left + confirmarRect.width / 2;
+            const y1_start = confirmarRect.bottom - lanesRect.top;
+            const y1_end = prepararRect.top - lanesRect.top;
+            const x1_end = prepararRect.left - lanesRect.left;
+            
+            const path1 = document.getElementById('conn1');
+            path1.setAttribute('d', `M ${x1} ${y1_start} L ${x1} ${(y1_start + y1_end) / 2} L ${x1_end - 10} ${(y1_start + y1_end) / 2} L ${x1_end - 10} ${y1_end - 8}`);
+            
+            // Connection 2: Empaquetar pedido → Asignar repartidor
+            const x2 = empaquetarRect.left - lanesRect.left + empaquetarRect.width / 2;
+            const y2_start = empaquetarRect.bottom - lanesRect.top;
+            const y2_end = asignarRect.top - lanesRect.top;
+            const x2_end = asignarRect.left - lanesRect.left + asignarRect.width / 2;
+            
+            const path2 = document.getElementById('conn2');
+            path2.setAttribute('d', `M ${x2} ${y2_start} L ${x2} ${(y2_start + y2_end) / 2} L ${x2_end} ${(y2_start + y2_end) / 2} L ${x2_end} ${y2_end - 8}`);
+        }
+
+        // Draw connectors on load and resize
+        window.addEventListener('load', drawConnectors);
+        window.addEventListener('resize', drawConnectors);
+
+        // Tooltip functionality
+        const tooltip = document.getElementById('tooltip');
+        const elements = document.querySelectorAll('[data-tooltip]');
+
+        elements.forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                const rect = el.getBoundingClientRect();
+                tooltip.querySelector('.tooltip-type').textContent = el.dataset.type || '';
+                tooltip.querySelector('.tooltip-desc').textContent = el.dataset.tooltip;
+                
+                tooltip.style.left = rect.left + 'px';
+                tooltip.style.top = (rect.bottom + 10) + 'px';
+                tooltip.classList.add('visible');
+            });
+
+            el.addEventListener('mouseleave', () => {
+                tooltip.classList.remove('visible');
+            });
+        });
+
+        // Add hover effects
+        document.querySelectorAll('.task, .gateway, .subprocess, .start-event, .end-event').forEach(el => {
+            el.style.cursor = 'pointer';
+        });
+    </script>
+</body>
+</html>

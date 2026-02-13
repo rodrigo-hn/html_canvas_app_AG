@@ -50,11 +50,18 @@ import { WebNodeWrapperComponent } from '../../components-tailwind/web-node-wrap
           [attr.width]="node.width"
           [attr.height]="node.height"
         >
+          @if (isTaskTemplateNode()) {
+          <div class="w-full h-full flex items-center gap-2 px-3 text-sm pointer-events-none">
+            <div class="shrink-0 w-7 h-7 text-slate-700" [innerHTML]="taskIconSvg()"></div>
+            <div class="leading-tight">{{ shapeNode()!.data.text }}</div>
+          </div>
+          } @else {
           <div
             class="w-full h-full flex items-center justify-center text-center p-1 text-sm pointer-events-none"
           >
-            {{ shapeNode()!.data?.text }}
+            {{ shapeNode()!.data.text }}
           </div>
+          }
         </foreignObject>
       </svg>
 
@@ -162,6 +169,54 @@ export class NodeRendererComponent {
 
   shapeNode(): ShapeNode | null {
     return this.node.type === 'shape' ? (this.node as ShapeNode) : null;
+  }
+
+  isTaskTemplateNode(): boolean {
+    if (this.node.type !== 'shape') return false;
+    const taskLike = new Set([
+      'bpmn-task',
+      'bpmn-subprocess',
+      'bpmn-call-activity',
+      'bpmn-transaction',
+      'bpmn-event-subprocess',
+    ]);
+    return taskLike.has(this.node.shapeType);
+  }
+
+  taskIconSvg(): string {
+    const shape = this.shapeNode();
+    const kind = String((shape?.data as { taskKind?: string } | undefined)?.taskKind || '').toLowerCase();
+    if (kind === 'receive') return this.iconEnvelope();
+    if (kind === 'prepare') return this.iconChef();
+    if (kind === 'bake') return this.iconOven();
+    if (kind === 'pack') return this.iconBox();
+    if (kind === 'deliver') return this.iconScooter();
+    if (kind === 'pickup') return this.iconScooter();
+    return this.iconTask();
+  }
+
+  private iconTask(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h10"/></svg>`;
+  }
+
+  private iconEnvelope(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 7 9-7"/></svg>`;
+  }
+
+  private iconChef(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 13h12v6H6z"/><path d="M7 13a3 3 0 116 0 3 3 0 116 0"/></svg>`;
+  }
+
+  private iconOven(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="8" cy="8" r="1"/><circle cx="12" cy="8" r="1"/><rect x="7" y="11" width="10" height="6" rx="1"/></svg>`;
+  }
+
+  private iconBox(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l9-4 9 4-9 4-9-4z"/><path d="M3 8v8l9 4 9-4V8"/></svg>`;
+  }
+
+  private iconScooter(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M7 17h6l2-5h3"/><path d="M11 7h3l2 5"/><path d="M10 7h1"/></svg>`;
   }
 
   onSelect(event: MouseEvent) {
