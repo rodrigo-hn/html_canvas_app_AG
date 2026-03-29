@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPMN - Gestión de Pedidos Completo</title>
+    <style>/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
+@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-border-style:solid;--tw-font-weight:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000}}}@layer theme{:root,:host{--font-sans:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";--font-mono:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;--spacing:.25rem;--text-sm:.875rem;--text-sm--line-height:calc(1.25 / .875);--text-base:1rem;--text-base--line-height:calc(1.5 / 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family)}}@layer utilities{.pointer-events-none{pointer-events:none}.absolute{position:absolute}.inset-0{inset:0}.h-full{height:100%}.w-full{width:100%}}
+    </style>
+    <style>
+      body { margin: 0; padding: 0; background-color: #0f172a; overflow: auto; }
+      .diagram-container { position: relative; width: 5300px; height: 300px; margin: 40px; }
+      .diagram-canvas { position: relative; width: 100%; height: 100%; transform: translate(-40px, -120px); transform-origin: top left; }
+    </style>
+</head>
+<body>
+    <div style="padding: 20px 40px; color: #f8fafc; font-family: 'DM Sans', sans-serif;">
+      <h1 style="font-size: 1.5rem; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">Gestión de Pedidos - Proceso Completo</h1>
+      <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 0;">25 nodos &bull; 27 conexiones &bull; 4 gateways &bull; 2 finales &bull; 1 subproceso &bull; Scroll horizontal para ver todo el flujo &rarr;</p>
+    </div>
+    <div class="diagram-container">
+      <div class="diagram-canvas">
+
+      <svg class="absolute inset-0 w-full h-full pointer-events-none" style="overflow:visible;">
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="context-stroke" />
+          </marker>
+        </defs>
+        <path d="M 140 200 L 200 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 380 200 L 440 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 620 200 L 680 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 760 200 L 1420 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="1079.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="1090" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">Sí</text>
+        <path d="M 760 200 L 820 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="779.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="790" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">No</text>
+        <path d="M 1000 200 L 1060 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 1240 200 L 1300 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 1600 200 L 1660 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 1740 200 L 2280 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="1999.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="2010" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">Sí</text>
+        <path d="M 1740 200 L 1800 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="1759.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="1770" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">No</text>
+        <path d="M 1980 200 L 2040 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 2220 200 L 2280 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 2460 200 L 2520 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 2700 200 L 2760 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 2840 200 L 3140 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="2979.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="2990" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">Sí</text>
+        <path d="M 2840 200 L 2900 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="2859.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="2870" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">No</text>
+        <path d="M 3080 200 L 2520 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 3320 200 L 3380 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 3560 200 L 3620 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 3800 200 L 3860 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 3940 200 L 4000 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="3959.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="3970" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">Sí</text>
+        <path d="M 3940 200 L 3380 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" /><rect x="3649.5" y="192" width="21" height="16" rx="3" fill="white" fill-opacity="0.85" /><text x="3660" y="200" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">No</text>
+        <path d="M 4180 200 L 4240 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 4420 200 L 4480 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 4660 200 L 4720 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 4900 200 L 4960 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+        <path d="M 5140 200 L 5200 200" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)" />
+      </svg>
+
+      <div style="position:absolute;left:80px;top:170px;z-index:1; width:60px;height:60px;border:1.5px solid #4ade80;border-radius:9999px;background:transparent;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+        <span style="line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+      </div>
+
+      <div style="position:absolute;left:200px;top:160px;z-index:2; width:180px;height:80px;border:2px solid #60a5fa;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">1. Registrar Pedido</div>
+      </div>
+
+      <div style="position:absolute;left:440px;top:160px;z-index:3; width:180px;height:80px;border:2px solid #4ade80;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">2. Validar Datos del Cliente</div>
+      </div>
+
+      <div style="position:absolute;left:680px;top:160px;z-index:4; width:80px;height:80px;box-sizing:border-box;">
+        <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.75rem;font-weight:500;color:#eab308;white-space:nowrap;">¿Cliente Válido?</div>
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:1.5px solid #facc15;background:#0b0f14;"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#eab308;line-height:1;">&times;</div>
+      </div>
+
+      <div style="position:absolute;left:820px;top:160px;z-index:5; width:180px;height:80px;border:2px solid #f87171;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">Rechazar Pedido</div>
+      </div>
+
+      <div style="position:absolute;left:1060px;top:160px;z-index:6; width:180px;height:80px;border:2px solid #f87171;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">Notificar Rechazo</div>
+      </div>
+
+      <div style="position:absolute;left:1300px;top:170px;z-index:7; width:60px;height:60px;border:2.5px solid #f87171;border-radius:9999px;background:rgba(248,113,113,0.20);display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+        <span style="font-size:10px;color:#ef4444;line-height:1;">&#9679;</span>
+      </div>
+
+      <div style="position:absolute;left:1420px;top:160px;z-index:8; width:180px;height:80px;border:2px solid #4ade80;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">3. Verificar Stock</div>
+      </div>
+
+      <div style="position:absolute;left:1660px;top:160px;z-index:9; width:80px;height:80px;box-sizing:border-box;">
+        <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.75rem;font-weight:500;color:#eab308;white-space:nowrap;">¿Stock Disponible?</div>
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:1.5px solid #facc15;background:#0b0f14;"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#eab308;line-height:1;">&times;</div>
+      </div>
+
+      <div style="position:absolute;left:1800px;top:160px;z-index:10; width:180px;height:80px;border:2px solid #c084fc;border-radius:10px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">Gestionar Backorder</div>
+        <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:3px;width:14px;height:14px;border:2px solid #c084fc;border-radius:2px;background:#0b0f14;color:#a855f7;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;line-height:1;">+</div>
+      </div>
+
+      <div style="position:absolute;left:2040px;top:160px;z-index:11; width:180px;height:80px;border:2px solid #facc15;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">Notificar Espera al Cliente</div>
+      </div>
+
+      <div style="position:absolute;left:2280px;top:160px;z-index:12; width:180px;height:80px;border:2px solid #c084fc;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">4. Calcular Precio y Descuentos</div>
+      </div>
+
+      <div style="position:absolute;left:2520px;top:160px;z-index:13; width:180px;height:80px;border:2px solid #4ade80;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">5. Procesar Pago</div>
+      </div>
+
+      <div style="position:absolute;left:2760px;top:160px;z-index:14; width:80px;height:80px;box-sizing:border-box;">
+        <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.75rem;font-weight:500;color:#eab308;white-space:nowrap;">¿Pago Aprobado?</div>
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:1.5px solid #facc15;background:#0b0f14;"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#eab308;line-height:1;">&times;</div>
+      </div>
+
+      <div style="position:absolute;left:2900px;top:160px;z-index:15; width:180px;height:80px;border:2px solid #facc15;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.75rem;font-weight:600;line-height:1.2;">Solicitar Nuevo Método de Pago</div>
+      </div>
+
+      <div style="position:absolute;left:3140px;top:160px;z-index:16; width:180px;height:80px;border:2px solid #c084fc;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">6. Generar Factura</div>
+      </div>
+
+      <div style="position:absolute;left:3380px;top:160px;z-index:17; width:180px;height:80px;border:2px solid #facc15;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v0M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.9-5.7-2.4L3.4 16a2 2 0 1 1 3.2-2.4L8 16"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">7. Preparar Paquete</div>
+      </div>
+
+      <div style="position:absolute;left:3620px;top:160px;z-index:18; width:180px;height:80px;border:2px solid #60a5fa;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">8. Control de Calidad</div>
+      </div>
+
+      <div style="position:absolute;left:3860px;top:160px;z-index:19; width:80px;height:80px;box-sizing:border-box;">
+        <div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:0.75rem;font-weight:500;color:#eab308;white-space:nowrap;">¿Pasa QA?</div>
+        <div style="position:absolute;left:50%;top:50%;width:72%;height:72%;transform:translate(-50%,-50%) rotate(45deg);border:1.5px solid #facc15;background:#0b0f14;"></div>
+        <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:24px;font-weight:700;color:#eab308;line-height:1;">&times;</div>
+      </div>
+
+      <div style="position:absolute;left:4000px;top:160px;z-index:20; width:180px;height:80px;border:2px solid #4ade80;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">9. Asignar Transportista</div>
+      </div>
+
+      <div style="position:absolute;left:4240px;top:160px;z-index:21; width:180px;height:80px;border:2px solid #c084fc;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">10. Enviar Pedido</div>
+      </div>
+
+      <div style="position:absolute;left:4480px;top:160px;z-index:22; width:180px;height:80px;border:2px solid #4ade80;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.75rem;font-weight:600;line-height:1.2;">11. Enviar Tracking al Cliente</div>
+      </div>
+
+      <div style="position:absolute;left:4720px;top:160px;z-index:23; width:180px;height:80px;border:2px solid #60a5fa;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">12. Confirmar Entrega</div>
+      </div>
+
+      <div style="position:absolute;left:4960px;top:160px;z-index:24; width:180px;height:80px;border:2px solid #c084fc;border-radius:8px;background:#0b0f14;color:#f8fafc;padding:0.8rem 1.2rem;font-family:'DM Sans',sans-serif;box-sizing:border-box;">
+        <div style="position:absolute;left:7px;top:5px;line-height:1;"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-align:center;font-size:0.8rem;font-weight:600;line-height:1.2;">13. Solicitar Valoración</div>
+      </div>
+
+      <div style="position:absolute;left:5200px;top:170px;z-index:25; width:60px;height:60px;border:2.5px solid #4ade80;border-radius:9999px;background:rgba(74,222,128,0.20);display:flex;align-items:center;justify-content:center;box-sizing:border-box;">
+        <span style="font-size:10px;color:#4ade80;line-height:1;">&#9679;</span>
+      </div>
+      </div>
+    </div>
+</body>
+</html>

@@ -45,10 +45,10 @@ export function registerBatchTools(
     "create_bpmn_process",
     {
       description:
-        "Create a complete BPMN process from a list of steps. Automatically positions nodes left-to-right or top-to-bottom and creates edges between them. Clears the current diagram first.",
+        "Create a complete BPMN process from a list of steps. Automatically positions nodes with branch-aware layout (gateways create visual branches). Clears the current diagram first.",
       inputSchema: {
         name: z.string().describe("Process name"),
-        steps: z.array(StepSchema).describe("List of process steps"),
+        steps: z.array(StepSchema).describe("List of process steps. For gateways, the FIRST connectTo is the main/positive branch (displayed straight), subsequent connectTo entries are alternate branches (displayed below)."),
         direction: z
           .enum(["left-to-right", "top-to-bottom"])
           .default("left-to-right"),
@@ -58,13 +58,9 @@ export function registerBatchTools(
     async ({ name, steps, direction, spacing }) => {
       engine.clear();
 
-      const isHorizontal = direction === "left-to-right";
       const nodeIds = new Map<string, string>();
 
-      // Create nodes with auto-positioning
-      let offset = 80;
-      const crossCenter = 200;
-
+      // Phase 1: Create all nodes (positions will be set by layoutBpmn)
       for (const step of steps) {
         const mapping = STEP_TYPE_MAP[step.type];
         if (!mapping) continue;
@@ -73,24 +69,20 @@ export function registerBatchTools(
         if (step.label) data.text = step.label;
         if (step.variant) data.variant = step.variant;
 
-        const x = isHorizontal ? offset : crossCenter - mapping.w / 2;
-        const y = isHorizontal ? crossCenter - mapping.h / 2 : offset;
-
         const node = engine.addNode({
           type: mapping.type,
           componentType: mapping.key,
-          x,
-          y,
+          x: 0,
+          y: 0,
           width: mapping.w,
           height: mapping.h,
           data,
         });
 
         nodeIds.set(step.id, node.id);
-        offset += (isHorizontal ? mapping.w : mapping.h) + spacing;
       }
 
-      // Create edges
+      // Phase 2: Create all edges
       let edgeCount = 0;
       for (const step of steps) {
         if (!step.connectTo) continue;
@@ -106,18 +98,19 @@ export function registerBatchTools(
             targetId,
             flowType: conn.flowType ?? "sequence",
             label: conn.label,
-            sourcePort: isHorizontal ? "right" : "bottom",
-            targetPort: isHorizontal ? "left" : "top",
           });
           edgeCount++;
         }
       }
 
+      // Phase 3: Apply BPMN-aware layout (positions nodes + assigns ports)
+      engine.layoutBpmn(direction, spacing);
+
       return {
         content: [
           {
             type: "text" as const,
-            text: `Created BPMN process "${name}": ${nodeIds.size} nodes, ${edgeCount} edges (${direction})`,
+            text: `Created BPMN process "${name}": ${nodeIds.size} nodes, ${edgeCount} edges (${direction}, branch-aware layout)`,
           },
         ],
       };

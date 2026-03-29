@@ -1,0 +1,654 @@
+{
+  "modelVersion": 2,
+  "nodes": [
+    {
+      "id": "6439a2df-d9d9-480b-ab9a-3a4d1e8a3524",
+      "type": "web-component",
+      "x": 80,
+      "y": 170,
+      "width": 60,
+      "height": 60,
+      "zIndex": 1,
+      "componentType": "bpmn-start-event-web",
+      "data": {
+        "text": "Pedido Recibido"
+      }
+    },
+    {
+      "id": "60131e07-6ed6-4f5a-adc3-7f782e802679",
+      "type": "web-component",
+      "x": 200,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 2,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "1. Registrar Pedido",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "114f880a-61b3-4572-8a94-d09f1f92ebdf",
+      "type": "web-component",
+      "x": 440,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 3,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "2. Validar Datos del Cliente",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "be708d88-9ab9-4b45-bca7-1cfc929810c6",
+      "type": "web-component",
+      "x": 680,
+      "y": 160,
+      "width": 80,
+      "height": 80,
+      "zIndex": 4,
+      "componentType": "bpmn-exclusive-gateway-web",
+      "data": {
+        "text": "¿Cliente Válido?"
+      }
+    },
+    {
+      "id": "d1863aed-8a84-40fc-acd9-75221219b888",
+      "type": "web-component",
+      "x": 820,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 5,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "Rechazar Pedido",
+        "variant": "red"
+      }
+    },
+    {
+      "id": "204896fb-7c0e-49d0-93e5-a3e7eb8e0f3d",
+      "type": "web-component",
+      "x": 1060,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 6,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "Notificar Rechazo",
+        "variant": "red"
+      }
+    },
+    {
+      "id": "fa5a5a7e-4d2e-4034-9627-5628e282397c",
+      "type": "web-component",
+      "x": 1300,
+      "y": 170,
+      "width": 60,
+      "height": 60,
+      "zIndex": 7,
+      "componentType": "bpmn-end-event-web",
+      "data": {
+        "text": "Pedido Rechazado"
+      }
+    },
+    {
+      "id": "0104ecef-f6c4-4fa8-9f6c-324784ba8848",
+      "type": "web-component",
+      "x": 1420,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 8,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "3. Verificar Stock",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "4f444c3d-0e79-4f0c-9712-e595a7fbabe8",
+      "type": "web-component",
+      "x": 1660,
+      "y": 160,
+      "width": 80,
+      "height": 80,
+      "zIndex": 9,
+      "componentType": "bpmn-exclusive-gateway-web",
+      "data": {
+        "text": "¿Stock Disponible?"
+      }
+    },
+    {
+      "id": "4952f9cb-874a-49d8-b57b-047a098e6587",
+      "type": "web-component",
+      "x": 1800,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 10,
+      "componentType": "bpmn-subprocess-web",
+      "data": {
+        "text": "Gestionar Backorder"
+      }
+    },
+    {
+      "id": "bbcdc02b-7959-41f7-874b-3f3ef68f1359",
+      "type": "web-component",
+      "x": 2040,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 11,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "Notificar Espera al Cliente",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "0b4d9142-26c9-48bd-abf6-b14881002d53",
+      "type": "web-component",
+      "x": 2280,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 12,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "4. Calcular Precio y Descuentos",
+        "variant": "purple"
+      }
+    },
+    {
+      "id": "b8789f62-cf85-4d59-bd72-fb9546619539",
+      "type": "web-component",
+      "x": 2520,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 13,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "5. Procesar Pago",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "448676db-8e9c-440b-80ad-9779dbd55fae",
+      "type": "web-component",
+      "x": 2760,
+      "y": 160,
+      "width": 80,
+      "height": 80,
+      "zIndex": 14,
+      "componentType": "bpmn-exclusive-gateway-web",
+      "data": {
+        "text": "¿Pago Aprobado?"
+      }
+    },
+    {
+      "id": "a78f7f2b-383f-498d-bce2-9c0531935b2e",
+      "type": "web-component",
+      "x": 2900,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 15,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "Solicitar Nuevo Método de Pago",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "63a41c32-17a5-44cf-8830-d3cb4dddfa7e",
+      "type": "web-component",
+      "x": 3140,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 16,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "6. Generar Factura",
+        "variant": "purple"
+      }
+    },
+    {
+      "id": "94e91dcd-6b67-4952-8e61-47699ec128da",
+      "type": "web-component",
+      "x": 3380,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 17,
+      "componentType": "bpmn-manual-task-web",
+      "data": {
+        "text": "7. Preparar Paquete",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "bc2cd7e0-1a6f-4a9e-bcb5-baa407bcdb82",
+      "type": "web-component",
+      "x": 3620,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 18,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "8. Control de Calidad",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "e434614d-b69c-4b45-ab43-5e01c3a1aa52",
+      "type": "web-component",
+      "x": 3860,
+      "y": 160,
+      "width": 80,
+      "height": 80,
+      "zIndex": 19,
+      "componentType": "bpmn-exclusive-gateway-web",
+      "data": {
+        "text": "¿Pasa QA?"
+      }
+    },
+    {
+      "id": "915c44ec-9f14-4886-8bf6-a483dbf8cd5f",
+      "type": "web-component",
+      "x": 4000,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 20,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "9. Asignar Transportista",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "c8001c0b-0318-4a6a-b2cd-85ee42385bf3",
+      "type": "web-component",
+      "x": 4240,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 21,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "10. Enviar Pedido",
+        "variant": "purple"
+      }
+    },
+    {
+      "id": "ae887ea0-aaa3-4012-9964-c1c2a2580be1",
+      "type": "web-component",
+      "x": 4480,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 22,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "11. Enviar Tracking al Cliente",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "5c81f906-2ef7-4fab-8658-3e4a1fa84052",
+      "type": "web-component",
+      "x": 4720,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 23,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "12. Confirmar Entrega",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "f09b7e29-bcd8-455c-bc1f-0c25e3184b3e",
+      "type": "web-component",
+      "x": 4960,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 24,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "13. Solicitar Valoración",
+        "variant": "purple"
+      }
+    },
+    {
+      "id": "92176e5e-9e17-40fe-911d-73ec348e800a",
+      "type": "web-component",
+      "x": 5200,
+      "y": 170,
+      "width": 60,
+      "height": 60,
+      "zIndex": 25,
+      "componentType": "bpmn-end-event-web",
+      "data": {
+        "text": "Pedido Completado"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "1cdf9609-b4dc-4a1a-a557-d2797e7c160b",
+      "sourceId": "6439a2df-d9d9-480b-ab9a-3a4d1e8a3524",
+      "targetId": "60131e07-6ed6-4f5a-adc3-7f782e802679",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "fd9b4fc6-5b1e-4873-bbfe-f76163bff4af",
+      "sourceId": "60131e07-6ed6-4f5a-adc3-7f782e802679",
+      "targetId": "114f880a-61b3-4572-8a94-d09f1f92ebdf",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "69f81f28-e871-4f35-ab0d-fe42c8a89941",
+      "sourceId": "114f880a-61b3-4572-8a94-d09f1f92ebdf",
+      "targetId": "be708d88-9ab9-4b45-bca7-1cfc929810c6",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "9607c777-e969-4345-9912-0c1b747ef9ff",
+      "sourceId": "be708d88-9ab9-4b45-bca7-1cfc929810c6",
+      "targetId": "0104ecef-f6c4-4fa8-9f6c-324784ba8848",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "68151957-b46d-4ce4-95e6-23e6557cb6c2",
+      "sourceId": "be708d88-9ab9-4b45-bca7-1cfc929810c6",
+      "targetId": "d1863aed-8a84-40fc-acd9-75221219b888",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "No",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "259a8cbd-8885-48d8-bbee-191db17d31c4",
+      "sourceId": "d1863aed-8a84-40fc-acd9-75221219b888",
+      "targetId": "204896fb-7c0e-49d0-93e5-a3e7eb8e0f3d",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "66829ffb-015c-4fed-9545-bc27d0374527",
+      "sourceId": "204896fb-7c0e-49d0-93e5-a3e7eb8e0f3d",
+      "targetId": "fa5a5a7e-4d2e-4034-9627-5628e282397c",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "6d460d21-4e31-43ed-b0f3-3115f443972c",
+      "sourceId": "0104ecef-f6c4-4fa8-9f6c-324784ba8848",
+      "targetId": "4f444c3d-0e79-4f0c-9712-e595a7fbabe8",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "a0ed8db2-43ad-4cd5-b098-59692e43691a",
+      "sourceId": "4f444c3d-0e79-4f0c-9712-e595a7fbabe8",
+      "targetId": "0b4d9142-26c9-48bd-abf6-b14881002d53",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "6faa2f8f-b412-4f23-affe-65f53e8bf525",
+      "sourceId": "4f444c3d-0e79-4f0c-9712-e595a7fbabe8",
+      "targetId": "4952f9cb-874a-49d8-b57b-047a098e6587",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "No",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "509710ae-7071-4f01-b72f-1cf15ff9eda8",
+      "sourceId": "4952f9cb-874a-49d8-b57b-047a098e6587",
+      "targetId": "bbcdc02b-7959-41f7-874b-3f3ef68f1359",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "15f51c56-cbc2-4797-aa21-9b0091cc6f73",
+      "sourceId": "bbcdc02b-7959-41f7-874b-3f3ef68f1359",
+      "targetId": "0b4d9142-26c9-48bd-abf6-b14881002d53",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "08c2416b-e2ce-4098-8e92-6d8cdc4b0034",
+      "sourceId": "0b4d9142-26c9-48bd-abf6-b14881002d53",
+      "targetId": "b8789f62-cf85-4d59-bd72-fb9546619539",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "03b7da04-902e-410d-82f1-87950b1e7bd7",
+      "sourceId": "b8789f62-cf85-4d59-bd72-fb9546619539",
+      "targetId": "448676db-8e9c-440b-80ad-9779dbd55fae",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "ebd613fc-78f7-4657-8260-8c2c0eeacf8e",
+      "sourceId": "448676db-8e9c-440b-80ad-9779dbd55fae",
+      "targetId": "63a41c32-17a5-44cf-8830-d3cb4dddfa7e",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "df2f210b-7032-43f5-9b72-83ea00f25cb9",
+      "sourceId": "448676db-8e9c-440b-80ad-9779dbd55fae",
+      "targetId": "a78f7f2b-383f-498d-bce2-9c0531935b2e",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "No",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "8ce6ab38-7589-406f-ba4c-67289635dd29",
+      "sourceId": "a78f7f2b-383f-498d-bce2-9c0531935b2e",
+      "targetId": "b8789f62-cf85-4d59-bd72-fb9546619539",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "b267063d-f289-4f29-85be-c96f4cd72f70",
+      "sourceId": "63a41c32-17a5-44cf-8830-d3cb4dddfa7e",
+      "targetId": "94e91dcd-6b67-4952-8e61-47699ec128da",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "68b99794-e23f-4b8e-a3e2-5140fdd40c1c",
+      "sourceId": "94e91dcd-6b67-4952-8e61-47699ec128da",
+      "targetId": "bc2cd7e0-1a6f-4a9e-bcb5-baa407bcdb82",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "c9235e23-2036-40a0-9016-c7410fd7b9df",
+      "sourceId": "bc2cd7e0-1a6f-4a9e-bcb5-baa407bcdb82",
+      "targetId": "e434614d-b69c-4b45-ab43-5e01c3a1aa52",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "41923164-22c7-4665-9a27-b35c38a35279",
+      "sourceId": "e434614d-b69c-4b45-ab43-5e01c3a1aa52",
+      "targetId": "915c44ec-9f14-4886-8bf6-a483dbf8cd5f",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "a8a3f046-2d76-4bbb-a422-9ae190686036",
+      "sourceId": "e434614d-b69c-4b45-ab43-5e01c3a1aa52",
+      "targetId": "94e91dcd-6b67-4952-8e61-47699ec128da",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "No",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "e52135ae-5bea-4e2e-b250-7d013df89dfe",
+      "sourceId": "915c44ec-9f14-4886-8bf6-a483dbf8cd5f",
+      "targetId": "c8001c0b-0318-4a6a-b2cd-85ee42385bf3",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "8e200686-66d4-4ebd-b992-37f3bb0a981c",
+      "sourceId": "c8001c0b-0318-4a6a-b2cd-85ee42385bf3",
+      "targetId": "ae887ea0-aaa3-4012-9964-c1c2a2580be1",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "fcb018dc-dcb5-4236-9731-df35bd6af13c",
+      "sourceId": "ae887ea0-aaa3-4012-9964-c1c2a2580be1",
+      "targetId": "5c81f906-2ef7-4fab-8658-3e4a1fa84052",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "37c76fde-13d5-4e5d-a32c-8f88c57159de",
+      "sourceId": "5c81f906-2ef7-4fab-8658-3e4a1fa84052",
+      "targetId": "f09b7e29-bcd8-455c-bc1f-0c25e3184b3e",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "2f2d9f75-585b-4dc4-b7d8-49056425f947",
+      "sourceId": "f09b7e29-bcd8-455c-bc1f-0c25e3184b3e",
+      "targetId": "92176e5e-9e17-40fe-911d-73ec348e800a",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    }
+  ]
+}

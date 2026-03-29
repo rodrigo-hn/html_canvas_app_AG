@@ -1,0 +1,206 @@
+{
+  "modelVersion": 2,
+  "nodes": [
+    {
+      "id": "99020273-0edc-4740-8052-959c8b637e68",
+      "type": "web-component",
+      "x": 80,
+      "y": 170,
+      "width": 60,
+      "height": 60,
+      "zIndex": 1,
+      "componentType": "bpmn-start-event-web",
+      "data": {
+        "text": "Pedido Recibido"
+      }
+    },
+    {
+      "id": "ebda60b3-a6c1-4f89-81c3-eaef185dc505",
+      "type": "web-component",
+      "x": 220,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 2,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "1. Verificar Pedido",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "d5bc3fb1-0246-4fff-9826-8be3e81098a8",
+      "type": "web-component",
+      "x": 480,
+      "y": 160,
+      "width": 80,
+      "height": 80,
+      "zIndex": 3,
+      "componentType": "bpmn-exclusive-gateway-web",
+      "data": {
+        "text": "¿Stock Disponible?"
+      }
+    },
+    {
+      "id": "7434c736-3aa3-4fe6-928c-f0317868347f",
+      "type": "web-component",
+      "x": 640,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 4,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "2. Procesar Pago",
+        "variant": "green"
+      }
+    },
+    {
+      "id": "e08e0f57-e9b7-40c1-9d5d-c32fb916fb4b",
+      "type": "web-component",
+      "x": 900,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 5,
+      "componentType": "bpmn-manual-task-web",
+      "data": {
+        "text": "3. Preparar Envío",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "ae6c17d2-fc84-4850-a294-875ccdf41b72",
+      "type": "web-component",
+      "x": 1160,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 6,
+      "componentType": "bpmn-service-task-web",
+      "data": {
+        "text": "4. Enviar Pedido",
+        "variant": "purple"
+      }
+    },
+    {
+      "id": "c269e84a-6dee-48c8-a9ad-7c02343a7230",
+      "type": "web-component",
+      "x": 1420,
+      "y": 160,
+      "width": 180,
+      "height": 80,
+      "zIndex": 7,
+      "componentType": "bpmn-user-task-web",
+      "data": {
+        "text": "5. Notificar Sin Stock",
+        "variant": "red"
+      }
+    },
+    {
+      "id": "dfef4230-2e49-4abb-94cc-9c47b700a6f6",
+      "type": "web-component",
+      "x": 1680,
+      "y": 170,
+      "width": 60,
+      "height": 60,
+      "zIndex": 8,
+      "componentType": "bpmn-end-event-web",
+      "data": {
+        "text": "Pedido Finalizado"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "89480b98-34f0-4623-ab46-671f638063c5",
+      "sourceId": "99020273-0edc-4740-8052-959c8b637e68",
+      "targetId": "ebda60b3-a6c1-4f89-81c3-eaef185dc505",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "624e7711-18f1-4d89-a3bd-fec9d9745a04",
+      "sourceId": "ebda60b3-a6c1-4f89-81c3-eaef185dc505",
+      "targetId": "d5bc3fb1-0246-4fff-9826-8be3e81098a8",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "34ce7dbc-c77d-457d-9bc4-215558b4484b",
+      "sourceId": "d5bc3fb1-0246-4fff-9826-8be3e81098a8",
+      "targetId": "7434c736-3aa3-4fe6-928c-f0317868347f",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "1d2f4c56-9d1a-4224-bd06-10c6785023cf",
+      "sourceId": "d5bc3fb1-0246-4fff-9826-8be3e81098a8",
+      "targetId": "c269e84a-6dee-48c8-a9ad-7c02343a7230",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "No",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "aceea567-5b42-4145-9e84-b0d1bec5c6a8",
+      "sourceId": "7434c736-3aa3-4fe6-928c-f0317868347f",
+      "targetId": "e08e0f57-e9b7-40c1-9d5d-c32fb916fb4b",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "93839c82-61f6-47f8-87fc-83fe7a34351f",
+      "sourceId": "e08e0f57-e9b7-40c1-9d5d-c32fb916fb4b",
+      "targetId": "ae6c17d2-fc84-4850-a294-875ccdf41b72",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "3e63cb02-8209-4d96-b3ed-d0f8b34e0b8e",
+      "sourceId": "ae6c17d2-fc84-4850-a294-875ccdf41b72",
+      "targetId": "dfef4230-2e49-4abb-94cc-9c47b700a6f6",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    },
+    {
+      "id": "7d5cd460-e851-4abe-a302-75837c2de951",
+      "sourceId": "c269e84a-6dee-48c8-a9ad-7c02343a7230",
+      "targetId": "dfef4230-2e49-4abb-94cc-9c47b700a6f6",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "points": [],
+      "markerEnd": "arrow",
+      "zIndex": 0
+    }
+  ]
+}

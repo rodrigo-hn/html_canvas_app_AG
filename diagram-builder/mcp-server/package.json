@@ -7,7 +7,9 @@
     "diagram-builder-mcp": "./build/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build:css": "tailwindcss -i src/styles/input.css -o build/tailwind.css --minify",
+    "build:ts": "tsc",
+    "build": "npm run build:css && npm run build:ts",
     "start": "node build/index.js",
     "dev": "tsx src/index.ts",
     "inspect": "npx @modelcontextprotocol/inspector node build/index.js"
@@ -24,8 +26,10 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.2.2",
     "@types/node": "^25.5.0",
     "@types/uuid": "^10.0.0",
+    "tailwindcss": "^4.2.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }
