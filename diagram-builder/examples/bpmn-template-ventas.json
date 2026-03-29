@@ -1,0 +1,208 @@
+{
+  "modelVersion": 2,
+  "nodes": [
+    {
+      "id": "ventas-pool",
+      "type": "web-component",
+      "componentType": "bpmn-pool-web",
+      "x": 60,
+      "y": 80,
+      "width": 1800,
+      "height": 480,
+      "zIndex": -2,
+      "data": {
+        "text": "Proceso de Ventas",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "ventas-lane-comercial",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 100,
+      "y": 80,
+      "width": 1760,
+      "height": 220,
+      "zIndex": -1,
+      "data": {
+        "text": "Comercial",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "ventas-lane-operaciones",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 100,
+      "y": 300,
+      "width": 1760,
+      "height": 260,
+      "zIndex": -1,
+      "data": {
+        "text": "Operaciones",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "ventas-start",
+      "type": "web-component",
+      "componentType": "bpmn-start-event-web",
+      "x": 190,
+      "y": 165,
+      "width": 60,
+      "height": 60,
+      "zIndex": 1,
+      "data": {
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "ventas-cotiza",
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 300,
+      "y": 150,
+      "width": 190,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Cotizar oportunidad",
+        "variant": "blue",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "ventas-gateway",
+      "type": "web-component",
+      "componentType": "bpmn-exclusive-gateway-web",
+      "x": 570,
+      "y": 148,
+      "width": 90,
+      "height": 90,
+      "zIndex": 1,
+      "data": {
+        "text": "¿Acepta?"
+      }
+    },
+    {
+      "id": "ventas-cierra",
+      "type": "web-component",
+      "componentType": "bpmn-service-task-web",
+      "x": 760,
+      "y": 150,
+      "width": 210,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Cerrar acuerdo",
+        "variant": "green",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "ventas-ordena",
+      "type": "web-component",
+      "componentType": "bpmn-subprocess-web",
+      "x": 1040,
+      "y": 340,
+      "width": 230,
+      "height": 92,
+      "zIndex": 1,
+      "data": {
+        "text": "Emitir orden interna",
+        "variant": "purple",
+        "badgeEnabled": true,
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "ventas-end",
+      "type": "web-component",
+      "componentType": "bpmn-end-event-web",
+      "x": 1380,
+      "y": 356,
+      "width": 64,
+      "height": 64,
+      "zIndex": 1,
+      "data": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "ve-1",
+      "sourceId": "ventas-start",
+      "targetId": "ventas-cotiza",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#9fa1a3",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "ve-2",
+      "sourceId": "ventas-cotiza",
+      "targetId": "ventas-gateway",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#9fa1a3",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "ve-3",
+      "sourceId": "ventas-gateway",
+      "targetId": "ventas-cierra",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "label": "Sí",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#9fa1a3",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "ve-4",
+      "sourceId": "ventas-cierra",
+      "targetId": "ventas-ordena",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#9fa1a3",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "ve-5",
+      "sourceId": "ventas-ordena",
+      "targetId": "ventas-end",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#9fa1a3",
+        "strokeWidth": 2
+      }
+    }
+  ]
+}

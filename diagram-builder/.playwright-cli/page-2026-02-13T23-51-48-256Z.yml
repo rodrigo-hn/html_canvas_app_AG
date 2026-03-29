@@ -1,0 +1,390 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]:
+        - button "Export HTML" [ref=e6] [cursor=pointer]
+        - button "Export SVG" [ref=e7] [cursor=pointer]
+        - button "Export PNG" [ref=e8] [cursor=pointer]
+        - button "Export JSON" [ref=e9] [cursor=pointer]
+        - button "Import JSON" [ref=e10] [cursor=pointer]
+        - button "Undo" [ref=e11] [cursor=pointer]
+        - button "Redo" [disabled] [ref=e12]
+        - combobox "Plantillas BPMN por dominio" [ref=e13]:
+          - option "Templates" [selected]
+          - option "Ventas"
+          - option "Soporte"
+          - option "Logística"
+        - button "Load" [disabled] [ref=e14]
+        - button "-" [ref=e15] [cursor=pointer]
+        - button "100%" [ref=e16] [cursor=pointer]
+        - button "+" [ref=e17] [cursor=pointer]
+        - button "Fit" [ref=e18] [cursor=pointer]
+        - button "Preset" [ref=e19] [cursor=pointer]
+        - button "Focus" [ref=e20] [cursor=pointer]
+        - button "Hide Components" [ref=e21] [cursor=pointer]
+        - combobox [ref=e22]:
+          - option "Infinite" [selected]
+          - option "A4"
+          - option "A3"
+          - option "16:9"
+          - option "Custom"
+        - button "Add Frame" [ref=e23] [cursor=pointer]
+        - combobox [ref=e24]:
+          - option "Frames" [selected]
+        - button "Go" [disabled] [ref=e25]
+        - button "Del" [disabled] [ref=e26]
+        - button "Align L" [ref=e27] [cursor=pointer]
+        - button "Align T" [ref=e28] [cursor=pointer]
+        - button "Dist H" [ref=e29] [cursor=pointer]
+        - button "Dist V" [ref=e30] [cursor=pointer]
+        - generic [ref=e31]:
+          - checkbox "Snap" [checked] [ref=e32]
+          - text: Snap
+        - generic [ref=e33]:
+          - text: Grid
+          - spinbutton "Grid" [ref=e34]: "20"
+        - generic [ref=e35]:
+          - checkbox "Auto-save" [ref=e36]
+          - text: Auto-save
+        - generic [ref=e37]:
+          - generic [ref=e38]: Contrast
+          - button "Claro" [ref=e39] [cursor=pointer]
+          - button "Medio" [ref=e40] [cursor=pointer]
+          - button "Alto" [ref=e41] [cursor=pointer]
+      - complementary [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]: Libraries
+          - textbox "Search shape..." [ref=e45]
+        - generic [ref=e46]:
+          - group [ref=e47]:
+            - generic "General" [ref=e48] [cursor=pointer]
+            - generic [ref=e49]:
+              - button "Rectangle" [ref=e50] [cursor=pointer]:
+                - generic [ref=e51]:
+                  - img [ref=e53]
+                  - generic [ref=e56]: Rectangle
+              - button "Rounded Rectangle" [ref=e57] [cursor=pointer]:
+                - generic [ref=e58]:
+                  - img [ref=e60]
+                  - generic [ref=e63]: Rounded Rectangle
+              - button "Diamond" [ref=e64] [cursor=pointer]:
+                - generic [ref=e65]:
+                  - img [ref=e67]
+                  - generic [ref=e70]: Diamond
+              - button "Document" [ref=e71] [cursor=pointer]:
+                - generic [ref=e72]:
+                  - img [ref=e74]
+                  - generic [ref=e77]: Document
+              - button "Cylinder" [ref=e78] [cursor=pointer]:
+                - generic [ref=e79]:
+                  - img [ref=e81]
+                  - generic [ref=e86]: Cylinder
+          - group [ref=e87]:
+            - generic "Web Components" [ref=e88] [cursor=pointer]
+          - group [ref=e89]:
+            - generic "BPMN Web Tasks" [ref=e90] [cursor=pointer]
+            - generic [ref=e91]:
+              - button "U User Task (Web)" [ref=e92] [cursor=pointer]:
+                - generic [ref=e93]:
+                  - generic [ref=e95]: U
+                  - generic [ref=e96]: User Task (Web)
+              - button "S Service Task (Web)" [ref=e97] [cursor=pointer]:
+                - generic [ref=e98]:
+                  - generic [ref=e100]: S
+                  - generic [ref=e101]: Service Task (Web)
+              - button "M Manual Task (Web)" [ref=e102] [cursor=pointer]:
+                - generic [ref=e103]:
+                  - generic [ref=e105]: M
+                  - generic [ref=e106]: Manual Task (Web)
+              - button "SP Subprocess (Web)" [ref=e107] [cursor=pointer]:
+                - generic [ref=e108]:
+                  - generic [ref=e110]: SP
+                  - generic [ref=e111]: Subprocess (Web)
+              - button "SE Start Event (Web)" [ref=e112] [cursor=pointer]:
+                - generic [ref=e113]:
+                  - generic [ref=e115]: SE
+                  - generic [ref=e116]: Start Event (Web)
+              - button "XOR Exclusive Gateway (Web)" [ref=e117] [cursor=pointer]:
+                - generic [ref=e118]:
+                  - generic [ref=e120]: XOR
+                  - generic [ref=e121]: Exclusive Gateway (Web)
+              - button "EE End Event (Web)" [ref=e122] [cursor=pointer]:
+                - generic [ref=e123]:
+                  - generic [ref=e125]: EE
+                  - generic [ref=e126]: End Event (Web)
+              - button "L Lane (Web)" [ref=e127] [cursor=pointer]:
+                - generic [ref=e128]:
+                  - generic [ref=e130]: L
+                  - generic [ref=e131]: Lane (Web)
+              - button "P Pool (Web)" [ref=e132] [cursor=pointer]:
+                - generic [ref=e133]:
+                  - generic [ref=e135]: P
+                  - generic [ref=e136]: Pool (Web)
+          - group [ref=e137]:
+            - generic "BPMN 2.0 General" [ref=e138] [cursor=pointer]
+            - generic [ref=e139]:
+              - button "Pool" [ref=e140] [cursor=pointer]:
+                - generic [ref=e141]:
+                  - img [ref=e143]
+                  - generic [ref=e147]: Pool
+              - button "Lane" [ref=e148] [cursor=pointer]:
+                - generic [ref=e149]:
+                  - img [ref=e151]
+                  - generic [ref=e155]: Lane
+              - button "Group" [ref=e156] [cursor=pointer]:
+                - generic [ref=e157]:
+                  - img [ref=e159]
+                  - generic [ref=e162]: Group
+              - button "Conversation" [ref=e163] [cursor=pointer]:
+                - generic [ref=e164]:
+                  - img [ref=e166]
+                  - generic [ref=e169]: Conversation
+          - group [ref=e170]:
+            - generic "BPMN 2.0 Tasks" [ref=e171] [cursor=pointer]
+            - generic [ref=e172]:
+              - button "Task" [ref=e173] [cursor=pointer]:
+                - generic [ref=e174]:
+                  - img [ref=e176]
+                  - generic [ref=e179]: Task
+              - button "Subprocess" [ref=e180] [cursor=pointer]:
+                - generic [ref=e181]:
+                  - img [ref=e183]
+                  - generic [ref=e187]: Subprocess
+              - button "Event Subprocess" [ref=e188] [cursor=pointer]:
+                - generic [ref=e189]:
+                  - img [ref=e191]
+                  - generic [ref=e194]: Event Subprocess
+              - button "Call Activity" [ref=e195] [cursor=pointer]:
+                - generic [ref=e196]:
+                  - img [ref=e198]
+                  - generic [ref=e201]: Call Activity
+              - button "Transaction" [ref=e202] [cursor=pointer]:
+                - generic [ref=e203]:
+                  - img [ref=e205]
+                  - generic [ref=e209]: Transaction
+          - group [ref=e210]:
+            - generic "BPMN 2.0 Events" [ref=e211] [cursor=pointer]
+            - generic [ref=e212]:
+              - button "Start Event" [ref=e213] [cursor=pointer]:
+                - generic [ref=e214]:
+                  - img [ref=e216]
+                  - generic [ref=e219]: Start Event
+              - button "Intermediate Event" [ref=e220] [cursor=pointer]:
+                - generic [ref=e221]:
+                  - img [ref=e223]
+                  - generic [ref=e227]: Intermediate Event
+              - button "Boundary Event" [ref=e228] [cursor=pointer]:
+                - generic [ref=e229]:
+                  - img [ref=e231]
+                  - generic [ref=e235]: Boundary Event
+              - button "Throwing Event" [ref=e236] [cursor=pointer]:
+                - generic [ref=e237]:
+                  - img [ref=e239]
+                  - generic [ref=e243]: Throwing Event
+              - button "End Event" [ref=e244] [cursor=pointer]:
+                - generic [ref=e245]:
+                  - img [ref=e247]
+                  - generic [ref=e251]: End Event
+              - button "Message Event" [ref=e252] [cursor=pointer]:
+                - generic [ref=e253]:
+                  - img [ref=e255]
+                  - generic [ref=e260]: Message Event
+              - button "Timer Event" [ref=e261] [cursor=pointer]:
+                - generic [ref=e262]:
+                  - img [ref=e264]
+                  - generic [ref=e268]: Timer Event
+              - button "Error Event" [ref=e269] [cursor=pointer]:
+                - generic [ref=e270]:
+                  - img [ref=e272]
+                  - generic [ref=e276]: Error Event
+              - button "Signal Event" [ref=e277] [cursor=pointer]:
+                - generic [ref=e278]:
+                  - img [ref=e280]
+                  - generic [ref=e284]: Signal Event
+              - button "Escalation Event" [ref=e285] [cursor=pointer]:
+                - generic [ref=e286]:
+                  - img [ref=e288]
+                  - generic [ref=e292]: Escalation Event
+          - group [ref=e293]:
+            - generic "BPMN 2.0 Gateways" [ref=e294] [cursor=pointer]
+            - generic [ref=e295]:
+              - button "Gateway" [ref=e296] [cursor=pointer]:
+                - generic [ref=e297]:
+                  - img [ref=e299]
+                  - generic [ref=e303]: Gateway
+              - button "Exclusive Gateway" [ref=e304] [cursor=pointer]:
+                - generic [ref=e305]:
+                  - img [ref=e307]
+                  - generic [ref=e311]: Exclusive Gateway
+              - button "Inclusive Gateway" [ref=e312] [cursor=pointer]:
+                - generic [ref=e313]:
+                  - img [ref=e315]
+                  - generic [ref=e319]: Inclusive Gateway
+              - button "Parallel Gateway" [ref=e320] [cursor=pointer]:
+                - generic [ref=e321]:
+                  - img [ref=e323]
+                  - generic [ref=e326]: Parallel Gateway
+              - button "Event-Based Gateway" [ref=e327] [cursor=pointer]:
+                - generic [ref=e328]:
+                  - img [ref=e330]
+                  - generic [ref=e335]: Event-Based Gateway
+          - group [ref=e336]:
+            - generic "BPMN 2.0 Data & Artifacts" [ref=e337] [cursor=pointer]
+            - generic [ref=e338]:
+              - button "Data Object" [ref=e339] [cursor=pointer]:
+                - generic [ref=e340]:
+                  - img [ref=e342]
+                  - generic [ref=e345]: Data Object
+              - button "Data Store" [ref=e346] [cursor=pointer]:
+                - generic [ref=e347]:
+                  - img [ref=e349]
+                  - generic [ref=e354]: Data Store
+              - button "Text Annotation" [ref=e355] [cursor=pointer]:
+                - generic [ref=e356]:
+                  - img [ref=e358]
+                  - generic [ref=e361]: Text Annotation
+          - group [ref=e362]:
+            - generic "BPMN 2.0 Flows" [ref=e363] [cursor=pointer]
+            - generic [ref=e364]:
+              - button "Sequence Flow Shape" [ref=e365] [cursor=pointer]:
+                - generic [ref=e366]:
+                  - img [ref=e368]
+                  - generic [ref=e371]: Sequence Flow Shape
+              - button "Message Flow Shape" [ref=e372] [cursor=pointer]:
+                - generic [ref=e373]:
+                  - img [ref=e375]
+                  - generic [ref=e378]: Message Flow Shape
+              - button "Association Shape" [ref=e379] [cursor=pointer]:
+                - generic [ref=e380]:
+                  - img [ref=e382]
+                  - generic [ref=e383]: Association Shape
+          - group [ref=e384]:
+            - generic "BPMN 2.0 Choreographies" [ref=e385] [cursor=pointer]
+            - generic [ref=e386]:
+              - button "Choreography Task" [ref=e387] [cursor=pointer]:
+                - generic [ref=e388]:
+                  - img [ref=e390]
+                  - generic [ref=e395]: Choreography Task
+              - button "Choreography Subprocess" [ref=e396] [cursor=pointer]:
+                - generic [ref=e397]:
+                  - img [ref=e399]
+                  - generic [ref=e405]: Choreography Subprocess
+      - generic [ref=e407]:
+        - generic:
+          - img:
+            - generic: Si
+            - generic: "No"
+            - generic: Si
+            - generic: "No"
+        - generic [ref=e414]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: PIZZERIA LA ITALIANA
+        - generic [ref=e417]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Atencion al Cliente
+        - generic [ref=e420]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Cocina
+        - generic [ref=e423]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: Delivery
+        - generic [ref=e429]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Registrar pedido
+        - generic [ref=e432]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Verificar disponibilidad
+        - generic [ref=e435]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: ×
+                - generic: Disponible?
+        - generic [ref=e438]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Confirmar pedido
+        - generic [ref=e441]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Notificar cliente
+        - generic [ref=e444]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: ●
+        - generic [ref=e447]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Preparar pizza
+                - generic: +
+        - generic [ref=e450]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Control calidad
+        - generic [ref=e453]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: ×
+                - generic: Aprobada?
+        - generic [ref=e456]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Empaquetar pedido
+        - generic [ref=e459]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Asignar repartidor
+        - generic [ref=e462]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Entregar pedido
+        - generic [ref=e465]:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Cobrar
+        - generic [ref=e468]:
+          - generic:
+            - generic:
+              - generic:
+                - generic:
+                  - generic: ●
+      - generic [ref=e469]:
+        - generic [ref=e470]: Minimap
+        - img [ref=e471] [cursor=pointer]
+    - generic [ref=e495]:
+      - heading "Inspector" [level=2] [ref=e496]
+      - generic [ref=e497]: No selection.
+    - button "Hide Inspector" [ref=e499] [cursor=pointer]
+  - generic [ref=e502]:
+    - generic [ref=e503]: "TS2339: Property 'undo' does not exist on type 'CanvasComponent'."
+    - generic [ref=e504]: src/app/canvas/canvas.component.ts:77:19
+    - generic [ref=e505]: Click outside, press Esc key, or fix the code to dismiss.

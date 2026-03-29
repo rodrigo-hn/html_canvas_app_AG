@@ -184,6 +184,7 @@ export interface DiagramEdge extends DiagramElement {
 }
 
 export interface DiagramModel {
+  modelVersion: number;
   nodes: DiagramNode[];
   edges: DiagramEdge[];
 }

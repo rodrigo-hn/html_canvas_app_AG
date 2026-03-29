@@ -1,4 +1,5 @@
 {
+  "modelVersion": 2,
   "nodes": [
     {
       "id": "pool-main",
@@ -9,8 +10,14 @@
       "width": 1820,
       "height": 820,
       "zIndex": 0,
-      "data": { "text": "Proceso de Pedido de Pizzeria" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": "Proceso de Pedido de Pizzeria"
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#0f172a",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "lane-cliente",
@@ -21,8 +28,14 @@
       "width": 1820,
       "height": 560,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#0f172a",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "lane-repartidor",
@@ -33,10 +46,15 @@
       "width": 1820,
       "height": 250,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#0f172a", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#0f172a",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "header-cliente",
       "type": "shape",
@@ -46,8 +64,14 @@
       "width": 170,
       "height": 72,
       "zIndex": 1,
-      "data": { "text": "Cliente" },
-      "style": { "fill": "#eef2ff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": "Cliente"
+      },
+      "style": {
+        "fill": "#eef2ff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "header-repartidor",
@@ -58,10 +82,15 @@
       "width": 220,
       "height": 72,
       "zIndex": 1,
-      "data": { "text": "Repartidor" },
-      "style": { "fill": "#ecfeff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": "Repartidor"
+      },
+      "style": {
+        "fill": "#ecfeff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "ev-start",
       "type": "shape",
@@ -71,8 +100,14 @@
       "width": 70,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "task-recibir",
@@ -83,8 +118,15 @@
       "width": 250,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Recibir Orden", "taskKind": "receive" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Recibir Orden",
+        "taskKind": "receive"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "gateway-confirmado",
@@ -95,10 +137,15 @@
       "width": 110,
       "height": 110,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fef3c7", "stroke": "#854d0e", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fef3c7",
+        "stroke": "#854d0e",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-validar-insumos",
       "type": "shape",
@@ -108,8 +155,15 @@
       "width": 230,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Validar Insumos", "taskKind": "prepare" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Validar Insumos",
+        "taskKind": "prepare"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "task-preparar",
@@ -120,8 +174,15 @@
       "width": 230,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Preparar Pizza", "taskKind": "prepare" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Preparar Pizza",
+        "taskKind": "prepare"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "task-hornear",
@@ -132,8 +193,15 @@
       "width": 220,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Hornear Pizza", "taskKind": "bake" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Hornear Pizza",
+        "taskKind": "bake"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "task-empacar",
@@ -144,8 +212,15 @@
       "width": 220,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Empacar Pedido", "taskKind": "pack" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Empacar Pedido",
+        "taskKind": "pack"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "task-entregar",
@@ -156,10 +231,16 @@
       "width": 170,
       "height": 108,
       "zIndex": 3,
-      "data": { "text": "Entregar Pedido", "taskKind": "deliver" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Entregar Pedido",
+        "taskKind": "deliver"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "ev-entregado",
       "type": "shape",
@@ -169,8 +250,14 @@
       "width": 86,
       "height": 86,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ecfccb", "stroke": "#3f6212", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ecfccb",
+        "stroke": "#3f6212",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-entregado",
@@ -181,10 +268,15 @@
       "width": 190,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "Pedido Entregado" },
-      "style": { "fill": "#f8fafc", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Pedido Entregado"
+      },
+      "style": {
+        "fill": "#f8fafc",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-notificar-rechazo",
       "type": "shape",
@@ -194,8 +286,14 @@
       "width": 84,
       "height": 84,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-notificar-rechazo",
@@ -206,10 +304,15 @@
       "width": 250,
       "height": 72,
       "zIndex": 3,
-      "data": { "text": "Notificar Rechazo" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Notificar Rechazo"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-fin",
       "type": "shape",
@@ -219,8 +322,14 @@
       "width": 84,
       "height": 84,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-fin",
@@ -231,10 +340,15 @@
       "width": 110,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "Fin" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Fin"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "label-pedido-confirmado",
       "type": "shape",
@@ -244,8 +358,14 @@
       "width": 270,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Pedido\nConfirmado?" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Pedido\nConfirmado?"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "label-si",
@@ -256,8 +376,14 @@
       "width": 72,
       "height": 44,
       "zIndex": 3,
-      "data": { "text": "Si" },
-      "style": { "fill": "#ecfccb", "stroke": "#3f6212", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Si"
+      },
+      "style": {
+        "fill": "#ecfccb",
+        "stroke": "#3f6212",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "label-no",
@@ -268,10 +394,15 @@
       "width": 72,
       "height": 44,
       "zIndex": 3,
-      "data": { "text": "No" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 1.5 }
+      "data": {
+        "text": "No"
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-repartidor",
       "type": "shape",
@@ -281,8 +412,14 @@
       "width": 96,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ecfeff", "stroke": "#155e75", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ecfeff",
+        "stroke": "#155e75",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "label-repartidor-tarea",
@@ -293,10 +430,16 @@
       "width": 320,
       "height": 72,
       "zIndex": 3,
-      "data": { "text": "Recoger y Entregar", "taskKind": "pickup" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Recoger y Entregar",
+        "taskKind": "pickup"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "legend-title",
       "type": "shape",
@@ -306,8 +449,14 @@
       "width": 170,
       "height": 48,
       "zIndex": 3,
-      "data": { "text": "Leyenda" },
-      "style": { "fill": "#e2e8f0", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Leyenda"
+      },
+      "style": {
+        "fill": "#e2e8f0",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "legend-success",
@@ -318,8 +467,14 @@
       "width": 210,
       "height": 48,
       "zIndex": 3,
-      "data": { "text": "Verde = resultado exitoso" },
-      "style": { "fill": "#ecfccb", "stroke": "#3f6212", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Verde = resultado exitoso"
+      },
+      "style": {
+        "fill": "#ecfccb",
+        "stroke": "#3f6212",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "legend-error",
@@ -330,8 +485,14 @@
       "width": 230,
       "height": 48,
       "zIndex": 3,
-      "data": { "text": "Rojo = rechazo o cierre" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Rojo = rechazo o cierre"
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "legend-flow",
@@ -342,8 +503,14 @@
       "width": 260,
       "height": 48,
       "zIndex": 3,
-      "data": { "text": "Punteado = mensaje/asociacion" },
-      "style": { "fill": "#f8fafc", "stroke": "#334155", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Punteado = mensaje/asociacion"
+      },
+      "style": {
+        "fill": "#f8fafc",
+        "stroke": "#334155",
+        "strokeWidth": 1.5
+      }
     }
   ],
   "edges": [
@@ -357,7 +524,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e2",
@@ -369,7 +539,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e3",
@@ -381,7 +554,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e4",
@@ -393,7 +569,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e5",
@@ -405,7 +584,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e6",
@@ -417,7 +599,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e7",
@@ -429,7 +614,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e8",
@@ -441,7 +629,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e9",
@@ -454,7 +645,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e10",
@@ -467,7 +661,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e11",
@@ -480,7 +677,11 @@
       "points": [],
       "markerEnd": "open-arrow",
       "markerStart": "open-circle",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2, "dashArray": "6 4" }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2,
+        "dashArray": "6 4"
+      }
     },
     {
       "id": "e12",
@@ -493,7 +694,11 @@
       "points": [],
       "markerEnd": "open-arrow",
       "markerStart": "open-circle",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2, "dashArray": "6 4" }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2,
+        "dashArray": "6 4"
+      }
     },
     {
       "id": "e13",
@@ -505,7 +710,10 @@
       "zIndex": 1,
       "points": [],
       "markerEnd": "arrow",
-      "style": { "stroke": "#1f2937", "strokeWidth": 2 }
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "e14",
@@ -516,7 +724,11 @@
       "flowType": "association",
       "zIndex": 1,
       "points": [],
-      "style": { "stroke": "#334155", "strokeWidth": 2, "dashArray": "3 4" }
+      "style": {
+        "stroke": "#334155",
+        "strokeWidth": 2,
+        "dashArray": "3 4"
+      }
     },
     {
       "id": "e15",
@@ -527,7 +739,11 @@
       "flowType": "association",
       "zIndex": 1,
       "points": [],
-      "style": { "stroke": "#334155", "strokeWidth": 2, "dashArray": "3 4" }
+      "style": {
+        "stroke": "#334155",
+        "strokeWidth": 2,
+        "dashArray": "3 4"
+      }
     }
   ]
 }

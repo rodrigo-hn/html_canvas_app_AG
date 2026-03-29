@@ -10,6 +10,7 @@ import { HtmlExportService } from '../core/services/html-exporter.service';
 import { InspectorComponent } from '../inspector/inspector.component';
 import { BpmnFlowType, DiagramNode, ShapeNode, WebNode } from '../core/models/diagram.model';
 import { StencilService } from '../stencils/stencil.service';
+import { CURRENT_DIAGRAM_MODEL_VERSION } from '../core/models/diagram-schema';
 
 interface CanvasFrame {
   id: string;
@@ -72,6 +73,40 @@ interface CanvasFrame {
         >
           Import JSON
         </button>
+        <button
+          (click)="undo()"
+          [disabled]="!commands.canUndo()"
+          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
+          title="Undo (Ctrl/Cmd+Z)"
+        >
+          Undo
+        </button>
+        <button
+          (click)="redo()"
+          [disabled]="!commands.canRedo()"
+          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
+          title="Redo (Ctrl/Cmd+Y o Ctrl/Cmd+Shift+Z)"
+        >
+          Redo
+        </button>
+        <select
+          class="rounded border border-slate-300 bg-white px-2 py-1 text-sm"
+          [ngModel]="selectedDomainTemplate"
+          (ngModelChange)="selectedDomainTemplate = $event"
+          title="Plantillas BPMN por dominio"
+        >
+          <option value="">Templates</option>
+          @for (tpl of domainTemplates; track tpl.value) {
+          <option [value]="tpl.value">{{ tpl.label }}</option>
+          }
+        </select>
+        <button
+          (click)="loadSelectedDomainTemplate()"
+          [disabled]="!selectedDomainTemplate"
+          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
+        >
+          Load
+        </button>
         <button (click)="zoomOut()" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">-</button>
         <button (click)="setZoom(1)" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">
           {{ (zoomLevel * 100) | number:'1.0-0' }}%
@@ -123,6 +158,10 @@ interface CanvasFrame {
         </select>
         <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" [disabled]="!selectedFrameId" (click)="goToSelectedFrame()">Go</button>
         <button class="bg-red-700 text-white px-3 py-2 rounded shadow hover:bg-red-800" [disabled]="!selectedFrameId" (click)="deleteSelectedFrame()">Del</button>
+        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="alignSelection('left')" title="Alt+Shift+Left">Align L</button>
+        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="alignSelection('top')" title="Alt+Shift+Up">Align T</button>
+        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="distributeSelection('horizontal')" title="Alt+Shift+H">Dist H</button>
+        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="distributeSelection('vertical')" title="Alt+Shift+V">Dist V</button>
         <label class="flex items-center gap-2 text-sm">
           <input type="checkbox" [checked]="store.snapToGrid()" (change)="onSnapToggle($event)" />
           Snap
@@ -427,6 +466,12 @@ export class CanvasComponent implements OnInit {
   frames: CanvasFrame[] = [];
   selectedFrameId: string | null = null;
   paletteQuery = '';
+  selectedDomainTemplate = '';
+  domainTemplates: Array<{ value: string; label: string; url: string }> = [
+    { value: 'ventas', label: 'Ventas', url: '/examples/bpmn-template-ventas.json' },
+    { value: 'soporte', label: 'Soporte', url: '/examples/bpmn-template-soporte.json' },
+    { value: 'logistica', label: 'Logística', url: '/examples/bpmn-template-logistica.json' },
+  ];
   paletteGroups = [
     { id: 'general', title: 'General', open: true },
     { id: 'web', title: 'Web Components', open: false },
@@ -555,6 +600,41 @@ export class CanvasComponent implements OnInit {
       this.inspectorOpen = true;
     }
     this.saveUiSettings();
+  }
+
+  undo() {
+    this.commands.undo();
+  }
+
+  redo() {
+    this.commands.redo();
+  }
+
+  alignSelection(mode: 'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom') {
+    this.commands.alignSelection(mode);
+  }
+
+  distributeSelection(axis: 'horizontal' | 'vertical') {
+    this.commands.distributeSelection(axis);
+  }
+
+  async loadSelectedDomainTemplate() {
+    if (!this.selectedDomainTemplate) return;
+    const template = this.domainTemplates.find((tpl) => tpl.value === this.selectedDomainTemplate);
+    if (!template) return;
+    try {
+      const response = await fetch(template.url, { cache: 'no-store' });
+      if (!response.ok) {
+        console.warn(`Template not loaded: ${response.status} ${response.statusText}`);
+        return;
+      }
+      const json = await response.text();
+      this.commands.loadFromJson(json);
+      this.fitToContent();
+      this.applyContrastPreset(this.contrastPreset);
+    } catch (error) {
+      console.warn('Template could not be loaded', error);
+    }
   }
 
   addPaletteItem(key: string) {
@@ -833,6 +913,15 @@ export class CanvasComponent implements OnInit {
 
   @HostListener('document:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
+    if (this.handleHistoryShortcuts(event)) {
+      return;
+    }
+    if (this.handleSelectionShortcuts(event)) {
+      return;
+    }
+    if (this.handleAlignmentShortcuts(event)) {
+      return;
+    }
     if (event.code === 'Space') {
       this.spacePressed = true;
       return;
@@ -938,8 +1027,7 @@ export class CanvasComponent implements OnInit {
   }
 
   private handleArrowMove(event: KeyboardEvent): boolean {
-    const active = document.activeElement as HTMLElement | null;
-    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+    if (this.isTypingContext()) {
       return false;
     }
     const arrowKeys = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']);
@@ -970,13 +1058,79 @@ export class CanvasComponent implements OnInit {
         break;
     }
 
-    const nodes = this.store.nodes();
-    for (const node of nodes) {
-      if (!selectedIds.has(node.id)) continue;
-      this.commands.updateNode(node.id, { x: node.x + dx, y: node.y + dy });
-    }
+    this.commands.moveSelectionBy(dx, dy);
 
     return true;
+  }
+
+  private handleHistoryShortcuts(event: KeyboardEvent): boolean {
+    if (this.isTypingContext()) return false;
+    const commandKey = event.ctrlKey || event.metaKey;
+    if (!commandKey) return false;
+    const key = event.key.toLowerCase();
+    if (key === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      this.commands.undo();
+      return true;
+    }
+    if (key === 'y' || (key === 'z' && event.shiftKey)) {
+      event.preventDefault();
+      this.commands.redo();
+      return true;
+    }
+    return false;
+  }
+
+  private handleSelectionShortcuts(event: KeyboardEvent): boolean {
+    if (this.isTypingContext()) return false;
+    const commandKey = event.ctrlKey || event.metaKey;
+    if (!commandKey) return false;
+    if (event.key.toLowerCase() !== 'a') return false;
+    event.preventDefault();
+    this.commands.setSelection(this.store.nodes().map((node) => node.id), false);
+    return true;
+  }
+
+  private handleAlignmentShortcuts(event: KeyboardEvent): boolean {
+    if (this.isTypingContext()) return false;
+    if (!event.altKey || !event.shiftKey) return false;
+    const key = event.key.toLowerCase();
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.commands.alignSelection('left');
+      return true;
+    }
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.commands.alignSelection('right');
+      return true;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      this.commands.alignSelection('top');
+      return true;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      this.commands.alignSelection('bottom');
+      return true;
+    }
+    if (key === 'h') {
+      event.preventDefault();
+      this.commands.distributeSelection('horizontal');
+      return true;
+    }
+    if (key === 'v') {
+      event.preventDefault();
+      this.commands.distributeSelection('vertical');
+      return true;
+    }
+    return false;
+  }
+
+  private isTypingContext(): boolean {
+    const active = document.activeElement as HTMLElement | null;
+    return !!active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
   }
 
   @HostListener('document:mousemove', ['$event'])
@@ -1773,6 +1927,7 @@ export class CanvasComponent implements OnInit {
 
   exportHtml() {
     const html = this.htmlExportService.exportHtml({
+      modelVersion: CURRENT_DIAGRAM_MODEL_VERSION,
       nodes: this.store.nodes(),
       edges: this.store.edges(),
     });
@@ -1789,6 +1944,7 @@ export class CanvasComponent implements OnInit {
 
   exportSvg() {
     const svg = this.htmlExportService.exportSvg({
+      modelVersion: CURRENT_DIAGRAM_MODEL_VERSION,
       nodes: this.store.nodes(),
       edges: this.store.edges(),
     });
@@ -1803,6 +1959,7 @@ export class CanvasComponent implements OnInit {
 
   async exportPng() {
     const blob = await this.htmlExportService.exportPng({
+      modelVersion: CURRENT_DIAGRAM_MODEL_VERSION,
       nodes: this.store.nodes(),
       edges: this.store.edges(),
     });

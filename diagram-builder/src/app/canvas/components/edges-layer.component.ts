@@ -4,6 +4,7 @@ import { DiagramStore } from '../../core/services/diagram-store.service';
 import { DiagramCommands } from '../../core/services/diagram-commands.service';
 import { DiagramEdge, DiagramNode, Point } from '../../core/models/diagram.model';
 import { EDGE_MARKER_TOKENS } from '../../core/styles/bpmn-visual-tokens';
+import { resolveEdgeStyle } from '../../core/edges/edge-style.mapper';
 
 type Port = 'top' | 'right' | 'bottom' | 'left';
 
@@ -314,7 +315,7 @@ export class EdgesLayerComponent {
     const start = this.getPortPoint(sourceNode, sourcePort);
     const end = this.getPortPoint(targetNode, targetPort);
     const manual = edge.points || [];
-    const radius = edge.style?.cornerRadius ?? this.defaultCornerRadius(edge);
+    const radius = resolveEdgeStyle(edge).cornerRadius;
     return this.buildOrthogonalPath(start, end, sourcePort, targetPort, manual, radius);
   }
 
@@ -327,30 +328,27 @@ export class EdgesLayerComponent {
   }
 
   markerEndUrl(edge: DiagramEdge): string | null {
-    const markerEnd = edge.markerEnd || this.defaultMarkerEnd(edge);
+    const markerEnd = resolveEdgeStyle(edge).markerEnd;
     if (!markerEnd) return null;
     return `url(#${markerEnd})`;
   }
 
   markerStartUrl(edge: DiagramEdge): string | null {
-    const markerStart = edge.markerStart || this.defaultMarkerStart(edge);
+    const markerStart = resolveEdgeStyle(edge).markerStart;
     if (!markerStart) return null;
     return `url(#${markerStart})`;
   }
 
   edgeStroke(edge: DiagramEdge): string {
-    return edge.color || edge.style?.stroke || '#1f2937';
+    return resolveEdgeStyle(edge).stroke;
   }
 
   edgeStrokeWidth(edge: DiagramEdge): number {
-    return edge.style?.strokeWidth || 2;
+    return resolveEdgeStyle(edge).strokeWidth;
   }
 
   edgeDashArray(edge: DiagramEdge): string | null {
-    if (edge.style?.dashArray) return edge.style.dashArray;
-    if (edge.flowType === 'message') return '6 4';
-    if (edge.flowType === 'association') return '3 4';
-    return null;
+    return resolveEdgeStyle(edge).dashArray;
   }
 
   private getPortPoint(node: DiagramNode, port: Port): Point {
@@ -606,23 +604,6 @@ export class EdgesLayerComponent {
       return dx >= 0 ? 'left' : 'right';
     }
     return dy >= 0 ? 'top' : 'bottom';
-  }
-
-  private defaultCornerRadius(edge: DiagramEdge): number {
-    if (edge.flowType === 'sequence') return 8;
-    if (edge.flowType === 'message') return 6;
-    return 4;
-  }
-
-  private defaultMarkerEnd(edge: DiagramEdge): string | null {
-    if (edge.flowType === 'association') return null;
-    if (edge.flowType === 'message') return 'open-arrow';
-    return 'arrow';
-  }
-
-  private defaultMarkerStart(edge: DiagramEdge): string | null {
-    if (edge.flowType === 'message') return 'open-circle';
-    return null;
   }
 
   edgeBendPoints(edge: DiagramEdge): Array<{ index: number; point: Point }> {

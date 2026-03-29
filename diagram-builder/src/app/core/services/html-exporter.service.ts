@@ -21,6 +21,7 @@ import {
   type BpmnTaskIconKind,
   type BpmnWebTaskVariant,
 } from '../styles/bpmn-visual-tokens';
+import { resolveEdgeStyle } from '../edges/edge-style.mapper';
 
 @Injectable({
   providedIn: 'root',
@@ -297,13 +298,14 @@ ${foregroundNodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.color || edge.style?.stroke || '#1f2937';
-        const strokeWidth = edge.style?.strokeWidth || 2;
-        const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
-        const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
+        const resolvedStyle = resolveEdgeStyle(edge);
+        const stroke = resolvedStyle.stroke;
+        const strokeWidth = resolvedStyle.strokeWidth;
+        const markerEndId = resolvedStyle.markerEnd;
+        const markerStartId = resolvedStyle.markerStart;
         const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
         const markerStart = markerStartId ? `url(#${markerStartId})` : '';
-        const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
+        const dashArray = resolvedStyle.dashArray;
         const points = this.buildOrthogonalPoints(
           start,
           end,
@@ -311,7 +313,7 @@ ${foregroundNodesHtml}
           edge.targetPort || 'left',
           edge.points || []
         );
-        const d = this.pointsToPath(points, edge.style?.cornerRadius ?? this.defaultCornerRadius(edge));
+        const d = this.pointsToPath(points, resolvedStyle.cornerRadius);
         const labelPoint = this.edgeLabelPoint(edge, points);
         const label = edge.label
           ? `<text x="${labelPoint.x}" y="${labelPoint.y}" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">${this.escapeText(edge.label)}</text>`
@@ -370,13 +372,14 @@ ${foregroundNodesHtml}
         const start = this.getPortPoint(model, edge.sourceId, edge.sourcePort || 'right');
         const end = this.getPortPoint(model, edge.targetId, edge.targetPort || 'left');
         if (!start || !end) return '';
-        const stroke = edge.color || edge.style?.stroke || '#1f2937';
-        const strokeWidth = edge.style?.strokeWidth || 2;
-        const markerEndId = edge.markerEnd || this.defaultMarkerEnd(edge);
-        const markerStartId = edge.markerStart || this.defaultMarkerStart(edge);
+        const resolvedStyle = resolveEdgeStyle(edge);
+        const stroke = resolvedStyle.stroke;
+        const strokeWidth = resolvedStyle.strokeWidth;
+        const markerEndId = resolvedStyle.markerEnd;
+        const markerStartId = resolvedStyle.markerStart;
         const markerEnd = markerEndId ? `url(#${markerEndId})` : '';
         const markerStart = markerStartId ? `url(#${markerStartId})` : '';
-        const dashArray = edge.style?.dashArray || this.defaultDashArray(edge);
+        const dashArray = resolvedStyle.dashArray;
         const points = this.buildOrthogonalPoints(
           start,
           end,
@@ -384,7 +387,7 @@ ${foregroundNodesHtml}
           edge.targetPort || 'left',
           edge.points || []
         );
-        const d = this.pointsToPath(points, edge.style?.cornerRadius ?? this.defaultCornerRadius(edge));
+        const d = this.pointsToPath(points, resolvedStyle.cornerRadius);
         const labelPoint = this.edgeLabelPoint(edge, points);
         const label = edge.label
           ? `<text x="${labelPoint.x}" y="${labelPoint.y}" text-anchor="middle" dominant-baseline="middle" fill="#334155" font-size="11" font-weight="600">${this.escapeText(edge.label)}</text>`
@@ -721,29 +724,6 @@ ${foregroundNodesHtml}
       return dx >= 0 ? 'left' : 'right';
     }
     return dy >= 0 ? 'top' : 'bottom';
-  }
-
-  private defaultCornerRadius(edge: DiagramModel['edges'][number]): number {
-    if (edge.flowType === 'sequence') return 8;
-    if (edge.flowType === 'message') return 6;
-    return 4;
-  }
-
-  private defaultMarkerEnd(edge: DiagramModel['edges'][number]): string | null {
-    if (edge.flowType === 'association') return null;
-    if (edge.flowType === 'message') return 'open-arrow';
-    return 'arrow';
-  }
-
-  private defaultMarkerStart(edge: DiagramModel['edges'][number]): string | null {
-    if (edge.flowType === 'message') return 'open-circle';
-    return null;
-  }
-
-  private defaultDashArray(edge: DiagramModel['edges'][number]): string {
-    if (edge.flowType === 'message') return '6 4';
-    if (edge.flowType === 'association') return '3 4';
-    return '';
   }
 
   private edgeLabelPoint(edge: DiagramEdge, points: Point[]): Point {

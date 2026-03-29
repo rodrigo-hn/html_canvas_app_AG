@@ -1,4 +1,5 @@
 {
+  "modelVersion": 2,
   "nodes": [
     {
       "id": "pool-main",
@@ -9,8 +10,14 @@
       "width": 1720,
       "height": 720,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "lane-cliente",
@@ -21,8 +28,14 @@
       "width": 1720,
       "height": 520,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "lane-repartidor",
@@ -33,10 +46,15 @@
       "width": 1720,
       "height": 190,
       "zIndex": 0,
-      "data": { "text": "" },
-      "style": { "fill": "transparent", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "transparent",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "header-cliente",
       "type": "shape",
@@ -46,8 +64,14 @@
       "width": 160,
       "height": 64,
       "zIndex": 1,
-      "data": { "text": "Cliente" },
-      "style": { "fill": "#eef2ff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": "Cliente"
+      },
+      "style": {
+        "fill": "#eef2ff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "header-repartidor",
@@ -58,10 +82,15 @@
       "width": 210,
       "height": 64,
       "zIndex": 1,
-      "data": { "text": "Repartidor" },
-      "style": { "fill": "#ecfeff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": "Repartidor"
+      },
+      "style": {
+        "fill": "#ecfeff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "ev-rechazo",
       "type": "shape",
@@ -71,8 +100,14 @@
       "width": 84,
       "height": 84,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-rechazo",
@@ -83,10 +118,15 @@
       "width": 250,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "Notificar Rechazo" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Notificar Rechazo"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#64748b",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-fin-top",
       "type": "shape",
@@ -96,8 +136,14 @@
       "width": 84,
       "height": 84,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-fin-top",
@@ -108,10 +154,15 @@
       "width": 110,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "Fin" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Fin"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#64748b",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-start",
       "type": "shape",
@@ -121,10 +172,15 @@
       "width": 70,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-recibir",
       "type": "shape",
@@ -134,8 +190,15 @@
       "width": 220,
       "height": 98,
       "zIndex": 3,
-      "data": { "text": "Recibir Orden", "taskKind": "receive" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Recibir Orden",
+        "taskKind": "receive"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-recibir",
@@ -146,10 +209,15 @@
       "width": 44,
       "height": 44,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "gateway-confirmado",
       "type": "shape",
@@ -159,8 +227,14 @@
       "width": 104,
       "height": 104,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#fef3c7", "stroke": "#854d0e", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#fef3c7",
+        "stroke": "#854d0e",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "label-pedido",
@@ -171,10 +245,15 @@
       "width": 230,
       "height": 78,
       "zIndex": 3,
-      "data": { "text": "Pedido\nConfirmado?" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Pedido\nConfirmado?"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#64748b",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "task-preparar-a",
       "type": "shape",
@@ -184,8 +263,15 @@
       "width": 205,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Preparar Pizza", "taskKind": "prepare" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Preparar Pizza",
+        "taskKind": "prepare"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-preparar-a",
@@ -196,10 +282,15 @@
       "width": 40,
       "height": 40,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-preparar-b",
       "type": "shape",
@@ -209,8 +300,15 @@
       "width": 205,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Preparar Pizza", "taskKind": "prepare" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Preparar Pizza",
+        "taskKind": "prepare"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-preparar-b",
@@ -221,10 +319,15 @@
       "width": 40,
       "height": 40,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-hornear",
       "type": "shape",
@@ -234,8 +337,15 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Hornear Pizza", "taskKind": "bake" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Hornear Pizza",
+        "taskKind": "bake"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-hornear",
@@ -246,10 +356,15 @@
       "width": 40,
       "height": 40,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-empacar",
       "type": "shape",
@@ -259,8 +374,15 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Empacar Pedido", "taskKind": "pack" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Empacar Pedido",
+        "taskKind": "pack"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-empacar",
@@ -271,10 +393,15 @@
       "width": 44,
       "height": 44,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ffffff", "stroke": "#334155", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#334155",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "task-entregar",
       "type": "shape",
@@ -284,8 +411,15 @@
       "width": 185,
       "height": 96,
       "zIndex": 3,
-      "data": { "text": "Entregar Pedido", "taskKind": "deliver" },
-      "style": { "fill": "#ffffff", "stroke": "#1f2937", "strokeWidth": 2 }
+      "data": {
+        "text": "Entregar Pedido",
+        "taskKind": "deliver"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "icon-entregar",
@@ -296,10 +430,15 @@
       "width": 40,
       "height": 40,
       "zIndex": 4,
-      "data": { "text": "" },
-      "style": { "fill": "#ecfeff", "stroke": "#155e75", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ecfeff",
+        "stroke": "#155e75",
+        "strokeWidth": 2
+      }
     },
-
     {
       "id": "ev-entregado",
       "type": "shape",
@@ -309,8 +448,14 @@
       "width": 90,
       "height": 90,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ecfccb", "stroke": "#3f6212", "strokeWidth": 3 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ecfccb",
+        "stroke": "#3f6212",
+        "strokeWidth": 3
+      }
     },
     {
       "id": "label-entregado",
@@ -321,10 +466,15 @@
       "width": 200,
       "height": 70,
       "zIndex": 3,
-      "data": { "text": "Pedido Entregado" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Pedido Entregado"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#64748b",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "label-si",
       "type": "shape",
@@ -334,8 +484,14 @@
       "width": 64,
       "height": 44,
       "zIndex": 3,
-      "data": { "text": "Si" },
-      "style": { "fill": "#ecfccb", "stroke": "#3f6212", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Si"
+      },
+      "style": {
+        "fill": "#ecfccb",
+        "stroke": "#3f6212",
+        "strokeWidth": 1.5
+      }
     },
     {
       "id": "label-no",
@@ -346,10 +502,15 @@
       "width": 64,
       "height": 44,
       "zIndex": 3,
-      "data": { "text": "No" },
-      "style": { "fill": "#fee2e2", "stroke": "#7f1d1d", "strokeWidth": 1.5 }
+      "data": {
+        "text": "No"
+      },
+      "style": {
+        "fill": "#fee2e2",
+        "stroke": "#7f1d1d",
+        "strokeWidth": 1.5
+      }
     },
-
     {
       "id": "ev-repartidor",
       "type": "shape",
@@ -359,8 +520,14 @@
       "width": 92,
       "height": 92,
       "zIndex": 3,
-      "data": { "text": "" },
-      "style": { "fill": "#ecfeff", "stroke": "#155e75", "strokeWidth": 2 }
+      "data": {
+        "text": ""
+      },
+      "style": {
+        "fill": "#ecfeff",
+        "stroke": "#155e75",
+        "strokeWidth": 2
+      }
     },
     {
       "id": "label-repartidor",
@@ -371,23 +538,218 @@
       "width": 320,
       "height": 68,
       "zIndex": 3,
-      "data": { "text": "Recoger y Entregar", "taskKind": "pickup" },
-      "style": { "fill": "#ffffff", "stroke": "#64748b", "strokeWidth": 1.5 }
+      "data": {
+        "text": "Recoger y Entregar",
+        "taskKind": "pickup"
+      },
+      "style": {
+        "fill": "#ffffff",
+        "stroke": "#64748b",
+        "strokeWidth": 1.5
+      }
     }
   ],
   "edges": [
-    { "id": "e1", "sourceId": "ev-start", "targetId": "task-recibir", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e2", "sourceId": "task-recibir", "targetId": "gateway-confirmado", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e3", "sourceId": "task-recibir", "targetId": "task-preparar-a", "sourcePort": "bottom", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e4", "sourceId": "task-preparar-a", "targetId": "task-preparar-b", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e5", "sourceId": "task-preparar-b", "targetId": "task-hornear", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e6", "sourceId": "task-hornear", "targetId": "task-empacar", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e7", "sourceId": "task-empacar", "targetId": "task-entregar", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e8", "sourceId": "task-entregar", "targetId": "ev-entregado", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e9", "sourceId": "gateway-confirmado", "targetId": "task-empacar", "sourcePort": "right", "targetPort": "top", "flowType": "sequence", "label": "Si", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e10", "sourceId": "gateway-confirmado", "targetId": "task-preparar-b", "sourcePort": "bottom", "targetPort": "top", "flowType": "sequence", "label": "No", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } },
-    { "id": "e11", "sourceId": "ev-rechazo", "targetId": "task-recibir", "sourcePort": "bottom", "targetPort": "top", "flowType": "message", "zIndex": 1, "points": [], "markerStart": "open-circle", "markerEnd": "open-arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2, "dashArray": "6 4" } },
-    { "id": "e12", "sourceId": "ev-fin-top", "targetId": "task-entregar", "sourcePort": "bottom", "targetPort": "top", "flowType": "message", "zIndex": 1, "points": [], "markerStart": "open-circle", "markerEnd": "open-arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2, "dashArray": "6 4" } },
-    { "id": "e13", "sourceId": "header-repartidor", "targetId": "ev-repartidor", "sourcePort": "right", "targetPort": "left", "flowType": "sequence", "zIndex": 1, "points": [], "markerEnd": "arrow", "style": { "stroke": "#1f2937", "strokeWidth": 2 } }
+    {
+      "id": "e1",
+      "sourceId": "ev-start",
+      "targetId": "task-recibir",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e2",
+      "sourceId": "task-recibir",
+      "targetId": "gateway-confirmado",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e3",
+      "sourceId": "task-recibir",
+      "targetId": "task-preparar-a",
+      "sourcePort": "bottom",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e4",
+      "sourceId": "task-preparar-a",
+      "targetId": "task-preparar-b",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e5",
+      "sourceId": "task-preparar-b",
+      "targetId": "task-hornear",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e6",
+      "sourceId": "task-hornear",
+      "targetId": "task-empacar",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e7",
+      "sourceId": "task-empacar",
+      "targetId": "task-entregar",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e8",
+      "sourceId": "task-entregar",
+      "targetId": "ev-entregado",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e9",
+      "sourceId": "gateway-confirmado",
+      "targetId": "task-empacar",
+      "sourcePort": "right",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "label": "Si",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e10",
+      "sourceId": "gateway-confirmado",
+      "targetId": "task-preparar-b",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "label": "No",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    },
+    {
+      "id": "e11",
+      "sourceId": "ev-rechazo",
+      "targetId": "task-recibir",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "message",
+      "zIndex": 1,
+      "points": [],
+      "markerStart": "open-circle",
+      "markerEnd": "open-arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2,
+        "dashArray": "6 4"
+      }
+    },
+    {
+      "id": "e12",
+      "sourceId": "ev-fin-top",
+      "targetId": "task-entregar",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "message",
+      "zIndex": 1,
+      "points": [],
+      "markerStart": "open-circle",
+      "markerEnd": "open-arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2,
+        "dashArray": "6 4"
+      }
+    },
+    {
+      "id": "e13",
+      "sourceId": "header-repartidor",
+      "targetId": "ev-repartidor",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 1,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": {
+        "stroke": "#1f2937",
+        "strokeWidth": 2
+      }
+    }
   ]
 }

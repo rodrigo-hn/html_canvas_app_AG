@@ -1,0 +1,206 @@
+{
+  "modelVersion": 2,
+  "nodes": [
+    {
+      "id": "log-pool",
+      "type": "web-component",
+      "componentType": "bpmn-pool-web",
+      "x": 50,
+      "y": 70,
+      "width": 1840,
+      "height": 560,
+      "zIndex": -2,
+      "data": {
+        "text": "Operación Logística",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "log-lane-plan",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 90,
+      "y": 70,
+      "width": 1800,
+      "height": 200,
+      "zIndex": -1,
+      "data": {
+        "text": "Planificación",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "log-lane-wh",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 90,
+      "y": 270,
+      "width": 1800,
+      "height": 190,
+      "zIndex": -1,
+      "data": {
+        "text": "Almacén",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "log-lane-dispatch",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 90,
+      "y": 460,
+      "width": 1800,
+      "height": 170,
+      "zIndex": -1,
+      "data": {
+        "text": "Despacho",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "log-start",
+      "type": "web-component",
+      "componentType": "bpmn-start-event-web",
+      "x": 180,
+      "y": 140,
+      "width": 60,
+      "height": 60,
+      "zIndex": 1,
+      "data": {}
+    },
+    {
+      "id": "log-plan",
+      "type": "web-component",
+      "componentType": "bpmn-service-task-web",
+      "x": 300,
+      "y": 128,
+      "width": 220,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Planificar despacho",
+        "variant": "green",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "log-pick",
+      "type": "web-component",
+      "componentType": "bpmn-manual-task-web",
+      "x": 620,
+      "y": 320,
+      "width": 220,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Preparar picking",
+        "variant": "yellow",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "log-packing",
+      "type": "web-component",
+      "componentType": "bpmn-subprocess-web",
+      "x": 940,
+      "y": 318,
+      "width": 230,
+      "height": 92,
+      "zIndex": 1,
+      "data": {
+        "text": "Empaque y verificación",
+        "variant": "purple",
+        "badgeEnabled": true,
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "log-dispatch",
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 1260,
+      "y": 500,
+      "width": 210,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Despachar ruta",
+        "variant": "blue",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "log-end",
+      "type": "web-component",
+      "componentType": "bpmn-end-event-web",
+      "x": 1580,
+      "y": 508,
+      "width": 64,
+      "height": 64,
+      "zIndex": 1,
+      "data": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "le-1",
+      "sourceId": "log-start",
+      "targetId": "log-plan",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "le-2",
+      "sourceId": "log-plan",
+      "targetId": "log-pick",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "le-3",
+      "sourceId": "log-pick",
+      "targetId": "log-packing",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "le-4",
+      "sourceId": "log-packing",
+      "targetId": "log-dispatch",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "le-5",
+      "sourceId": "log-dispatch",
+      "targetId": "log-end",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    }
+  ]
+}

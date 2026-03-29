@@ -73,6 +73,8 @@ describe('DiagramCommands', () => {
     store.setEdges(edges);
 
     const json = commands.exportJson();
+    const parsed = JSON.parse(json) as { modelVersion?: number };
+    expect(parsed.modelVersion).toBe(2);
     commands.loadFromJson(json);
 
     expect(store.nodes().length).toBe(2);
@@ -81,5 +83,65 @@ describe('DiagramCommands', () => {
     expect(store.edges()[0].markerEnd).toBe('open-arrow');
     expect(store.edges()[0].markerStart).toBe('open-circle');
     expect(store.edges()[0].style?.dashArray).toBe('6 4');
+  });
+
+  it('migrates legacy JSON without modelVersion and normalizes edge points', () => {
+    const store = new DiagramStore();
+    const commands = new DiagramCommands(store);
+    const legacy = JSON.stringify({
+      nodes: [seedNode('1', 10, 10, 'A'), seedNode('2', 200, 10, 'B')],
+      edges: [
+        {
+          id: 'legacy-edge',
+          sourceId: '1',
+          targetId: '2',
+          sourcePort: 'right',
+          targetPort: 'left',
+          zIndex: 0,
+          points: [{ x: 50, y: 50 }, { x: 'invalid', y: 80 }],
+          labelPosition: { x: 140, y: 20 },
+        },
+      ],
+    });
+
+    commands.loadFromJson(legacy);
+    expect(store.edges().length).toBe(1);
+    expect(store.edges()[0].points.length).toBe(1);
+    expect(store.edges()[0].points[0]).toEqual({ x: 50, y: 50 });
+    expect(store.edges()[0].labelPosition).toEqual({ x: 140, y: 20 });
+  });
+
+  it('supports undo and redo for node updates', () => {
+    const store = new DiagramStore();
+    const commands = new DiagramCommands(store);
+    store.setNodes([seedNode('1', 100, 100, 'A')]);
+
+    commands.updateNode('1', { x: 240 });
+    expect((store.nodes().find((n) => n.id === '1') as ShapeNode).x).toBe(240);
+
+    expect(commands.undo()).toBe(true);
+    expect((store.nodes().find((n) => n.id === '1') as ShapeNode).x).toBe(100);
+
+    expect(commands.redo()).toBe(true);
+    expect((store.nodes().find((n) => n.id === '1') as ShapeNode).x).toBe(240);
+  });
+
+  it('aligns and distributes selected nodes', () => {
+    const store = new DiagramStore();
+    const commands = new DiagramCommands(store);
+    store.setNodes([
+      seedNode('1', 100, 100, 'A'),
+      seedNode('2', 220, 180, 'B'),
+      seedNode('3', 340, 140, 'C'),
+    ]);
+    store.setSelection(new Set(['1', '2', '3']));
+
+    commands.alignSelection('top');
+    const topY = store.nodes().map((n) => n.y);
+    expect(topY).toEqual([100, 100, 100]);
+
+    commands.distributeSelection('horizontal');
+    const sortedX = [...store.nodes()].sort((a, b) => a.x - b.x).map((n) => n.x);
+    expect(sortedX[1] - sortedX[0]).toBeCloseTo(sortedX[2] - sortedX[1], 5);
   });
 });

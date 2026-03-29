@@ -1,22 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { TestBed } from '@angular/core/testing';
-import { DomSanitizer } from '@angular/platform-browser';
+import { createEnvironmentInjector, runInInjectionContext } from '@angular/core';
 import { HtmlExportService } from './html-exporter.service';
+import { StencilService } from '../../stencils/stencil.service';
+
+function createService(): HtmlExportService {
+  const injector = createEnvironmentInjector([
+    {
+      provide: StencilService,
+      useValue: {},
+    },
+  ]);
+  return runInInjectionContext(injector, () => new HtmlExportService());
+}
 
 describe('HtmlExportService', () => {
   it('exports SVG with edges and markers', () => {
-    TestBed.configureTestingModule({
-      providers: [
-        HtmlExportService,
-        {
-          provide: DomSanitizer,
-          useValue: { bypassSecurityTrustHtml: (v: string) => v },
-        },
-      ],
-    });
-
-    const service = TestBed.inject(HtmlExportService);
+    const service = createService();
     const svg = service.exportSvg({
+      modelVersion: 2,
       nodes: [
         {
           id: '1',
@@ -62,18 +63,9 @@ describe('HtmlExportService', () => {
   });
 
   it('exports message-flow markers and dashed style', () => {
-    TestBed.configureTestingModule({
-      providers: [
-        HtmlExportService,
-        {
-          provide: DomSanitizer,
-          useValue: { bypassSecurityTrustHtml: (v: string) => v },
-        },
-      ],
-    });
-
-    const service = TestBed.inject(HtmlExportService);
+    const service = createService();
     const svg = service.exportSvg({
+      modelVersion: 2,
       nodes: [
         {
           id: '1',
@@ -121,18 +113,9 @@ describe('HtmlExportService', () => {
   });
 
   it('exports HTML including classic web components even with negative coordinates', () => {
-    TestBed.configureTestingModule({
-      providers: [
-        HtmlExportService,
-        {
-          provide: DomSanitizer,
-          useValue: { bypassSecurityTrustHtml: (v: string) => v },
-        },
-      ],
-    });
-
-    const service = TestBed.inject(HtmlExportService);
+    const service = createService();
     const html = service.exportHtml({
+      modelVersion: 2,
       nodes: [
         {
           id: 'btn-1',
@@ -165,5 +148,58 @@ describe('HtmlExportService', () => {
     expect(html).toContain('>Button<');
     expect(html).toContain('>Card<');
     expect(html).toContain('Card content');
+  });
+
+  it('exports SVG multi-bend edge with label and manual label position', () => {
+    const service = createService();
+    const svg = service.exportSvg({
+      modelVersion: 2,
+      nodes: [
+        {
+          id: 'n1',
+          type: 'shape',
+          shapeType: 'rectangle',
+          x: 0,
+          y: 0,
+          width: 120,
+          height: 70,
+          zIndex: 0,
+          data: { text: 'A' },
+        },
+        {
+          id: 'n2',
+          type: 'shape',
+          shapeType: 'rectangle',
+          x: 320,
+          y: 220,
+          width: 120,
+          height: 70,
+          zIndex: 0,
+          data: { text: 'B' },
+        },
+      ],
+      edges: [
+        {
+          id: 'e-multi',
+          sourceId: 'n1',
+          targetId: 'n2',
+          sourcePort: 'right',
+          targetPort: 'left',
+          zIndex: 0,
+          points: [
+            { x: 180, y: 35 },
+            { x: 180, y: 255 },
+          ],
+          label: 'A->B',
+          labelPosition: { x: 200, y: 120 },
+          markerEnd: 'arrow',
+        },
+      ],
+    });
+
+    expect(svg).toContain('A-&gt;B');
+    expect(svg).toContain('x="200" y="120"');
+    expect(svg).toContain('marker-end="url(#arrow)"');
+    expect(svg).toContain('<path d="M ');
   });
 });

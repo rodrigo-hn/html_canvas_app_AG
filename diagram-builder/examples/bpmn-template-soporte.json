@@ -1,0 +1,191 @@
+{
+  "modelVersion": 2,
+  "nodes": [
+    {
+      "id": "soporte-pool",
+      "type": "web-component",
+      "componentType": "bpmn-pool-web",
+      "x": 60,
+      "y": 90,
+      "width": 1700,
+      "height": 500,
+      "zIndex": -2,
+      "data": {
+        "text": "Mesa de Soporte",
+        "variant": "yellow"
+      }
+    },
+    {
+      "id": "soporte-lane-front",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 100,
+      "y": 90,
+      "width": 1660,
+      "height": 250,
+      "zIndex": -1,
+      "data": {
+        "text": "Frontline",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "soporte-lane-back",
+      "type": "web-component",
+      "componentType": "bpmn-lane-web",
+      "x": 100,
+      "y": 340,
+      "width": 1660,
+      "height": 250,
+      "zIndex": -1,
+      "data": {
+        "text": "Backoffice",
+        "variant": "blue"
+      }
+    },
+    {
+      "id": "soporte-start",
+      "type": "web-component",
+      "componentType": "bpmn-start-event-web",
+      "x": 180,
+      "y": 185,
+      "width": 60,
+      "height": 60,
+      "zIndex": 1,
+      "data": {}
+    },
+    {
+      "id": "soporte-recibe",
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 290,
+      "y": 170,
+      "width": 210,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Registrar ticket",
+        "variant": "blue",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "soporte-prioriza",
+      "type": "web-component",
+      "componentType": "bpmn-manual-task-web",
+      "x": 580,
+      "y": 170,
+      "width": 220,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Priorizar caso",
+        "variant": "yellow",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "soporte-resuelve",
+      "type": "web-component",
+      "componentType": "bpmn-service-task-web",
+      "x": 900,
+      "y": 420,
+      "width": 220,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Resolver incidente",
+        "variant": "green",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "soporte-cierra",
+      "type": "web-component",
+      "componentType": "bpmn-user-task-web",
+      "x": 1220,
+      "y": 170,
+      "width": 210,
+      "height": 84,
+      "zIndex": 1,
+      "data": {
+        "text": "Cerrar ticket",
+        "variant": "red",
+        "iconEnabled": true
+      }
+    },
+    {
+      "id": "soporte-end",
+      "type": "web-component",
+      "componentType": "bpmn-end-event-web",
+      "x": 1510,
+      "y": 180,
+      "width": 64,
+      "height": 64,
+      "zIndex": 1,
+      "data": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "se-1",
+      "sourceId": "soporte-start",
+      "targetId": "soporte-recibe",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "se-2",
+      "sourceId": "soporte-recibe",
+      "targetId": "soporte-prioriza",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "se-3",
+      "sourceId": "soporte-prioriza",
+      "targetId": "soporte-resuelve",
+      "sourcePort": "bottom",
+      "targetPort": "top",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "se-4",
+      "sourceId": "soporte-resuelve",
+      "targetId": "soporte-cierra",
+      "sourcePort": "top",
+      "targetPort": "bottom",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    },
+    {
+      "id": "se-5",
+      "sourceId": "soporte-cierra",
+      "targetId": "soporte-end",
+      "sourcePort": "right",
+      "targetPort": "left",
+      "flowType": "sequence",
+      "zIndex": 0,
+      "points": [],
+      "markerEnd": "arrow",
+      "style": { "stroke": "#9fa1a3", "strokeWidth": 2 }
+    }
+  ]
+}
