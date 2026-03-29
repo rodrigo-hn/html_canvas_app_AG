@@ -41,232 +41,310 @@ interface CanvasFrame {
       (wheel)="onCanvasWheel($event)"
     >
       @if (!presentationMode) {
-      <!-- Toolbar (Simulated) -->
-      <div class="absolute top-4 left-4 z-50 flex flex-wrap items-center gap-2 bg-white/90 border border-slate-200 rounded px-2 py-1 shadow-sm">
-        <button
-          (click)="exportHtml()"
-          class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700"
-        >
-          Export HTML
-        </button>
-        <button
-          (click)="exportSvg()"
-          class="bg-indigo-600 text-white px-3 py-2 rounded shadow hover:bg-indigo-700"
-        >
-          Export SVG
-        </button>
-        <button
-          (click)="exportPng()"
-          class="bg-indigo-600 text-white px-3 py-2 rounded shadow hover:bg-indigo-700"
-        >
-          Export PNG
-        </button>
-        <button
-          (click)="exportJson()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800"
-        >
-          Export JSON
-        </button>
-        <button
-          (click)="importJson()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800"
-        >
-          Import JSON
-        </button>
-        <button
-          (click)="undo()"
-          [disabled]="!commands.canUndo()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
-          title="Undo (Ctrl/Cmd+Z)"
-        >
-          Undo
-        </button>
-        <button
-          (click)="redo()"
-          [disabled]="!commands.canRedo()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
-          title="Redo (Ctrl/Cmd+Y o Ctrl/Cmd+Shift+Z)"
-        >
-          Redo
-        </button>
-        <select
-          class="rounded border border-slate-300 bg-white px-2 py-1 text-sm"
-          [ngModel]="selectedDomainTemplate"
-          (ngModelChange)="selectedDomainTemplate = $event"
-          title="Plantillas BPMN por dominio"
-        >
-          <option value="">Templates</option>
-          @for (tpl of domainTemplates; track tpl.value) {
-          <option [value]="tpl.value">{{ tpl.label }}</option>
+      <!-- Toolbar -->
+      <div class="absolute top-3 left-3 right-3 z-50 flex items-center gap-0.5 bg-white/95 backdrop-blur border border-slate-200 rounded-lg px-2 py-1" style="box-shadow: var(--shadow-toolbar);" (click)="$event.stopPropagation()">
+
+        <!-- File dropdown -->
+        <div class="toolbar-dropdown">
+          <button class="tb-btn" (click)="toggleMenu('file')" title="File">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 3h8l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M12 3v4h4"/></svg>
+            <span>File</span>
+            <svg class="w-3 h-3 opacity-50" viewBox="0 0 12 12" fill="currentColor"><path d="M3 5l3 3 3-3z"/></svg>
+          </button>
+          @if (openMenu === 'file') {
+          <div class="toolbar-dropdown-panel">
+            <button class="dropdown-item" (click)="exportHtml(); closeMenu()">
+              <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 13l3-3-3-3M10 13h6"/></svg>
+              Export HTML
+            </button>
+            <button class="dropdown-item" (click)="exportSvg(); closeMenu()">
+              <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="6"/><path d="M10 4v12M4 10h12"/></svg>
+              Export SVG
+            </button>
+            <button class="dropdown-item" (click)="exportPng(); closeMenu()">
+              <svg class="w-4 h-4 text-indigo-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><circle cx="8" cy="8" r="1.5"/><path d="M3 14l4-4 3 3 2-2 5 5"/></svg>
+              Export PNG
+            </button>
+            <button class="dropdown-item" (click)="exportJson(); closeMenu()">
+              <svg class="w-4 h-4 text-slate-500" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3C4.5 3 4 4 4 5v2c0 1-1 2-2 2 1 0 2 1 2 2v2c0 1 .5 2 2 2M14 3c1.5 0 2 1 2 2v2c0 1 1 2 2 2-1 0-2 1-2 2v2c0 1-.5 2-2 2"/></svg>
+              Export JSON
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" (click)="importJson(); closeMenu()">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 14v2a1 1 0 001 1h12a1 1 0 001-1v-2M10 3v10M6 9l4 4 4-4"/></svg>
+              Import JSON
+            </button>
+            <div class="dropdown-divider"></div>
+            <div class="px-2 py-1.5">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">Templates</div>
+              <select
+                class="w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs"
+                [ngModel]="selectedDomainTemplate"
+                (ngModelChange)="selectedDomainTemplate = $event"
+                (click)="$event.stopPropagation()"
+              >
+                <option value="">Select template...</option>
+                @for (tpl of domainTemplates; track tpl.value) {
+                <option [value]="tpl.value">{{ tpl.label }}</option>
+                }
+              </select>
+              <button
+                class="mt-1.5 w-full rounded bg-indigo-600 px-2 py-1 text-xs text-white hover:bg-indigo-700 disabled:opacity-40"
+                [disabled]="!selectedDomainTemplate"
+                (click)="loadSelectedDomainTemplate(); closeMenu()"
+              >Load Template</button>
+            </div>
+            <div class="dropdown-divider"></div>
+            <label class="dropdown-item cursor-pointer" (click)="$event.stopPropagation()">
+              <input
+                type="checkbox"
+                class="rounded"
+                [checked]="autoSaveEnabled"
+                (change)="onAutoSaveToggle($event)"
+              />
+              Auto-save
+            </label>
+          </div>
           }
-        </select>
-        <button
-          (click)="loadSelectedDomainTemplate()"
-          [disabled]="!selectedDomainTemplate"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800 disabled:opacity-40"
-        >
-          Load
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <!-- Undo / Redo -->
+        <button class="tb-btn" (click)="undo()" [disabled]="!commands.canUndo()" title="Undo (Ctrl+Z)">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8l4-4M4 8l4 4M5 8h8a4 4 0 010 8H11"/></svg>
         </button>
-        <button (click)="zoomOut()" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">-</button>
-        <button (click)="setZoom(1)" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">
+        <button class="tb-btn" (click)="redo()" [disabled]="!commands.canRedo()" title="Redo (Ctrl+Y)">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 8l-4-4M16 8l-4 4M15 8H7a4 4 0 000 8h2"/></svg>
+        </button>
+
+        <div class="tb-sep"></div>
+
+        <!-- Arrange dropdown -->
+        <div class="toolbar-dropdown">
+          <button class="tb-btn" (click)="toggleMenu('arrange')" title="Arrange">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
+            <span>Arrange</span>
+            <svg class="w-3 h-3 opacity-50" viewBox="0 0 12 12" fill="currentColor"><path d="M3 5l3 3 3-3z"/></svg>
+          </button>
+          @if (openMenu === 'arrange') {
+          <div class="toolbar-dropdown-panel">
+            <button class="dropdown-item" (click)="alignSelection('left'); closeMenu()" title="Alt+Shift+Left">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14M7 6h8v3H7zM7 12h5v3H7z"/></svg>
+              Align Left
+            </button>
+            <button class="dropdown-item" (click)="alignSelection('top'); closeMenu()" title="Alt+Shift+Up">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h14M6 7v8h3V7zM12 7v5h3v-5z"/></svg>
+              Align Top
+            </button>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" (click)="distributeSelection('horizontal'); closeMenu()" title="Alt+Shift+H">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v14M17 3v14M7 7h6v6H7z"/></svg>
+              Distribute Horizontal
+            </button>
+            <button class="dropdown-item" (click)="distributeSelection('vertical'); closeMenu()" title="Alt+Shift+V">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3h14M3 17h14M7 7h6v6H7z"/></svg>
+              Distribute Vertical
+            </button>
+            <div class="dropdown-divider"></div>
+            <div class="px-2 py-1.5">
+              <label class="flex items-center gap-2 text-xs cursor-pointer">
+                <input type="checkbox" class="rounded" [checked]="store.snapToGrid()" (change)="onSnapToggle($event)" (click)="$event.stopPropagation()" />
+                Snap to Grid
+              </label>
+              <div class="mt-1.5 flex items-center gap-2">
+                <span class="text-xs text-slate-500">Size</span>
+                <input
+                  type="number"
+                  min="2"
+                  class="w-14 border border-slate-200 rounded px-1.5 py-0.5 text-xs"
+                  [value]="store.gridSize()"
+                  (change)="onGridSizeChange($event)"
+                  (click)="$event.stopPropagation()"
+                />
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <!-- Zoom controls -->
+        <button class="tb-btn" (click)="zoomOut()" title="Zoom Out">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3M7 9h4"/></svg>
+        </button>
+        <button class="tb-btn tabular-nums min-w-[48px] justify-center" (click)="setZoom(1)" title="Reset Zoom">
           {{ (zoomLevel * 100) | number:'1.0-0' }}%
         </button>
-        <button (click)="zoomIn()" class="bg-slate-700 text-white px-2 py-2 rounded shadow hover:bg-slate-800">+</button>
-        <button (click)="fitToContent()" class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800">Fit</button>
-        <button (click)="applyBpmnPreset()" class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800">Preset</button>
-        <button
-          (click)="toggleFocusMode()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800"
-        >
-          {{ focusMode ? 'Exit Focus' : 'Focus' }}
+        <button class="tb-btn" (click)="zoomIn()" title="Zoom In">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3M9 7v4M7 9h4"/></svg>
+        </button>
+        <button class="tb-btn" (click)="fitToContent()" title="Fit to Content">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 7V4a1 1 0 011-1h3M13 3h3a1 1 0 011 1v3M17 13v3a1 1 0 01-1 1h-3M7 17H4a1 1 0 01-1-1v-3"/></svg>
+        </button>
+
+        <div class="tb-sep"></div>
+
+        <!-- Canvas dropdown -->
+        <div class="toolbar-dropdown">
+          <button class="tb-btn" (click)="toggleMenu('canvas')" title="Canvas Settings">
+            <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="14" height="14" rx="2"/><path d="M3 7h14"/></svg>
+            <span>Canvas</span>
+            <svg class="w-3 h-3 opacity-50" viewBox="0 0 12 12" fill="currentColor"><path d="M3 5l3 3 3-3z"/></svg>
+          </button>
+          @if (openMenu === 'canvas') {
+          <div class="toolbar-dropdown-panel">
+            <div class="px-2 py-1.5">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">Page Size</div>
+              <select
+                class="w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs"
+                [ngModel]="pagePreset"
+                (ngModelChange)="onPagePresetChange($event)"
+                (click)="$event.stopPropagation()"
+              >
+                <option value="Infinite">Infinite</option>
+                <option value="A4">A4</option>
+                <option value="A3">A3</option>
+                <option value="16:9">16:9</option>
+                <option value="Custom">Custom</option>
+              </select>
+              @if (pagePreset === 'Custom') {
+              <div class="mt-1.5 flex gap-2">
+                <label class="flex items-center gap-1 text-xs flex-1">
+                  W <input type="number" min="200" class="w-full rounded border border-slate-200 px-1.5 py-0.5 text-xs" [ngModel]="pageWidth" (ngModelChange)="onCustomPageWidth($event)" (click)="$event.stopPropagation()" />
+                </label>
+                <label class="flex items-center gap-1 text-xs flex-1">
+                  H <input type="number" min="200" class="w-full rounded border border-slate-200 px-1.5 py-0.5 text-xs" [ngModel]="pageHeight" (ngModelChange)="onCustomPageHeight($event)" (click)="$event.stopPropagation()" />
+                </label>
+              </div>
+              }
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="px-2 py-1.5">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">Frames</div>
+              <select
+                class="w-full rounded border border-slate-200 bg-white px-2 py-1 text-xs mb-1"
+                [ngModel]="selectedFrameId"
+                (ngModelChange)="selectedFrameId = $event"
+                (click)="$event.stopPropagation()"
+              >
+                <option [ngValue]="null">Select frame...</option>
+                @for (frame of frames; track frame.id) {
+                <option [ngValue]="frame.id">{{ frame.name }}</option>
+                }
+              </select>
+              <div class="flex gap-1">
+                <button class="flex-1 rounded bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200" (click)="addFrameFromView(); closeMenu()">Add</button>
+                <button class="flex-1 rounded bg-slate-100 px-2 py-1 text-xs hover:bg-slate-200 disabled:opacity-40" [disabled]="!selectedFrameId" (click)="goToSelectedFrame(); closeMenu()">Go</button>
+                <button class="flex-1 rounded bg-red-50 px-2 py-1 text-xs text-red-600 hover:bg-red-100 disabled:opacity-40" [disabled]="!selectedFrameId" (click)="deleteSelectedFrame(); closeMenu()">Delete</button>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <div class="px-2 py-1.5">
+              <div class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold mb-1">Contrast</div>
+              <div class="flex gap-0.5 rounded-md bg-slate-100 p-0.5">
+                <button
+                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  [class.bg-white]="contrastPreset === 'light'"
+                  [class.shadow-sm]="contrastPreset === 'light'"
+                  [class.font-semibold]="contrastPreset === 'light'"
+                  (click)="applyContrastPreset('light'); $event.stopPropagation()"
+                  title="Light borders for dark backgrounds"
+                >Light</button>
+                <button
+                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  [class.bg-white]="contrastPreset === 'medium'"
+                  [class.shadow-sm]="contrastPreset === 'medium'"
+                  [class.font-semibold]="contrastPreset === 'medium'"
+                  (click)="applyContrastPreset('medium'); $event.stopPropagation()"
+                  title="Balanced contrast"
+                >Medium</button>
+                <button
+                  class="flex-1 rounded px-2 py-1 text-xs transition-colors"
+                  [class.bg-white]="contrastPreset === 'high'"
+                  [class.shadow-sm]="contrastPreset === 'high'"
+                  [class.font-semibold]="contrastPreset === 'high'"
+                  (click)="applyContrastPreset('high'); $event.stopPropagation()"
+                  title="Maximum contrast"
+                >High</button>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <button class="dropdown-item" (click)="applyBpmnPreset(); closeMenu()">
+              <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 4h5v5H4zM11 4h5v5h-5zM4 11h5v5H4zM11 11h5v5h-5z"/></svg>
+              Apply BPMN Preset
+            </button>
+          </div>
+          }
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <!-- View toggles -->
+        <button class="tb-btn" [class.active]="focusMode" (click)="toggleFocusMode()" title="Focus Mode">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="3"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3"/></svg>
         </button>
         @if (!focusMode) {
-        <button
-          (click)="togglePaletteFromToolbar()"
-          class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800"
-        >
-          {{ isPaletteOpen ? 'Hide Components' : 'Show Components' }}
+        <button class="tb-btn" [class.active]="isPaletteOpen" (click)="togglePaletteFromToolbar()" title="Toggle Components Panel">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="5" height="14" rx="1"/><path d="M11 5h6M11 9h6M11 13h4"/></svg>
         </button>
         }
-        <select
-          class="rounded border border-slate-300 bg-white px-2 py-1 text-sm"
-          [ngModel]="pagePreset"
-          (ngModelChange)="onPagePresetChange($event)"
-        >
-          <option value="Infinite">Infinite</option>
-          <option value="A4">A4</option>
-          <option value="A3">A3</option>
-          <option value="16:9">16:9</option>
-          <option value="Custom">Custom</option>
-        </select>
-        @if (pagePreset === 'Custom') {
-        <label class="flex items-center gap-1 text-xs">
-          W
-          <input type="number" min="200" class="w-16 rounded border px-1 py-0.5" [ngModel]="pageWidth" (ngModelChange)="onCustomPageWidth($event)" />
-        </label>
-        <label class="flex items-center gap-1 text-xs">
-          H
-          <input type="number" min="200" class="w-16 rounded border px-1 py-0.5" [ngModel]="pageHeight" (ngModelChange)="onCustomPageHeight($event)" />
-        </label>
-        }
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="addFrameFromView()">Add Frame</button>
-        <select class="rounded border border-slate-300 bg-white px-2 py-1 text-sm" [ngModel]="selectedFrameId" (ngModelChange)="selectedFrameId = $event">
-          <option [ngValue]="null">Frames</option>
-          @for (frame of frames; track frame.id) {
-          <option [ngValue]="frame.id">{{ frame.name }}</option>
-          }
-        </select>
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" [disabled]="!selectedFrameId" (click)="goToSelectedFrame()">Go</button>
-        <button class="bg-red-700 text-white px-3 py-2 rounded shadow hover:bg-red-800" [disabled]="!selectedFrameId" (click)="deleteSelectedFrame()">Del</button>
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="alignSelection('left')" title="Alt+Shift+Left">Align L</button>
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="alignSelection('top')" title="Alt+Shift+Up">Align T</button>
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="distributeSelection('horizontal')" title="Alt+Shift+H">Dist H</button>
-        <button class="bg-slate-700 text-white px-3 py-2 rounded shadow hover:bg-slate-800" (click)="distributeSelection('vertical')" title="Alt+Shift+V">Dist V</button>
-        <label class="flex items-center gap-2 text-sm">
-          <input type="checkbox" [checked]="store.snapToGrid()" (change)="onSnapToggle($event)" />
-          Snap
-        </label>
-        <label class="flex items-center gap-2 text-sm">
-          Grid
-          <input
-            type="number"
-            min="2"
-            class="w-16 border rounded px-1 py-0.5 text-sm"
-            [value]="store.gridSize()"
-            (change)="onGridSizeChange($event)"
-          />
-        </label>
-        <label class="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            [checked]="autoSaveEnabled"
-            (change)="onAutoSaveToggle($event)"
-          />
-          Auto-save
-        </label>
-        <div class="ml-2 flex items-center gap-1 rounded border border-slate-300 bg-slate-50 px-1 py-1">
-          <span class="px-1 text-[11px] font-semibold text-slate-600">Contrast</span>
-          <button
-            class="rounded px-2 py-1 text-xs"
-            [class.bg-slate-700]="contrastPreset === 'light'"
-            [class.text-white]="contrastPreset === 'light'"
-            [class.bg-white]="contrastPreset !== 'light'"
-            [class.text-slate-700]="contrastPreset !== 'light'"
-            (click)="applyContrastPreset('light')"
-            title="Bordes claros para fondo oscuro"
-          >
-            Claro
-          </button>
-          <button
-            class="rounded px-2 py-1 text-xs"
-            [class.bg-slate-700]="contrastPreset === 'medium'"
-            [class.text-white]="contrastPreset === 'medium'"
-            [class.bg-white]="contrastPreset !== 'medium'"
-            [class.text-slate-700]="contrastPreset !== 'medium'"
-            (click)="applyContrastPreset('medium')"
-            title="Contraste equilibrado"
-          >
-            Medio
-          </button>
-          <button
-            class="rounded px-2 py-1 text-xs"
-            [class.bg-slate-700]="contrastPreset === 'high'"
-            [class.text-white]="contrastPreset === 'high'"
-            [class.bg-white]="contrastPreset !== 'high'"
-            [class.text-slate-700]="contrastPreset !== 'high'"
-            (click)="applyContrastPreset('high')"
-            title="Máximo contraste para tema oscuro"
-          >
-            Alto
-          </button>
-        </div>
+
+        <!-- Flow draw mode indicator -->
         @if (activeFlowType) {
-        <span class="rounded bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-900">
-          Draw {{ activeFlowType }} flow
+        <div class="tb-sep"></div>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-medium text-amber-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+          Drawing {{ activeFlowType }} flow
         </span>
-        <button class="rounded bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-700" (click)="clearFlowDrawMode()">
-          Cancel
+        <button class="tb-btn text-amber-700 hover:bg-amber-50" (click)="clearFlowDrawMode()">
+          <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 6l8 8M14 6l-8 8"/></svg>
         </button>
         }
+
       </div>
       }
 
       @if (activeFlowType) {
-      <div class="absolute left-1/2 top-20 z-50 -translate-x-1/2 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow">
-        <div class="font-semibold">Modo conexión activo: {{ flowTypeLabel(activeFlowType) }}</div>
-        <div>Selecciona un nodo, arrastra desde un puerto y suelta en otro nodo.</div>
+      <div class="absolute left-1/2 top-16 z-50 -translate-x-1/2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-xs text-amber-900 shadow-sm">
+        <div class="font-semibold">Connection mode active: {{ flowTypeLabel(activeFlowType) }}</div>
+        <div class="text-amber-700 mt-0.5">Select a node, drag from a port and drop on another node.</div>
       </div>
       }
 
       @if (!presentationMode && !focusMode && isPaletteOpen) {
       <aside
         data-palette="true"
-        class="absolute top-28 left-4 z-40 max-h-[70vh] overflow-hidden rounded border border-slate-700 bg-slate-900/95 text-slate-100 shadow-xl"
+        class="absolute top-14 left-3 z-40 max-h-[80vh] overflow-hidden rounded-lg border border-slate-200 bg-white/95 backdrop-blur text-slate-800 shadow-lg"
         [style.width.px]="leftPanelWidth"
         (click)="$event.stopPropagation()"
       >
-        <div class="border-b border-slate-700 px-3 py-2">
-          <div class="text-xs font-semibold uppercase tracking-wide text-slate-300">Libraries</div>
-          <input
-            type="text"
-            class="mt-2 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 text-xs text-slate-100 outline-none focus:border-cyan-500"
-            placeholder="Search shape..."
-            [ngModel]="paletteQuery"
-            (ngModelChange)="paletteQuery = $event"
-            (click)="$event.stopPropagation()"
-          />
+        <div class="border-b border-slate-100 px-3 py-2.5">
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Components</div>
+          <div class="mt-2 relative">
+            <svg class="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="5"/><path d="M14 14l3 3"/></svg>
+            <input
+              type="text"
+              class="w-full rounded-md border border-slate-200 bg-white pl-7 pr-2 py-1.5 text-xs text-slate-700 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 transition-colors"
+              placeholder="Search..."
+              [ngModel]="paletteQuery"
+              (ngModelChange)="paletteQuery = $event"
+              (click)="$event.stopPropagation()"
+            />
+          </div>
         </div>
 
-        <div class="max-h-[68vh] overflow-auto">
+        <div class="max-h-[74vh] overflow-auto panel-scroll">
           @for (group of paletteGroups; track group.id) {
-          <details [open]="group.open" class="border-b border-slate-800 px-3 py-2">
-            <summary class="cursor-pointer text-xs font-semibold uppercase tracking-wide text-slate-300">
+          <details [open]="group.open" class="border-b border-slate-100 px-3 py-2">
+            <summary class="cursor-pointer text-[10px] font-semibold uppercase tracking-wider text-slate-400 select-none">
               {{ group.title }}
             </summary>
-            <div class="mt-2 grid grid-cols-2 gap-2">
+            <div class="mt-2 grid grid-cols-2 gap-1.5">
               @for (item of filteredGroupItems(group.id); track item.key) {
               <button
-                class="rounded border border-slate-700 bg-slate-800 px-2 py-1.5 text-left text-[11px] text-slate-100 hover:border-cyan-500 hover:bg-slate-700"
+                class="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-left text-[11px] text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 transition-colors"
                 (click)="addPaletteItem(item.key)"
                 [title]="item.label"
                 draggable="true"
@@ -274,9 +352,9 @@ interface CanvasFrame {
                 (dragend)="onPaletteDragEnd()"
               >
                 <div class="flex items-center gap-2">
-                  <span class="inline-flex h-8 w-8 items-center justify-center rounded border border-slate-600 bg-slate-900">
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded border border-slate-200 bg-slate-50">
                     @if (isWebPaletteItem(item.key)) {
-                    <span class="text-[10px] font-semibold text-cyan-300">{{ webIconLabel(item.key) }}</span>
+                    <span class="text-[10px] font-semibold text-indigo-500">{{ webIconLabel(item.key) }}</span>
                     } @else {
                     <svg class="h-6 w-6" viewBox="0 0 36 36">
                       <g [innerHTML]="shapePreview(item.key)"></g>
@@ -293,8 +371,8 @@ interface CanvasFrame {
         </div>
       </aside>
       <div
-        class="absolute top-28 z-50 h-[70vh] w-1 cursor-ew-resize bg-transparent hover:bg-cyan-500/40"
-        [style.left.px]="16 + leftPanelWidth"
+        class="absolute top-14 z-50 h-[80vh] w-1 cursor-ew-resize bg-transparent hover:bg-indigo-400/40"
+        [style.left.px]="12 + leftPanelWidth"
         (mousedown)="startPanelResize('left', $event)"
       ></div>
       }
@@ -360,8 +438,8 @@ interface CanvasFrame {
       }
 
       @if (!presentationMode) {
-      <div class="absolute bottom-4 z-40 rounded border border-slate-300 bg-white/95 p-2 shadow" [style.right.px]="minimapRightOffset()" (click)="$event.stopPropagation()">
-        <div class="mb-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Minimap</div>
+      <div class="minimap-container absolute bottom-4 z-40" [style.right.px]="minimapRightOffset()" (click)="$event.stopPropagation()">
+        <div class="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Minimap</div>
         <svg
           width="200"
           height="130"
@@ -396,11 +474,11 @@ interface CanvasFrame {
     </div>
 
     @if (!presentationMode && !focusMode && inspectorOpen) {
-    <div class="absolute top-0 right-0 h-full z-50" [style.width.px]="rightPanelWidth">
+    <div class="absolute top-0 right-0 h-full z-50 bg-white/95 backdrop-blur" style="box-shadow: var(--shadow-panel);" [style.width.px]="rightPanelWidth">
       <app-inspector></app-inspector>
     </div>
     <div
-      class="absolute top-0 z-50 h-full w-1 cursor-ew-resize bg-transparent hover:bg-cyan-500/40"
+      class="absolute top-0 z-50 h-full w-1 cursor-ew-resize bg-transparent hover:bg-indigo-400/40"
       [style.right.px]="rightPanelWidth"
       (mousedown)="startPanelResize('right', $event)"
     ></div>
@@ -408,10 +486,11 @@ interface CanvasFrame {
 
     @if (!presentationMode && !focusMode) {
     <button
-      class="absolute top-20 right-4 z-50 rounded border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow hover:bg-slate-50"
+      class="absolute top-16 right-4 z-50 rounded-md border border-slate-200 bg-white/90 backdrop-blur px-2.5 py-1.5 text-xs font-medium text-slate-600 shadow-sm hover:bg-white transition-colors"
       (click)="toggleInspector($event)"
     >
-      {{ inspectorOpen ? 'Hide Inspector' : 'Show Inspector' }}
+      <svg class="w-4 h-4 inline-block mr-1 align-text-bottom" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="11" y="3" width="6" height="14" rx="1"/><path d="M3 5h6M3 9h6M3 13h4"/></svg>
+      {{ inspectorOpen ? 'Hide' : 'Inspector' }}
     </button>
     }
   `,
@@ -452,6 +531,7 @@ export class CanvasComponent implements OnInit {
   panX = 0;
   panY = 0;
   activeFlowType: BpmnFlowType | null = null;
+  openMenu: string | null = null;
   isPaletteOpen = true;
   inspectorOpen = true;
   focusMode = false;
@@ -559,6 +639,7 @@ export class CanvasComponent implements OnInit {
   }
 
   onBackgroundClick(event: MouseEvent) {
+    this.openMenu = null;
     const target = event.target as HTMLElement;
     if (target.closest('button,input,textarea,select,option,summary,details,[data-palette="true"],[appdraggable],[data-frame="true"]')) {
       return;
@@ -599,7 +680,16 @@ export class CanvasComponent implements OnInit {
       this.isPaletteOpen = true;
       this.inspectorOpen = true;
     }
+    this.openMenu = null;
     this.saveUiSettings();
+  }
+
+  toggleMenu(name: string) {
+    this.openMenu = this.openMenu === name ? null : name;
+  }
+
+  closeMenu() {
+    this.openMenu = null;
   }
 
   undo() {

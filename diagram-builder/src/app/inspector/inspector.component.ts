@@ -18,15 +18,15 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="h-full w-full bg-white border-l border-slate-200 p-4 overflow-auto">
-      <h2 class="text-lg font-semibold mb-4">Inspector</h2>
+    <div class="h-full w-full bg-white border-l border-slate-200 p-4 overflow-auto panel-scroll">
+      <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500 mb-4">Inspector</h2>
 
       @if (selectedEdge()) {
-      <details open>
-        <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">Edge</summary>
+      <details open class="inspector-section">
+        <summary>Edge</summary>
         <div class="space-y-3">
           <div class="text-xs text-slate-500">ID: {{ selectedEdge()!.id }}</div>
-          <div>
+          <div class="inspector-field">
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('flowType')"
               >Flow Type</label
             >
@@ -42,7 +42,7 @@ import {
               }
             </select>
           </div>
-          <div>
+          <div class="inspector-field">
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('label')"
               >Label</label
             >
@@ -83,7 +83,7 @@ import {
           >
             Reset Bend
           </button>
-          <div>
+          <div class="inspector-field">
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('color')"
               >Color</label
             >
@@ -110,10 +110,10 @@ import {
               {{ edgeColorError() }}
             </div>
             } @else {
-            <div class="mt-1 text-xs text-slate-500">Formato: #RRGGBB o #RGB</div>
+            <div class="mt-1 text-xs text-slate-500">Format: #RRGGBB or #RGB</div>
             }
           </div>
-          <div>
+          <div class="inspector-field">
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('strokeWidth')"
               >Stroke Width</label
             >
@@ -138,7 +138,7 @@ import {
             />
             Rounded corners
           </label>
-          <div>
+          <div class="inspector-field">
             <label class="block text-xs font-semibold mb-1" [attr.for]="edgeFieldId('cornerRadius')"
               >Corner Radius</label
             >
@@ -166,103 +166,102 @@ import {
         </div>
       </details>
       } @else if (selectedNodes().length === 0) {
-      <div class="text-sm text-slate-500">No selection.</div>
+      <div class="text-sm text-slate-400 text-center py-8">No selection</div>
       } @else if (selectedNodes().length > 1) {
-      <div class="text-sm text-slate-600">
-        {{ selectedNodes().length }} nodes selected.
+      <div class="inspector-section">
+        <div class="text-sm text-slate-600 font-medium">
+          {{ selectedNodes().length }} nodes selected
+        </div>
+        <button
+          class="mt-3 w-full bg-red-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors"
+          (click)="deleteSelectedNodes()"
+        >
+          Delete Selected
+        </button>
       </div>
-      <button
-        class="mt-3 w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
-        (click)="deleteSelectedNodes()"
-      >
-        Delete Selected Nodes
-      </button>
       } @else {
       <div class="space-y-4">
         <div class="text-xs text-slate-500">ID: {{ node()!.id }}</div>
         <div class="text-xs text-slate-500">Type: {{ node()!.type }}</div>
-        <button
-          class="w-full bg-red-600 text-white text-sm px-3 py-1 rounded hover:bg-red-700"
-          (click)="deleteCurrentNode()"
-        >
-          Delete Node
-        </button>
+        <div class="inspector-section" style="background: transparent; border-color: #fecaca;">
+          <button
+            class="w-full bg-red-600 text-white text-sm px-3 py-1.5 rounded-md hover:bg-red-700 transition-colors"
+            (click)="deleteCurrentNode()"
+          >
+            Delete Node
+          </button>
+        </div>
 
-        <details open>
-          <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">
-            Position & Size
-          </summary>
-          <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('x')">X</label>
-              <input
-                [id]="fieldId('x')"
-                [attr.name]="fieldId('x')"
-                type="number"
-                min="0"
-                class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.x"
-                (ngModelChange)="updateNumber('x', $event)"
-              />
-              @if (nodeValidationError('x')) {
-              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('x') }}</div>
-              }
+        <details open class="inspector-section">
+          <summary>Position & Size</summary>
+          <div class="space-y-2">
+            <div class="inspector-row">
+              <div class="inspector-field">
+                <label [attr.for]="fieldId('x')">X</label>
+                <input
+                  [id]="fieldId('x')"
+                  [attr.name]="fieldId('x')"
+                  type="number"
+                  min="0"
+                  [ngModel]="node()!.x"
+                  (ngModelChange)="updateNumber('x', $event)"
+                />
+                @if (nodeValidationError('x')) {
+                <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('x') }}</div>
+                }
+              </div>
+              <div class="inspector-field">
+                <label [attr.for]="fieldId('y')">Y</label>
+                <input
+                  [id]="fieldId('y')"
+                  [attr.name]="fieldId('y')"
+                  type="number"
+                  min="0"
+                  [ngModel]="node()!.y"
+                  (ngModelChange)="updateNumber('y', $event)"
+                />
+                @if (nodeValidationError('y')) {
+                <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('y') }}</div>
+                }
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('y')">Y</label>
-              <input
-                [id]="fieldId('y')"
-                [attr.name]="fieldId('y')"
-                type="number"
-                min="0"
-                class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.y"
-                (ngModelChange)="updateNumber('y', $event)"
-              />
-              @if (nodeValidationError('y')) {
-              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('y') }}</div>
-              }
+            <div class="inspector-row">
+              <div class="inspector-field">
+                <label [attr.for]="fieldId('width')">W</label>
+                <input
+                  [id]="fieldId('width')"
+                  [attr.name]="fieldId('width')"
+                  type="number"
+                  min="0"
+                  [ngModel]="node()!.width"
+                  (ngModelChange)="updateNumber('width', $event)"
+                />
+                @if (nodeValidationError('width')) {
+                <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('width') }}</div>
+                }
+              </div>
+              <div class="inspector-field">
+                <label [attr.for]="fieldId('height')">H</label>
+                <input
+                  [id]="fieldId('height')"
+                  [attr.name]="fieldId('height')"
+                  type="number"
+                  min="0"
+                  [ngModel]="node()!.height"
+                  (ngModelChange)="updateNumber('height', $event)"
+                />
+                @if (nodeValidationError('height')) {
+                <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('height') }}</div>
+                }
+              </div>
             </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('width')">Width</label>
-              <input
-                [id]="fieldId('width')"
-                [attr.name]="fieldId('width')"
-                type="number"
-                min="0"
-                class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.width"
-                (ngModelChange)="updateNumber('width', $event)"
-              />
-              @if (nodeValidationError('width')) {
-              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('width') }}</div>
-              }
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('height')">Height</label>
-              <input
-                [id]="fieldId('height')"
-                [attr.name]="fieldId('height')"
-                type="number"
-                min="0"
-                class="w-full border rounded px-2 py-1 text-sm"
-                [ngModel]="node()!.height"
-                (ngModelChange)="updateNumber('height', $event)"
-              />
-              @if (nodeValidationError('height')) {
-              <div class="mt-1 text-xs text-red-600">{{ nodeValidationError('height') }}</div>
-              }
-            </div>
-            <div>
-              <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('zIndex')"
-                >Z-Index</label
-              >
+            <div class="inspector-field">
+              <label [attr.for]="fieldId('zIndex')">Z-Index</label>
               <input
                 [id]="fieldId('zIndex')"
                 [attr.name]="fieldId('zIndex')"
                 type="number"
                 min="0"
-                class="w-full border rounded px-2 py-1 text-sm"
                 [ngModel]="node()!.zIndex"
                 (ngModelChange)="updateNumber('zIndex', $event)"
               />
@@ -274,10 +273,8 @@ import {
         </details>
 
         @if (isShapeNode()) {
-        <details open>
-          <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">
-            Shape
-          </summary>
+        <details open class="inspector-section">
+          <summary>Shape</summary>
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('shapeType')"
@@ -313,10 +310,8 @@ import {
         }
 
         @if (isWebNode()) {
-        <details open>
-          <summary class="cursor-pointer text-sm font-semibold text-slate-700 mb-2">
-            Web Component
-          </summary>
+        <details open class="inspector-section">
+          <summary>Web Component</summary>
           <div class="space-y-3">
             <div>
               <label class="block text-xs font-semibold mb-1" [attr.for]="fieldId('componentType')"
@@ -744,7 +739,7 @@ export class InspectorComponent {
     this.edgeColorInputSignal.set(raw);
     const normalized = this.normalizeColor(raw);
     if (!normalized) {
-      this.edgeColorErrorSignal.set('Color inválido. Usa #RRGGBB o #RGB.');
+      this.edgeColorErrorSignal.set('Invalid color. Use #RRGGBB or #RGB.');
       if (!fromTextInput) {
         this.edgeColorInputSignal.set(edge.color || edge.style?.stroke || '#1f2937');
         this.edgeColorErrorSignal.set(null);
