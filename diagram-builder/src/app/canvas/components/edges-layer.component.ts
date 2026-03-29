@@ -69,6 +69,16 @@ type Port = 'top' | 'right' | 'bottom' | 'left';
         (dblclick)="onEdgeDoubleClick(edge, $event)"
       />
       @if (edge.label) {
+      <rect
+        [attr.x]="edgeLabelPoint(edge).x - edgeLabelWidth(edge) / 2 - 4"
+        [attr.y]="edgeLabelPoint(edge).y - 8"
+        [attr.width]="edgeLabelWidth(edge) + 8"
+        height="16"
+        rx="3"
+        fill="white"
+        fill-opacity="0.85"
+        class="pointer-events-none"
+      />
       <text
         [attr.x]="edgeLabelPoint(edge).x"
         [attr.y]="edgeLabelPoint(edge).y"
@@ -615,8 +625,37 @@ export class EdgesLayerComponent {
     if (edge.labelPosition) return edge.labelPosition;
     const pathPoints = this.edgePathPoints(edge);
     if (pathPoints.length === 0) return { x: 0, y: 0 };
-    const mid = Math.floor(pathPoints.length / 2);
-    return pathPoints[mid];
+    if (pathPoints.length === 1) return pathPoints[0];
+    // Calculate total path length
+    let totalLength = 0;
+    const segments: number[] = [];
+    for (let i = 1; i < pathPoints.length; i++) {
+      const dx = pathPoints[i].x - pathPoints[i - 1].x;
+      const dy = pathPoints[i].y - pathPoints[i - 1].y;
+      const len = Math.hypot(dx, dy);
+      segments.push(len);
+      totalLength += len;
+    }
+    // Find the point at 50% of total length
+    const halfLength = totalLength / 2;
+    let accumulated = 0;
+    for (let i = 0; i < segments.length; i++) {
+      if (accumulated + segments[i] >= halfLength) {
+        const remaining = halfLength - accumulated;
+        const ratio = segments[i] === 0 ? 0 : remaining / segments[i];
+        return {
+          x: pathPoints[i].x + (pathPoints[i + 1].x - pathPoints[i].x) * ratio,
+          y: pathPoints[i].y + (pathPoints[i + 1].y - pathPoints[i].y) * ratio,
+        };
+      }
+      accumulated += segments[i];
+    }
+    return pathPoints[Math.floor(pathPoints.length / 2)];
+  }
+
+  edgeLabelWidth(edge: DiagramEdge): number {
+    const label = edge.label || '';
+    return label.length * 6.5 + 2;
   }
 
   private findNearestPort(point: Point): { nodeId: string; port: Port } | null {
